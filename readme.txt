@@ -10,7 +10,7 @@ Allows admins to create user groups and restrict access to sections of the site 
 
 == Description ==
 
-Contexture Page Security adds some rudimentary "page security" to WordPress, allowing admins to limit or
+Contexture Page Security adds some much-needed "page security" to WordPress, allowing admins to limit or
 restrict access to individual pages or entire sections of their website. To do this, admins create "groups"
 of users that can be added to pages or posts. Only users that are in at least one of those groups are then
 able to access those pages/sections.
