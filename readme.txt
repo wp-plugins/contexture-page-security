@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: trunk
+Stable tag: 0.7.0
 
 Allows admins to create user groups and restrict access to sections of the site by group.
 
