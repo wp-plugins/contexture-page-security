@@ -1,5 +1,5 @@
 === Contexture Page Security ===
-Contributors: Contexture Intl., Matt VanAndel
+Contributors: Contexture Intl., Matt VanAndel, Jerrol Krause
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0

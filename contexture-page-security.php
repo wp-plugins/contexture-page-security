@@ -5,7 +5,7 @@ Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-s
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
 Version: 0.7.1
 Stable tag:0.7.1
-Author: Contexture Intl., Matt VanAndel
+Author: Contexture Intl., Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
 */
