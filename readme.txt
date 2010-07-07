@@ -6,7 +6,7 @@ Requires at least: 3.0.0
 Tested up to: 3.0.0
 Stable tag: trunk
 
-Allows admins to create user groups and restrict access to sections of the site by user, group, or role.
+Allows admins to create user groups and restrict access to sections of the site by group.
 
 == Description ==
 
