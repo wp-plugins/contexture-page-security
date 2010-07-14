@@ -3,7 +3,7 @@
 Plugin Name: Contexture Page Security
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.8.0
+Version: 0.8.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -52,9 +52,9 @@ add_action('wp','ctx_ps_security_action');
 add_filter( "the_posts","ctx_ps_security_filter");
 
 //Ensure that menus do not display protected pages (when using default menus only)
-add_filter('get_pages','ctx_ps_security_filter');
+add_filter('get_pages','ctx_ps_security_filter_menu');
 //Ensure that menus do not display protected pages (when using WP3 custom menus only)
-//add_filter('get_pages','ctx_ps_menu_filter_custom');
+add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
 
 
 
@@ -120,7 +120,7 @@ function ctx_ps_security_action(){
  * @param <type> $content
  * @return <type>
  */
-function ctx_ps_security_filter($content){
+function ctx_ps_security_filter($content, $content2 = '', $content3 = ''){
     global $current_user;
 
     if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() ) ) {
@@ -146,7 +146,82 @@ function ctx_ps_security_filter($content){
         }
     }
 
-    
+    return $content;
+}
+
+/**
+ * When the default menu is being used, this checks restrictions for each page
+ * in the menu and removes it if it's restricted to the current user.
+ *
+ * @global object $post
+ * @global <type> $page
+ * @global <type> $id
+ * @global object $current_user
+ * @param <type> $content
+ * @return The array of wordpress posts used to build the default menu
+ */
+function ctx_ps_security_filter_menu($content){
+    global $current_user;
+
+    if( !current_user_can('manage_options') ) {
+        foreach($content as $post->key => $post->value){
+
+            /**Groups that this user is a member of*/
+            $useraccess = ctx_ps_get_usergroups($current_user->ID);
+            /**Groups required to access this page*/
+            $pagereqs = ctx_ps_getprotection($post->value->ID);
+
+            if(!!$pagereqs){
+                $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
+
+                if($secureallowed){
+                    //If we're allowed to access this page
+                }else{
+                    //If we're NOT allowed to access this page
+                    unset($content[$post->key]);
+                }
+            }
+        }
+    }
+
+    return $content;
+}
+
+
+/**
+ * When a WP3 custom menu is being used, this checks restrictions for each page
+ * in the menu and removes it if it's restricted to the current user.
+ *
+ * @global object $post
+ * @global <type> $page
+ * @global <type> $id
+ * @global object $current_user
+ * @param <type> $content
+ * @return The array of wordpress posts used to build the custom menu.
+ */
+function ctx_ps_security_filter_menu_custom($content){
+    global $current_user;
+
+    if( !current_user_can('manage_options') ) {
+        foreach($content as $post->key => $post->value){
+
+            /**Groups that this user is a member of*/
+            $useraccess = ctx_ps_get_usergroups($current_user->ID);
+            /**Groups required to access this page*/
+            $pagereqs = ctx_ps_getprotection($post->value->object_id);
+
+            if(!!$pagereqs){
+                $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
+
+                if($secureallowed){
+                    //If we're allowed to access this page
+                }else{
+                    //If we're NOT allowed to access this page
+                    unset($content[$post->key]);
+                }
+            }
+        }
+    }
 
     return $content;
 }

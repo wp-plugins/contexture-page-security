@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 0.8.0
+Stable tag: 0.8.1
 
 Allows admins to create user groups and restrict access to sections of the site by group.
 
@@ -48,6 +48,9 @@ no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK
 1. screenshot-2.png
 
 == Changelog ==
+
+= 0.8.0 =
+* Added menu filtering to WP3 custom menus. Minor bug fixes.
 
 = 0.8.0 =
 * Users will no longer see menu links to pages they are restricted from (default menus only).
