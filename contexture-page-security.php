@@ -3,9 +3,8 @@
 Plugin Name: Contexture Page Security
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.7.1
-Stable tag:0.7.1
-Author: Contexture Intl., Matt VanAndel, Jerrol Krause
+Version: 0.8.0
+Author: Contexture Intl., Matt VanAndel
 Author URI: http://www.contextureintl.com
 License: GPL2
 */
@@ -27,6 +26,7 @@ License: GPL2
 
 //Version number for plugin
 $contexture_ps_db_version = "1.0";
+$page_output_handytest = "";
 
 // Install new tables
 register_activation_hook(__FILE__,'ctx_ps_install');
@@ -52,16 +52,12 @@ add_action('wp','ctx_ps_security_action');
 //Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home)
 add_filter( "the_posts","ctx_ps_security_filter");
 
+//Ensure that menus do not display protected pages (when using default menus only)
+add_filter('get_pages','ctx_ps_security_filter');
+//Ensure that menus do not display protected pages (when using WP3 custom menus only)
+//add_filter('get_pages','ctx_ps_menu_filter_custom');
 
 
-
-/**
- * Just for testing stuff
- */
-function ctx_ps_helloworld(){
-    die('Hello world');
-   //echo "<h3 style=\"color:red;font-weight:bold;\">Hello world!!!</h3>";
-}
 
 /**
  * Same as ctx_ps_security_filter, but modified for use as an action. Controls
@@ -692,11 +688,13 @@ function ctx_ps_getprotection($postid){
 }
 
 /**
- * Creates the "Groups" page
+ * Filters menu made by WP3 custom menu system (NOT IMPLEMENTED)
+ * @param array $args
+ * @return string
  */
-function ctx_ps_page_groups_view(){
-    global $wpdb;
-    require_once 'groups.php';
+function ctx_ps_menu_filter_custom($array){
+    //wp_die("<array>".print_r($array,true)."</array>");
+    return $array;
 }
 
 /**
@@ -705,6 +703,14 @@ function ctx_ps_page_groups_view(){
 function ctx_ps_page_groups_add(){
     global $wpdb;
     require_once 'group-new.php';
+}
+
+/**
+ * Creates the "Groups" page
+ */
+function ctx_ps_page_groups_view(){
+    global $wpdb;
+    require_once 'groups.php';
 }
 
 /**
