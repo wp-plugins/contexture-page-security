@@ -4,7 +4,7 @@ Plugin Name: Contexture Page Security
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
 Version: 0.8.0
-Author: Contexture Intl., Matt VanAndel
+Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
 */
@@ -26,7 +26,6 @@ License: GPL2
 
 //Version number for plugin
 $contexture_ps_db_version = "1.0";
-$page_output_handytest = "";
 
 // Install new tables
 register_activation_hook(__FILE__,'ctx_ps_install');
