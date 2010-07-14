@@ -49,7 +49,7 @@ no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK
 
 == Changelog ==
 
-= 0.8.0 =
+= 0.8.1 =
 * Added menu filtering to WP3 custom menus. Minor bug fixes.
 
 = 0.8.0 =
