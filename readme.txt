@@ -6,7 +6,7 @@ Requires at least: 3.0.0
 Tested up to: 3.0.0
 Stable tag: 0.8.2
 
-Allows admins to create user groups and restrict access to sections of the site by group.
+Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
 == Description ==
 
