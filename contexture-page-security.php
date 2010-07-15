@@ -3,7 +3,7 @@
 Plugin Name: Contexture Page Security
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.8.1
+Version: 0.8.2
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -49,7 +49,7 @@ add_action('wp_ajax_ctx_ps_security_update','ctx_ps_ajax_security_update');
 add_action('wp','ctx_ps_security_action');
 
 //Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home)
-add_filter( "the_posts","ctx_ps_security_filter");
+add_filter( "the_posts","ctx_ps_security_filter_blog");
 
 //Ensure that menus do not display protected pages (when using default menus only)
 add_filter('get_pages','ctx_ps_security_filter_menu');
@@ -120,10 +120,10 @@ function ctx_ps_security_action(){
  * @param <type> $content
  * @return <type>
  */
-function ctx_ps_security_filter($content, $content2 = '', $content3 = ''){
+function ctx_ps_security_filter_blog($content){
     global $current_user;
 
-    if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() ) ) {
+    if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() ) ) {
         foreach($content as $post->key => $post->value){
             //Fun with manipulating the array
             //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
@@ -145,6 +145,9 @@ function ctx_ps_security_filter($content, $content2 = '', $content3 = ''){
             }
         }
     }
+
+    //Adjust top-level array key numbers to be concurrent (since a gap between numbers can cause wp to freak out)
+    $content = array_merge($content,array());
 
     return $content;
 }
