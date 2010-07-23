@@ -3,7 +3,7 @@
 Plugin Name: Contexture Page Security
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.8.2
+Version: 0.8.3
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -253,6 +253,21 @@ function ctx_ps_admin_head_js(){
             jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
         });
 
+        //Will display a "Security Updated" message in the sidebar when successful change to security
+        function showSavemsg(){
+            if(jQuery('#ctx_ps_sidebar_security h3.hndle .ctx-ajax-status').length==0){
+                jQuery('#ctx_ps_sidebar_security h3.hndle')
+                    .append('<span class="ctx-ajax-status">Saved</span>')
+                    .find('.ctx-ajax-status')
+                    .fadeIn(500,function(){
+                        jQuery(this)
+                            .delay(750).fadeOut(500,function(){
+                                jQuery(this).remove();
+                            });
+                    });
+            }
+        }
+
         //Updates the security status of the page
         function ctx_ps_togglesecurity(){
             var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
@@ -268,6 +283,7 @@ function ctx_ps_admin_head_js(){
                     function(data){ data = jQuery(data);
                         if(data.find('code').text() == '1'){
                             jQuery("#ctx_ps_pagegroupoptions").show();
+                            showSavemsg();
                         }
                     },'xml'
                 );
@@ -283,6 +299,7 @@ function ctx_ps_admin_head_js(){
                         function(data){ data = jQuery(data);
                             if(data.find('code').text() =='1'){
                                 jQuery("#ctx_ps_pagegroupoptions").hide();
+                                showSavemsg();
                             }
                         },'xml'
                     );
@@ -311,6 +328,7 @@ function ctx_ps_admin_head_js(){
                         if(data.find('html').length > 0){
                             jQuery('#ctx-ps-page-group-list').html(data.find('html').text());
                             jQuery('#groups_available').val('0').find('option[value="'+igroupid+'"]').hide();
+                            showSavemsg();
                         }
                     },'xml'
                 );
@@ -335,6 +353,7 @@ function ctx_ps_admin_head_js(){
                         if(data.find('code').text() == '1'){
                             jQuery('#groups_available option[value="'+igroupid+'"]').show();
                             me.parent().remove();
+                            showSavemsg();
                         }
                     },'xml'
                 );
@@ -357,6 +376,7 @@ function ctx_ps_admin_head_css(){
         #ctx-ps-page-group-list > div .viewgrp {float:right;color:gray;font-family:arial,helvetica,sans-serif;display:none;font-weight:bold;text-decoration:none;}
         #ctx-ps-page-group-list > div:hover .removegrp,
         #ctx-ps-page-group-list > div:hover .viewgrp{display:inline;cursor:pointer;}
+        .ctx-ajax-status { display:none; float:right; color:green; font-size:0.8em; margin-right:5px; margin-top:-5px; }
     </style>
     <?php
 }
@@ -834,69 +854,73 @@ function ctx_ps_isprotected_section($postid){
 function ctx_ps_sidebar_security(){
     global $wpdb;
 
-    //See what groups are already attached to the page
-    $currentGroups = array();
-    foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$wpdb->escape($_GET['post'])}'") as $curGrp){
-        $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
-    }
-     
+    if(!empty($_GET['post'])){
 
-    $securityStatus = ctx_ps_getprotection( $_GET['post'] );
-    //print_r($securityStatus);
+        //Create an array of groups that are already attached to the page
+        $currentGroups = array();
+        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$wpdb->escape($_GET['post'])}'") as $curGrp){
+            $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
+        }
 
-    echo '<div class="new-admin-wp25">';
-    echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
-    echo '  <label for="ctx_ps_protectmy">';
-    echo '      <input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy"';
-    if ( !!$securityStatus )
-        echo ' checked="checked" ';
-    if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') )
-        echo ' disabled="disabled"';
-    echo '/>';
-    echo ' Protect this page and it\'s descendants';
-    echo '  </label>';
-    /**TODO: Add link to parent that has this setting enabled, if this isnt that page*/
-    echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
-    if ( !!$securityStatus )
-        echo ' display:block ';
-    echo '">';
-    echo '      <h5>Available Groups</h5>';
-    echo '      <select id="groups_available" name="groups_available">';
-    echo '          <option value="0">-- Select -- </option>';
-    //Loop through all groups in the db to populate the drop-down list
-    foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups") as $group){
-        //Generate the option HTML, hiding it if it's already in our $currentGroups array
-        echo '          <option '.((!empty($currentGroups[$group->ID]))?'style="display:none;"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
-    }
-    echo '      </select>';
-    echo '      <input type="button" id="add_group_page" class="button-secondary action" value="Add" />';
-    echo '      <h5>Allowed Groups</h5>';
-    echo '      <div id="ctx-ps-page-group-list">';
-    //Set this to 0, we are going to count the number of groups attached to this page next...
-    $groupcount = 0;
-    //Count the number of groups attached to this page (including inherited groups)
-    if(!!$securityStatus)
-        foreach($securityStatus as $securityGroups){ $groupcount = $groupcount+count($securityGroups); }
-    //Show groups that are already added to this page
-    if($groupcount===0){
-        //Display this if we have no groups (inherited or otherwise)
-        echo '          <div><em>No groups have been added yet.</em></div>';
-    }else{
-        foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
-            if($securityArray->pageid == $_GET['post']){
-                foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                    echo '          <div>&bull; '.$currentGroup->name.'<span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
-                }
-            }else{
-                foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                    echo '          <div class="inherited">&bull; '.$currentGroup->name.'<a class="viewgrp" target="_blank" href="post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
+
+        $securityStatus = ctx_ps_getprotection( $_GET['post'] );
+        //print_r($securityStatus);
+
+
+        echo '<div class="new-admin-wp25">';
+        echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
+        echo '  <label for="ctx_ps_protectmy">';
+        echo '      <input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy"';
+        if ( !!$securityStatus )
+            echo ' checked="checked" ';
+        if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') )
+            echo ' disabled="disabled"';
+        echo '/>';
+        echo ' Protect this page and it\'s descendants';
+        echo '  </label>';
+        /**TODO: Add link to parent that has this setting enabled, if this isnt that page*/
+        echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
+        if ( !!$securityStatus )
+            echo ' display:block ';
+        echo '">';
+        echo '      <h5>Available Groups</h5>';
+        echo '      <select id="groups_available" name="groups_available">';
+        echo '          <option value="0">-- Select -- </option>';
+        //Loop through all groups in the db to populate the drop-down list
+        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups") as $group){
+            //Generate the option HTML, hiding it if it's already in our $currentGroups array
+            echo '          <option '.((!empty($currentGroups[$group->ID]))?'style="display:none;"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
+        }
+        echo '      </select>';
+        echo '      <input type="button" id="add_group_page" class="button-secondary action" value="Add" />';
+        echo '      <h5>Allowed Groups</h5>';
+        echo '      <div id="ctx-ps-page-group-list">';
+        //Set this to 0, we are going to count the number of groups attached to this page next...
+        $groupcount = 0;
+        //Count the number of groups attached to this page (including inherited groups)
+        if(!!$securityStatus)
+            foreach($securityStatus as $securityGroups){ $groupcount = $groupcount+count($securityGroups); }
+        //Show groups that are already added to this page
+        if($groupcount===0){
+            //Display this if we have no groups (inherited or otherwise)
+            echo '          <div><em>No groups have been added yet.</em></div>';
+        }else{
+            foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
+                if($securityArray->pageid == $_GET['post']){
+                    foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
+                        echo '          <div>&bull; '.$currentGroup->name.'<span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
+                    }
+                }else{
+                    foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
+                        echo '          <div class="inherited">&bull; '.$currentGroup->name.'<a class="viewgrp" target="_blank" href="post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
+                    }
                 }
             }
         }
+        echo '      </div>';
+        echo '  </div>';
+        echo '</div>';
     }
-    echo '      </div>';
-    echo '  </div>';
-    echo '</div>';
 }
 
 /**
