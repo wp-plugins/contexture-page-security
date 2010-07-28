@@ -248,6 +248,10 @@ function ctx_ps_admin_head_js(){
         jQuery(function(){
             jQuery('#add_group_page').click(function(){ctx_ps_add_group_to_page()});
             jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
+            jQuery('#groups_available')
+                .data('options',jQuery('#groups_available').html())
+                .find('.detach')
+                    .remove();
         });
 
         //Will display a "Security Updated" message in the sidebar when successful change to security
@@ -323,8 +327,21 @@ function ctx_ps_admin_head_js(){
                     function(data){
                         data = jQuery(data);
                         if(data.find('html').length > 0){
+                            //Add group to list of "attached" groups
                             jQuery('#ctx-ps-page-group-list').html(data.find('html').text());
-                            jQuery('#groups_available').val('0').find('option[value="'+igroupid+'"]').hide();
+
+                            //Load saved options
+                            var savedOpts = jQuery('#groups_available').data('options');
+                            //Update saved options to detach current option
+                            jQuery(savedOpts).find('option[value="'+igroupid+'"]').addClass('detach');
+                            //Save changes to data and reload option HTML
+                            jQuery('#groups_available')
+                                .data('options',savedOpts)
+                                .html(savedOpts) //Use select data to rebuild options
+                                .find('.detach').remove(); //Remove detached options
+
+                            //jQuery('#groups_available').val('0').find('option[value="'+igroupid+'"]').hide();
+
                             showSavemsg();
                         }
                     },'xml'
@@ -336,7 +353,7 @@ function ctx_ps_admin_head_js(){
 
         //Removes a group from a page with security
         function ctx_ps_remove_group_from_page(igroupid,me){
-            if(confirm('Are you sure you want to remove this group from this page?')){
+            if(confirm('Are you sure you want to remove group "'+me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()+'" from this page?')){
                 var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
                 //alert("The group you want to add is: "+$groupid);
                 jQuery.get('admin-ajax.php',
@@ -348,7 +365,17 @@ function ctx_ps_admin_head_js(){
                     function(data){
                         data = jQuery(data);
                         if(data.find('code').text() == '1'){
-                            jQuery('#groups_available option[value="'+igroupid+'"]').show();
+                            //jQuery('#groups_available option[value="'+igroupid+'"]').show();
+                            //Load saved options
+                            var savedOpts = jQuery('#groups_available').data('options');
+                            //Update saved options to detach current option
+                            jQuery(savedOpts).find('option[value="'+igroupid+'"]').removeClass('detach');
+                            //Save changes to data and reload option HTML
+                            jQuery('#groups_available')
+                                .data('options',savedOpts)
+                                .html(savedOpts) //Use select data to rebuild options
+                                .find('.detach').remove(); //Remove detached options
+                            //Remove this group from "Current Groups"
                             me.parent().remove();
                             showSavemsg();
                         }
@@ -377,6 +404,9 @@ function ctx_ps_admin_head_css(){
         .ctx-ps-sysgroup { color:gray; }
         .ctx-ps-sysgroup:hover { color:gray; }
         option.cts-ps-system-group { font-weight:bold; }
+        .ctx-ps-sidebar-group { padding-bottom:2px; }
+        .ctx-ps-sidebar-group:hover { background:#FFFCE0; }
+        #groups_available detach { display:none; visibility:hidden; }
     </style>
     <?php
 }
@@ -412,7 +442,7 @@ function ctx_ps_ajax_add_group_to_page(){
             WHERE sec_protect_id = '{$wpdb->escape($_GET['postid'])}'
         ";
         foreach($wpdb->get_results($qryGetGroups) as $curGrp){
-            $OutputHTML .= '<div>&bull; '.$curGrp->group_title.'<span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$curGrp->sec_access_id.',jQuery(this))">remove</span></div>';
+            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$curGrp->group_title.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$curGrp->sec_access_id.',jQuery(this))">remove</span></div>';
         }
         ctx_ps_ajax_response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
     }
@@ -712,7 +742,12 @@ function ctx_ps_get_usergroups($userid){
     return $array;
 }
 
-
+/**
+ * Gets database record for the specified system group
+ *
+ * @param string $system_id The group_system_id for the smart group to select (ie "CPS01")
+ * @return object Returns $wpdb object for the selected system group
+ */
 function ctx_ps_get_sysgroup($system_id){
     global $wpdb;
     $array = $wpdb->get_results("
@@ -894,7 +929,7 @@ function ctx_ps_sidebar_security(){
         //Loop through all groups in the db to populate the drop-down list
         foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
             //Generate the option HTML, hiding it if it's already in our $currentGroups array
-            echo '          <option '.((!empty($currentGroups[$group->ID]))?'style="display:none;"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
+            echo '          <option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
         }
         echo '      </select>';
         echo '      <input type="button" id="add_group_page" class="button-secondary action" value="Add" />';
@@ -913,11 +948,11 @@ function ctx_ps_sidebar_security(){
             foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
                 if($securityArray->pageid == $_GET['post']){
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '          <div>&bull; '.$currentGroup->name.'<span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
+                        echo '          <div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
                     }
                 }else{
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '          <div class="inherited">&bull; '.$currentGroup->name.'<a class="viewgrp" target="_blank" href="post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
+                        echo '          <div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
                     }
                 }
             }
