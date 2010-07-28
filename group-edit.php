@@ -61,7 +61,13 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         <div class="icon32" id="icon-users"><br/></div>
         <h2>Editing a Group</h2>
         <?php echo $actionmessage; ?>
-        <?php if (empty($groupInfo->group_title)){ echo '<div id="message" class="error below-h2"><p>A group with that id does not exist.</p></div>'; }else{ ?>
+        <?php 
+            if (empty($groupInfo->group_title)){ //Group doesnt exist error
+                echo '<div id="message" class="error below-h2"><p>A group with that id does not exist. <a href="users.php?page=ps_groups">View all groups &gt;&gt;</a></p></div>';
+            }else if(isset($groupInfo->group_system_id)){ //Group is a system group error (cannot edit)
+                echo '<div id="message" class="error below-h2"><p>System groups cannot be edited. <a href="users.php?page=ps_groups">View all groups &gt;&gt;</a></p></div>';
+            }else{ 
+        ?>
 
         <form id="editgroup" name="editgroup" class="validate" method="get" action="">
             <h3>Group Details</h3>

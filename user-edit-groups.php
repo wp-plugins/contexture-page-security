@@ -43,13 +43,13 @@ global $current_user;
                 <?php
                     if ( IS_PROFILE_PAGE ) {
                         if(ctx_ps_count_groups($current_user->ID) == 0){
-                            echo '<td colspan="4">This user is not attached to any groups. You can enroll users from a <a href="users.php?page=ps_groups">group\'s detail page</a>.</td>';
+                            echo '<td colspan="4">This user has not been added to any static groups. You can enroll users from any <a href="users.php?page=ps_groups">group detail page</a>.</td>';
                         } else {
                             echo ctx_ps_display_group_list($current_user->ID);
                         }
                     }else{
                         if(ctx_ps_count_groups($_GET['user_id']) == 0){
-                            echo '<td colspan="4">This user is not attached to any groups. You can enroll users from a <a href="users.php?page=ps_groups">group\'s detail page</a>.</td>';
+                            echo '<td colspan="4">This user has not been added to any static groups. You can enroll users from any <a href="users.php?page=ps_groups">group detail page</a>.</td>';
                         } else {
                             echo ctx_ps_display_group_list($_GET['user_id']);
                         }

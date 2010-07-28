@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.8.5
+Version: 1.0.0
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -374,6 +374,9 @@ function ctx_ps_admin_head_css(){
         #ctx-ps-page-group-list > div:hover .removegrp,
         #ctx-ps-page-group-list > div:hover .viewgrp{display:inline;cursor:pointer;}
         .ctx-ajax-status { display:none; float:right; color:green; font-size:0.8em; margin-right:5px; margin-top:-5px; }
+        .ctx-ps-sysgroup { color:gray; }
+        .ctx-ps-sysgroup:hover { color:gray; }
+        option.cts-ps-system-group { font-weight:bold; }
     </style>
     <?php
 }
@@ -549,7 +552,7 @@ function ctx_ps_create_menus(){
 
 /**
  * This function takes an array of user groups and an array of page-required groups
- * and determines if the user should be allowed to access the specified page.
+ * and determines if the user should be allowed to access the specified content.
  * 
  * @param array $UserGroupsArray The array returned by ctx_ps_get_usergroups()
  * @param array $PageSecurityArray The array returned by ctx_ps_get_protection()
@@ -557,20 +560,22 @@ function ctx_ps_create_menus(){
  */
 function ctx_ps_determine_access($UserGroupsArray,$PageSecurityArray){
 
+    //Testing...
     //wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));
 
-    //If our array page security array is empty, automatically return false
+    //If our page-security array is empty, automatically return false
     if(!!$PageSecurityArray && count($PageSecurityArray) == 0){return false;}
 
     //Used to count each page that has at least one group
     $loopswithgroups = 0;
 
-    //Loop through each page's permissions, starting with current and going up...
+    //Loop through each page's permissions, starting with current page and going up the heirarchy...
     foreach($PageSecurityArray as $security->page => $security->secarray){
-        //If the current page has group settings...
+        //If the current page has group settings attached...
         if(count($security->secarray) != 0){
+            //Increment our group tracking var
             $loopswithgroups += 1;
-            //If any user group does not match any page group
+            //If any of this user's groups do not match any of this page's groups...
             if( count(array_intersect($UserGroupsArray,$security->secarray)) == 0 ){
                 //We return false as the user does not have access
                 return false;
@@ -597,25 +602,31 @@ function ctx_ps_display_group_list($memberid=''){
     global $wpdb;
 
     if($memberid==''){
-        $groups = $wpdb->get_results("SELECT * FROM `{$wpdb->prefix}ps_groups`");
+        $groups = $wpdb->get_results("
+            SELECT * FROM `{$wpdb->prefix}ps_groups`
+            ORDER BY `{$wpdb->prefix}ps_groups`.`group_system_id` DESC, `{$wpdb->prefix}ps_groups`.`group_title` ASC
+        ");
     }else{
         $groups = $wpdb->get_results("
             SELECT * FROM `{$wpdb->prefix}ps_group_relationships`
             JOIN `{$wpdb->prefix}ps_groups`
                 ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
             WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$memberid}'
+            ORDER BY `{$wpdb->prefix}ps_groups`.`group_system_id` DESC, `{$wpdb->prefix}ps_groups`.`group_title` ASC
         ");
     }
 
     $html = '';
     $countmembers = '';
     $alternatecss = ' class="alternate" ';
+    $countusers = count_users();
 
     foreach($groups as $group){
-        $countmembers = ctx_ps_count_members($group->ID);
+        $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
+        $grouplink = (!isset($group->group_system_id)) ? "<a href=\"?page=ps_groups_edit&groupid={$group->ID}\">{$group->group_title}</a>" : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\">{$group->group_title}</a>";
         $html .= "<tr {$alternatecss}>
             <td class=\"id\">{$group->ID}</td>
-            <td class=\"name\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">{$group->group_title}</a></td>
+            <td class=\"name\">{$grouplink}</td>
             <td class=\"description\">{$group->group_description}</td>
             <td class=\"user-count\">$countmembers</td>
         </tr>";
@@ -669,37 +680,13 @@ function ctx_ps_display_member_list($GroupID){
 }
 
 /**
- * DO NOT USE.
- * 
- * This function results in incorrect interpretation of access allowances. Instead,
- * ctx_ps_determine_access() should be used.
- *
- * This aggregates all the groups that a user must be a member of in order to
- * access a specific page.
- * 
- * @param array $getprotection_array The array returned by ctx_ps_get_protection
- * @return mixed Returns an array with all the groups required, or false if there is no security.
- */
-function ctx_ps_get_required_groups($getprotection_array){
-    if(!$getprotection_array){
-        return false;
-    }else{
-        $returnarray = array();
-        foreach($getprotection_array as $grouparray){
-            $returnarray += $grouparray;
-        }
-        return $returnarray;
-    }
-}
-
-/**
  * Gets an array with all the groups that the user belongs to.
  * 
  * @param int $userid The user id of the user to check
  * @return array Returns an array with all the groups that the specified user belongs to.
  */
 function ctx_ps_get_usergroups($userid){
-    global $wpdb;
+    global $wpdb, $current_user;
     $array = array();
     $groups = $wpdb->get_results("
         SELECT * FROM `{$wpdb->prefix}ps_group_relationships`
@@ -707,10 +694,33 @@ function ctx_ps_get_usergroups($userid){
             ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
         WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$userid}'
     ");
+
+    //We only need an ID and a name as a key/value...
     foreach($groups as $group){
         $array += array($group->ID => $group->group_title);
     }
+
+    /*** ADD SMART GROUPS (AKA SYSTEM GROUPS ***/
+    //Registered Users Smart Group
+    if($current_user->ID != 0){
+        //Get the ID for CPS01
+        $newArray = ctx_ps_get_sysgroup('CPS01');
+        //Add CPS01 to the current users permissions array
+        $array += array($newArray->ID => $newArray->group_title);
+    }
+
     return $array;
+}
+
+
+function ctx_ps_get_sysgroup($system_id){
+    global $wpdb;
+    $array = $wpdb->get_results("
+        SELECT * FROM `{$wpdb->prefix}ps_groups`
+        WHERE group_system_id = '{$system_id}'
+        LIMIT 1
+    ");
+    return $array[0];
 }
 
 /**
@@ -859,10 +869,8 @@ function ctx_ps_sidebar_security(){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
-
         $securityStatus = ctx_ps_getprotection( $_GET['post'] );
         //print_r($securityStatus);
-
 
         echo '<div class="new-admin-wp25">';
         echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
@@ -884,7 +892,7 @@ function ctx_ps_sidebar_security(){
         echo '      <select id="groups_available" name="groups_available">';
         echo '          <option value="0">-- Select -- </option>';
         //Loop through all groups in the db to populate the drop-down list
-        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups") as $group){
+        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
             //Generate the option HTML, hiding it if it's already in our $currentGroups array
             echo '          <option '.((!empty($currentGroups[$group->ID]))?'style="display:none;"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
         }
@@ -971,7 +979,7 @@ function ctx_ps_activate(){
 
     /********* START UPGRADE PATH ***********/
     $dbver = get_option("contexture_ps_db_version");
-    if($dbver == "1.0" || $dbver == ""){
+    if($dbver == "" || (float)$dbver < 1.1){
         $wpdb->query("ALTER TABLE `$table_groups` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
         update_option("contexture_ps_db_version", "1.1");
     }
@@ -979,7 +987,7 @@ function ctx_ps_activate(){
 
     //Check if our "Registered Users" group already exists
     $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `$table_groups` WHERE `group_system_id` = 'CPS01' LIMIT 1");
-    if($CntRegSmrtGrp == "0"){
+    if(!$CntRegSmrtGrp){
         //Adds the Registered Users system group (if it doesnt exist)
         $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
     }
