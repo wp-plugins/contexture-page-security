@@ -1,4 +1,4 @@
-=== Contexture Page Security ===
+=== Page Security by Contexture ===
 Contributors: Contexture Intl, Matt VanAndel, Jerrol Krause
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post

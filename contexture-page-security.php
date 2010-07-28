@@ -1,9 +1,9 @@
 <?php
 /*
-Plugin Name: Contexture Page Security
+Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.8.3
+Version: 0.8.5
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -24,12 +24,9 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//Version number for plugin
-$contexture_ps_db_version = "1.0";
-
-// Install new tables
-register_activation_hook(__FILE__,'ctx_ps_install');
-// Remove tables from db
+// Install new tables (on activate)
+register_activation_hook(__FILE__,'ctx_ps_activate');
+// Remove tables from db (on delete)
 register_uninstall_hook(__FILE__,'ctx_ps_uninstall');
 // Add "Groups" option to "Users" in admin
 add_action('admin_menu', 'ctx_ps_create_menus');
@@ -926,9 +923,8 @@ function ctx_ps_sidebar_security(){
 /**
  * Adds the important tables to the wordpress database
  */
-function ctx_ps_install(){
-    global $wpdb,
-           $contexture_ps_db_version;
+function ctx_ps_activate(){
+    global $wpdb;
 
     //Name our tables
     $table_groups = $wpdb->prefix . "ps_groups";
@@ -942,9 +938,10 @@ function ctx_ps_install(){
         `group_description` text COMMENT 'A description of or notes about the group',
         `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
         `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
+        `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
         PRIMARY KEY (`ID`)
     )";
-
+    
     $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `$table_group_relationships` (
         `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
@@ -969,8 +966,23 @@ function ctx_ps_install(){
     $wpdb->query($sql_create_group_relationships);
     $wpdb->query($sql_create_security);
 
-    //Record what version of the db we're using
-    add_option("contexture_ps_db_version", $contexture_ps_db_version);
+    //Record what version of the db we're using (only works if option not already set)
+    add_option("contexture_ps_db_version", "1.1");
+
+    /********* START UPGRADE PATH ***********/
+    $dbver = get_option("contexture_ps_db_version");
+    if($dbver == "1.0" || $dbver == ""){
+        $wpdb->query("ALTER TABLE `$table_groups` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
+        update_option("contexture_ps_db_version", "1.1");
+    }
+    /******** END UPGRADE PATH **************/
+
+    //Check if our "Registered Users" group already exists
+    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `$table_groups` WHERE `group_system_id` = 'CPS01' LIMIT 1");
+    if($CntRegSmrtGrp == "0"){
+        //Adds the Registered Users system group (if it doesnt exist)
+        $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
+    }
 }
 
 /**
