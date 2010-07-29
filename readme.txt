@@ -13,25 +13,23 @@ Allows admins to restrict access to posts, pages, or entire sections of a site t
 Contexture Page Security (CPS) adds some much-needed "page security" to WordPress. With Contexture Page Security you can now limit access
 to posts, pages, or entire sections of your website.
 
-Sort users into groups and attach those groups to any page or post. Now, only users in one or more of those groups will be able to
-access that page (or any pages beneath it)! You can even create sub-sections that require the current user to be a member of additional
-groups (so you can set up a secure section to have separate sub-sections with additional security).
+Easily create "Members-only" sections of your site with CPS' built-in "Registered Users" smart group - or create your own custom user groups
+to limit access only to users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
+secure entire sections of your site with plenty of flexibility.
 
-CPS checks security on menu links, RSS feeds, and blog post excerpts as well, so any user who doesn't have the proper permissions won't even see 
-the content... this includes blog excerpts on your main blog page.
-
-CPS only effects users who are logged in. For maximum security, all secure content is automatically hidden from unauthenticated users.
+CPS also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
+creep onto your site because of an overlooked WordPress option.
 
 CPS is simple and easy to use. Visible changes made to the Dashboard are:
 
-1. Two new options are located under the Users category. This includes "Users > Groups" and "Users > Add Group".
-1. A "Restrict Access" sidebar is visible when editing a page or post.
+1. Two new options are located under the Users category. This includes "Groups" and "Add Group".
+1. A "Restrict Access" sidebar is available when editing any page or post.
 1. A "Group Membership" overview is added to the "Edit User" pages.
 
 Additional features:
 
-1. You can easily make any page or post "admin only". Simply check the "Protect this page it's descendants" checkbox but don't add any groups. By default,
-all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to all other users.
+1. Any page or post can be easily made "admin only". When editing a page, check the "Protect this page it's descendants" checkbox but don't add any groups. By default,
+all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to all non-admin users.
 1. The "Restrict Access" sidebar on the "edit page" admin pages is AJAX-loaded, so any changes you make to security are saved immediately. You do not need to click
 "Update" to save changes to the page's security.
 
@@ -50,6 +48,11 @@ no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK
 1. screenshot-2.png
 
 == Changelog ==
+
+= 0.9.0 =
+* Added a system-owned "Registered Users" smart group so admins can easily limit access to logged-in users only
+* Fixed a webkit-only bug where "Restrict Access" sidebar was not being properly updated when changes were made
+* Lots of minor usability improvements
 
 = 0.8.3 =
 * Usability improvement: Restrict Access sidebar now lets you know that your security changes are saved
