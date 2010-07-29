@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 0.8.3
+Stable tag: 0.9.0
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 

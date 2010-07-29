@@ -246,12 +246,12 @@ function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
         jQuery(function(){
-            jQuery('#add_group_page').click(function(){ctx_ps_add_group_to_page()});
-            jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
             jQuery('#groups_available')
                 .data('options',jQuery('#groups_available').html())
-                .find('.detach')
+                .children('.detach')
                     .remove();
+            jQuery('#add_group_page').click(function(){ctx_ps_add_group_to_page()});
+            jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
         });
 
         //Will display a "Security Updated" message in the sidebar when successful change to security
@@ -327,20 +327,19 @@ function ctx_ps_admin_head_js(){
                     function(data){
                         data = jQuery(data);
                         if(data.find('html').length > 0){
-                            //Add group to list of "attached" groups
+                            //Add group to the Allowed Groups list
                             jQuery('#ctx-ps-page-group-list').html(data.find('html').text());
 
-                            //Load saved options
-                            var savedOpts = jQuery('#groups_available').data('options');
-                            //Update saved options to detach current option
-                            jQuery(savedOpts).find('option[value="'+igroupid+'"]').addClass('detach');
-                            //Save changes to data and reload option HTML
-                            jQuery('#groups_available')
-                                .data('options',savedOpts)
-                                .html(savedOpts) //Use select data to rebuild options
-                                .find('.detach').remove(); //Remove detached options
+                            var grpsAvail = jQuery('#groups_available');
 
-                            //jQuery('#groups_available').val('0').find('option[value="'+igroupid+'"]').hide();
+                            grpsAvail
+                                .html(grpsAvail.data('options'))
+                                .children('option[value="'+igroupid+'"]')
+                                    .addClass('detach')
+                                .end()
+                                .data('options',grpsAvail.html())
+                                .children('.detach')
+                                    .remove();
 
                             showSavemsg();
                         }
@@ -365,18 +364,18 @@ function ctx_ps_admin_head_js(){
                     function(data){
                         data = jQuery(data);
                         if(data.find('code').text() == '1'){
-                            //jQuery('#groups_available option[value="'+igroupid+'"]').show();
-                            //Load saved options
-                            var savedOpts = jQuery('#groups_available').data('options');
-                            //Update saved options to detach current option
-                            jQuery(savedOpts).find('option[value="'+igroupid+'"]').removeClass('detach');
-                            //Save changes to data and reload option HTML
-                            jQuery('#groups_available')
-                                .data('options',savedOpts)
-                                .html(savedOpts) //Use select data to rebuild options
-                                .find('.detach').remove(); //Remove detached options
-                            //Remove this group from "Current Groups"
+                            
+                           var grpsAvail = jQuery('#groups_available');
+                            grpsAvail
+                                .html(grpsAvail.data('options'))
+                                .children('option[value="'+igroupid+'"]')
+                                    .removeClass('detach')
+                                .end()
+                                .data('options',grpsAvail.html())
+                                .children('.detach')
+                                    .remove();
                             me.parent().remove();
+
                             showSavemsg();
                         }
                     },'xml'
@@ -406,7 +405,7 @@ function ctx_ps_admin_head_css(){
         option.cts-ps-system-group { font-weight:bold; }
         .ctx-ps-sidebar-group { padding-bottom:2px; }
         .ctx-ps-sidebar-group:hover { background:#FFFCE0; }
-        #groups_available detach { display:none; visibility:hidden; }
+        #groups_available .detach { display:none; visibility:hidden; }
     </style>
     <?php
 }
@@ -925,13 +924,13 @@ function ctx_ps_sidebar_security(){
         echo '">';
         echo '      <h5>Available Groups</h5>';
         echo '      <select id="groups_available" name="groups_available">';
-        echo '          <option value="0">-- Select -- </option>';
+        echo            '<option value="0">-- Select -- </option>';
         //Loop through all groups in the db to populate the drop-down list
         foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
             //Generate the option HTML, hiding it if it's already in our $currentGroups array
-            echo '          <option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
+            echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
         }
-        echo '      </select>';
+        echo       '</select>';
         echo '      <input type="button" id="add_group_page" class="button-secondary action" value="Add" />';
         echo '      <h5>Allowed Groups</h5>';
         echo '      <div id="ctx-ps-page-group-list">';
