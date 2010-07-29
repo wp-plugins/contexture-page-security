@@ -28,10 +28,10 @@ CPS is simple and easy to use. Visible changes made to the Dashboard are:
 
 Additional features:
 
+1. The "Restrict Access" sidebar is AJAX-loaded, so any changes you make to security are saved immediately! You do not need to click
+the "Update" button to save changes to the page's security.
 1. Any page or post can be easily made "admin only". When editing a page, check the "Protect this page it's descendants" checkbox but don't add any groups. By default,
 all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to all non-admin users.
-1. The "Restrict Access" sidebar on the "edit page" admin pages is AJAX-loaded, so any changes you make to security are saved immediately. You do not need to click
-"Update" to save changes to the page's security.
 
 This plugin is still under development and should NOT be relied on to protect mission critical data. We make
 no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK!
