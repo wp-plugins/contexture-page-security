@@ -1,6 +1,8 @@
 <?php
 /**Creates the "Add/View Groups" page**/
 
+$creategroup_message = "";
+
 //Several forms post back to this page, so we catch the action and process accordingly
 if(!empty($_POST['action'])){
     //Launch code based on action
@@ -27,7 +29,7 @@ if(!empty($_POST['action'])){
         #grouptable .description {}
         #grouptable .user-count {width:60px;}
 
-        #grouptable tbody .name a {font-weight:bold}
+        #grouptable tbody .name a {}
 
     </style>
     <script type="text/javascript">

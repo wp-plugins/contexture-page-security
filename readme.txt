@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 0.9.0
+Stable tag: 1.0.0
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
@@ -49,9 +49,10 @@ no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK
 
 == Changelog ==
 
-= 0.9.0 =
+= 1.0.0 =
 * Added a system-owned "Registered Users" smart group so admins can easily limit access to logged-in users only
 * Fixed a webkit-only bug where "Restrict Access" sidebar was not being properly updated when changes were made
+* Groups can now be deleted
 * Lots of minor usability improvements
 
 = 0.8.3 =

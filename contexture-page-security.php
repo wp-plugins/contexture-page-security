@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 0.9.0
+Version: 1.0.0
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -577,6 +577,7 @@ function ctx_ps_create_menus(){
     add_submenu_page('users.php', 'Group Management', 'Groups', 'manage_options', 'ps_groups', 'ctx_ps_page_groups_view');
     add_submenu_page('users.php', 'Add a Group', 'Add Group', 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
     add_submenu_page('', 'Edit Group', 'Edit Group', 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
+    add_submenu_page('', 'Delete Group', 'Delete Group', 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
 }
 
 /**
@@ -652,7 +653,9 @@ function ctx_ps_display_group_list($memberid=''){
 
     foreach($groups as $group){
         $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
-        $grouplink = (!isset($group->group_system_id)) ? "<a href=\"?page=ps_groups_edit&groupid={$group->ID}\">{$group->group_title}</a>" : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\">{$group->group_title}</a>";
+        $grouplink = (!isset($group->group_system_id)) 
+                ? "<a href=\"?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a><div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>" //User group
+                : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>"; //System group
         $html .= "<tr {$alternatecss}>
             <td class=\"id\">{$group->ID}</td>
             <td class=\"name\">{$grouplink}</td>
@@ -836,7 +839,7 @@ function ctx_ps_menu_filter_custom($array){
 }
 
 /**
- * Creates the "Groups" page
+ * Creates the "Add Group" page
  */
 function ctx_ps_page_groups_add(){
     global $wpdb;
@@ -852,11 +855,19 @@ function ctx_ps_page_groups_view(){
 }
 
 /**
- * Creates the "Groups" page
+ * Creates the "Edit Group" page
  */
 function ctx_ps_page_groups_edit(){
     global $wpdb;
     require_once 'group-edit.php';
+}
+
+/**
+ * Creates the "Delete Group" page
+ */
+function ctx_ps_page_groups_delete(){
+    global $wpdb;
+    require_once 'group-delete.php';
 }
 
 /**
