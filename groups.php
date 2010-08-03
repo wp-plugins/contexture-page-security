@@ -60,7 +60,8 @@ if(!empty($_POST['action'])){
             <tbody>
                 <?php
                     if(ctx_ps_count_groups() == 0){
-                        echo '<td colspan="4">No groups have been created yet. Please <a href="?page=ps_groups_add">add a group</a>.</td>';
+                        echo ctx_ps_display_group_list();
+                        echo '<td colspan="4">You have not created any groups. Please <a href="?page=ps_groups_add">add a group</a>.</td>';
                     } else {
                         echo ctx_ps_display_group_list();
                 }

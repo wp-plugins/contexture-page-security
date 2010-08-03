@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.0.0
+Version: 1.0.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -297,7 +297,8 @@ function ctx_ps_admin_head_js(){
                             setting:'off',
                             postid:ipostid
                         },
-                        function(data){ data = jQuery(data);
+                        function(data){
+                            data = jQuery(data);
                             if(data.find('code').text() =='1'){
                                 jQuery("#ctx_ps_pagegroupoptions").hide();
                                 showSavemsg();
@@ -517,11 +518,12 @@ function ctx_ps_ajax_security_update(){
 function ctx_ps_count_groups($memberid=''){
     global $wpdb;
     if($memberid==''){
-        return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups"));
+        return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_system_id IS NULL"));
     }else{
         return $wpdb->get_var("
             SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships
             WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$memberid}'
+            AND group_system_id IS NULL
         ");
     }
 }

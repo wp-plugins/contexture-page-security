@@ -4,23 +4,23 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
 == Description ==
 
-Contexture Page Security (CPS) adds some much-needed "page security" to WordPress. With Contexture Page Security you can now limit access
+Page Security by Contexture (PSC) adds some much-needed "page security" to WordPress. With Contexture Page Security you can now limit access
 to posts, pages, or entire sections of your website.
 
-Easily create "Members-only" sections of your site with CPS' built-in "Registered Users" smart group - or create your own custom user groups
+Easily create "Members-only" sections of your site with PSC' built-in "Registered Users" smart group - or create your own custom user groups
 to limit access only to users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
 secure entire sections of your site with plenty of flexibility.
 
-CPS also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
+PSC also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
 creep onto your site because of an overlooked WordPress option.
 
-CPS is simple and easy to use. Visible changes made to the Dashboard are:
+PSC is simple and easy to use. Visible changes made to the Dashboard are:
 
 1. Two new options are located under the Users category. This includes "Groups" and "Add Group".
 1. A "Restrict Access" sidebar is available when editing any page or post.
@@ -46,7 +46,17 @@ While we believe this plugin is secure, we make no warranty about it's effective
 1. screenshot-1.png
 1. screenshot-2.png
 
+== Requirements ==
+
+= PHP5 =
+PSC requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation. If you are using a
+web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your hosting dashboard).
+
 == Changelog ==
+
+= 1.0.1 =
+* Fixed a bug where group count was incorrectly including smart groups
+* Updated readme to reflect PHP5 requirement
 
 = 1.0.0 =
 * Added a system-owned "Registered Users" smart group so admins can easily limit access to logged-in users only
