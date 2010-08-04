@@ -56,7 +56,7 @@ web hosting service, simply contact your hosting provider about updating your de
 == Changelog ==
 
 = 1.0.3 =
-* Typo in PHP version check in 1.0.2 made plugin installation impossible. Whoops. (this is now fixed)
+* Fixed a bug with the PHP version check.
 
 = 1.0.2 =
 * Activation now enforces PHP requirement
