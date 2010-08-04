@@ -1,7 +1,7 @@
 === Page Security by Contexture ===
 Contributors: Contexture Intl, Matt VanAndel, Jerrol Krause
 Donate link: http://www.contextureintl.com/
-Tags: security, permissions, users, groups, page, post
+Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.0.0
 Stable tag: 1.0.2
