@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 1.0.2
+Stable tag: 1.0.3
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
@@ -54,6 +54,9 @@ PSC requires PHP5 to work. If you receive an error message while activating/inst
 web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your hosting dashboard).
 
 == Changelog ==
+
+= 1.0.3 =
+* Fixed a bug with the PHP version check.
 
 = 1.0.2 =
 * Activation now enforces PHP requirement
