@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.0.3
+Version: 1.0.4
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -96,10 +96,11 @@ function ctx_ps_security_action(){
                     //Redirect to insufficient permissions page
                 }*/
                 if($current_user->ID == 0){
+                    $blogurl = get_bloginfo('url');
                     //header('Location: /wp-login.php?ctx_ps_msg=nogroup');
-                    wp_die('You do not have the appropriate group permissions to access this page. Please try <a href="/wp-login.pho">logging in</a> or contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="/">&lt;&lt; Go to home page</a>');
+                    wp_die('You do not have the appropriate group permissions to access this page. Please try <a href="'.$blogurl.'/wp-login.php">logging in</a> or contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }else{
-                    wp_die('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="/">&lt;&lt; Go to home page</a>');
+                    wp_die('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }
             }
         }
@@ -632,6 +633,7 @@ function ctx_ps_determine_access($UserGroupsArray,$PageSecurityArray){
  */
 function ctx_ps_display_group_list($memberid=''){
     global $wpdb;
+    $linkBack = admin_url();
 
     if($memberid==''){
         $groups = $wpdb->get_results("
@@ -656,7 +658,7 @@ function ctx_ps_display_group_list($memberid=''){
     foreach($groups as $group){
         $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
         $grouplink = (!isset($group->group_system_id)) 
-                ? "<a href=\"?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a><div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>" //User group
+                ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a><div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>" //User group
                 : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>"; //System group
         $html .= "<tr {$alternatecss}>
             <td class=\"id\">{$group->ID}</td>
@@ -679,6 +681,8 @@ function ctx_ps_display_group_list($memberid=''){
  */
 function ctx_ps_display_member_list($GroupID){
     global $wpdb;
+
+
 
     $sqlGetMembers = "
         SELECT
@@ -986,7 +990,7 @@ function ctx_ps_activate(){
     //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
     if (version_compare(PHP_VERSION, '5', '<')) {
         deactivate_plugins(__FILE__);
-        wp_die("<span style=\"color:red;font-weight:bold;\">Missing Requirement: </span> Page Security by Contexture requires PHP5 or higher. Your server is running ".PHP_VERSION.". Please contact your hosting service about enabling PHP5 support. <a href=\"{$linkBack}/plugins.php\"> Return to plugin page &gt;&gt;</a>");
+        wp_die("<span style=\"color:red;font-weight:bold;\">Missing Requirement: </span> Page Security by Contexture requires PHP5 or higher. Your server is running ".PHP_VERSION.". Please contact your hosting service about enabling PHP5 support. <a href=\"{$linkBack}plugins.php\"> Return to plugin page &gt;&gt;</a>");
     }
 
     //Name our tables

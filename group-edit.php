@@ -10,7 +10,8 @@ if(!empty($_GET['action'])){
             if($wpdb->query($sqlUpdateGroup) === false){
                 $actionmessage = '<div class="error below-h2"><p>An error occurred. Group Details could not be updated.</p></div>';
             } else {
-                $actionmessage = '<div id="message" class="updated below-h2"><p>Group details have been saved.</p></div>';
+                $linkBack = admin_url();
+                $actionmessage = '<div id="message" class="updated below-h2"><p>Group details have been saved. <a href="'.$linkBack.'users.php?page=ps_groups">Return to group list &gt;&gt;</a></p></div>';
             }
             break;
         case 'addusr':
