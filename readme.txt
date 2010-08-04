@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
@@ -46,13 +46,17 @@ While we believe this plugin is secure, we make no warranty about it's effective
 1. screenshot-1.png
 1. screenshot-2.png
 
-== Requirements ==
+== Other Notes ==
 
-= PHP5 =
+= PHP5 is Required =
+
 PSC requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation. If you are using a
 web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your hosting dashboard).
 
 == Changelog ==
+
+= 1.0.2 =
+* Activation now enforces PHP requirement
 
 = 1.0.1 =
 * Fixed a bug where group count was incorrectly including smart groups
