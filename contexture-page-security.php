@@ -982,7 +982,7 @@ function ctx_ps_activate(){
     global $wpdb;
 
     //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
-    if (version_compare(PHP_VERSION, '6', '<')) {
+    if (version_compare(PHP_VERSION, '5', '<')) {
         deactivate_plugins(__FILE__);
         wp_die("<span style=\"color:red;font-weight:bold;\">Missing Requirement: </span> Page Security by Contexture requires PHP5 or higher. Your server is running ".PHP_VERSION.". Please contact your hosting service about enabling PHP5 support. <a href=\"/wp-admin/plugins.php\"> Return to plugin page &gt;&gt;</a>");
     }
