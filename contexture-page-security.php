@@ -611,7 +611,9 @@ function ctx_ps_create_menus(){
     add_submenu_page('users.php', 'Add a Group', 'Add Group', 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
     add_submenu_page('', 'Edit Group', 'Edit Group', 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
     add_submenu_page('', 'Delete Group', 'Delete Group', 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
-    add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_groups_settings', 'ctx_ps_page_settings');
+
+    add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
+    //add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
 }
 
 
@@ -885,25 +887,7 @@ function ctx_ps_menu_filter_custom($array){
  */
 function ctx_ps_page_groups_add(){
     global $wpdb;
-    require_once 'group-new.php';
-}
-
-
-/**
- * Creates the "Groups" page
- */
-function ctx_ps_page_groups_view(){
-    global $wpdb;
-    require_once 'groups.php';
-}
-
-
-/**
- * Creates the "Edit Group" page
- */
-function ctx_ps_page_groups_edit(){
-    global $wpdb;
-    require_once 'group-edit.php';
+    require_once 'inc/group-new.php';
 }
 
 
@@ -912,14 +896,33 @@ function ctx_ps_page_groups_edit(){
  */
 function ctx_ps_page_groups_delete(){
     global $wpdb;
-    require_once 'group-delete.php';
+    require_once 'inc/group-delete.php';
 }
+
+
+/**
+ * Creates the "Edit Group" page
+ */
+function ctx_ps_page_groups_edit(){
+    global $wpdb;
+    require_once 'inc/group-edit.php';
+}
+
+
+/**
+ * Creates the "Groups" page
+ */
+function ctx_ps_page_groups_view(){
+    global $wpdb;
+    require_once 'inc/groups.php';
+}
+
 
 /**
  * Creates the "Settings" page
  */
-function ctx_ps_page_settings(){
-    require_once 'options.php';
+function ctx_ps_page_options(){
+    require_once 'inc/options.php';
 }
 
 /**
@@ -1113,7 +1116,7 @@ function ctx_ps_filter_checksecurity($content){
  * Generates the user-edit-groups feature
  */
 function ctx_ps_generate_usergroupslist(){
-    require_once("user-edit-groups.php");
+    require_once("inc/user-edit-groups.php");
     //echo "<h3 style=\"color:red;font-weight:bold;\">Hello world!!!</h3>";
 }
 

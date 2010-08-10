@@ -10,27 +10,21 @@ if(empty($_POST['action'])){
     //Launch code based on action
     switch($_POST['action']){
         case 'addgroup':
-            $creategroup_message = ctx_ps_create_group($_POST['group_name'], $_POST['group_description']);
             break;
         default: break;
     }
 }
 
-/**
- * Loads the options page values
- */
-function ctx_ps_load_options(){
-    global $wpdb;
-    
-}
+
 
 ?>
     <style type="text/css">
-        /**/
+        /*Styles*/
     </style>
     <script type="text/javascript">
-        /**/
+        /*Scripts*/
     </script>
+
     <div class="wrap">
         <div class="icon32" id="icon-users"><br/></div>
         <h2>Page Security Options</h2>
