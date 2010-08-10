@@ -19,7 +19,7 @@ if(empty($_POST['action'])){
 
 ?>
     <style type="text/css">
-        /*Styles*/
+        #ad-msg-auth, #ad-msg-anon { width:500px; }
     </style>
     <script type="text/javascript">
         /*Scripts*/
@@ -38,7 +38,8 @@ if(empty($_POST['action'])){
                         <label for="ad-msg-auth">Authenticated Users:</label>
                     </th>
                     <td>
-                        <input type="text" name="ad-msg-auth" id="ad-msg-auth" value="" />
+                        <input type="text" name="ad-msg-auth" id="ad-msg-auth" value="" /><br/>
+                        <div>The &quot;access denied&quot; message shown to users who are logged in (HTML OK).</div>
                     </td>
                 </tr>
                 <tr valign="top">
@@ -46,7 +47,8 @@ if(empty($_POST['action'])){
                         <label for="ad-msg-anon">Anonymous Users:</label>
                     </th>
                     <td>
-                        <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="" />
+                        <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="" /><br/>
+                        <div>The &quot;access denied&quot; message shown to users who are <span style="text-decoration:underline"><em>not</em></span> logged in (HTML OK).</div>
                     </td>
                 </tr>
             </table>
