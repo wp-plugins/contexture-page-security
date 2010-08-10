@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.0.5
+Version: 1.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -23,6 +23,12 @@ License: GPL2
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+
+/** TODO: Implement custom access denied messages */
+/** TODO: Implement custom access denied PAGES */
+/** TODO: Implement "Advanced Features" for restrict access toolbar (ie: Show in menu, show in RSS, etc) */
+/** TODO: Allow admins to specifify specific access denied pages for specific restricted pages */
 
 // Install new tables (on activate)
 register_activation_hook(__FILE__,'ctx_ps_activate');
@@ -80,26 +86,21 @@ function ctx_ps_security_action(){
         //wp_die(print_r($pagereqs,true));
         
         if(!!$pagereqs){
+            //Determine if user can access this content
             $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
 
             //wp_die(print_r($secureallowed,true));
 
             if($secureallowed){
-                //If we're allowed to access this page
-                //$content = "<p>Access Granted</p><p>User access: ".print_r($useraccess,true).". Page Requirements: ".print_r($pagereqs,true)."</p>".$content;
+                //If we're allowed to access this page (do nothing)
             }else{
                 //If we're NOT allowed to access this page
-                /*
-                if($current_user->ID == 0){
-                    header('Location: /wp-login.php?ctx_ps_msg=nogroup');
-                }else{
-                    //Redirect to insufficient permissions page
-                }*/
                 if($current_user->ID == 0){
                     $blogurl = get_bloginfo('url');
-                    //header('Location: /wp-login.php?ctx_ps_msg=nogroup');
-                    wp_die('You do not have the appropriate group permissions to access this page. Please try <a href="'.$blogurl.'/wp-login.php">logging in</a> or contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    //If user is anonymous, show this message
+                    wp_die('You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'/wp-login.php">logging in</a> or contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }else{
+                    //If user is authenticated, show this message
                     wp_die('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }
             }
@@ -164,27 +165,33 @@ function ctx_ps_security_filter_blog($content){
 function ctx_ps_security_filter_menu($content){
     global $current_user;
 
-    if( !current_user_can('manage_options') ) {
+    //Do this filtering only if the user isn't an admin
+    if( !current_user_can('manage_options') ) { 
+
+        //Loop through the content array
         foreach($content as $post->key => $post->value){
 
-            /**Groups that this user is a member of*/
+            //Get groups that this user is a member of
             $useraccess = ctx_ps_get_usergroups($current_user->ID);
-            /**Groups required to access this page*/
+            //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->ID);
 
+            //So long as $pagereqs is anything but false
             if(!!$pagereqs){
+
+                //Determine user access
                 $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
 
                 if($secureallowed){
                     //If we're allowed to access this page
                 }else{
                     //If we're NOT allowed to access this page
-                    unset($content[$post->key]);
+                    unset($content[$post->key]); //Remove content from array
                 }
             }
         }
-    }
 
+    }
     return $content;
 }
 
@@ -203,15 +210,19 @@ function ctx_ps_security_filter_menu($content){
 function ctx_ps_security_filter_menu_custom($content){
     global $current_user;
 
+    //Do this filtering only if user isn't an admin
     if( !current_user_can('manage_options') ) {
         foreach($content as $post->key => $post->value){
 
-            /**Groups that this user is a member of*/
+            //Get groups that this user is a member of
             $useraccess = ctx_ps_get_usergroups($current_user->ID);
-            /**Groups required to access this page*/
+            //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->object_id);
 
+            //So long as $pagereqs is anything but false
             if(!!$pagereqs){
+
+                //Determine user access
                 $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
 
                 if($secureallowed){
@@ -233,7 +244,7 @@ function ctx_ps_security_filter_menu_custom($content){
 function ctx_ps_admin_init(){
     add_action('admin_head', 'ctx_ps_admin_head_js');
     add_action('admin_head', 'ctx_ps_admin_head_css');
-    //We MUST have a post id in the querystring in order for this to work
+    //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
     if(isset($_GET['post']) && intval($_GET['post']) == $_GET['post']){
         add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
         add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
@@ -417,19 +428,24 @@ function ctx_ps_admin_head_css(){
  */
 function ctx_ps_ajax_add_group_to_page(){
     global $wpdb;
+
+    $result=false; //Assume result is false
     
-    $qryAddSec = "INSERT INTO {$wpdb->prefix}ps_security (
-        sec_protect_type,
-        sec_protect_id,
-        sec_access_type,
-        sec_access_id)
-        VALUES (
-        'page',
-        '{$wpdb->escape($_GET['postid'])}',
-        'group',
-        '{$wpdb->escape($_GET['groupid'])}'
-        )";
-    $result = $wpdb->query($qryAddSec);
+    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(current_user_can('manage_options')){
+        $qryAddSec = "INSERT INTO {$wpdb->prefix}ps_security (
+            sec_protect_type,
+            sec_protect_id,
+            sec_access_type,
+            sec_access_id)
+            VALUES (
+            'page',
+            '{$wpdb->escape($_GET['postid'])}',
+            'group',
+            '{$wpdb->escape($_GET['groupid'])}'
+            )";
+        $result = $wpdb->query($qryAddSec);
+    }
 
     if(!!$result){
         //See what groups are already attached to the page
@@ -447,6 +463,7 @@ function ctx_ps_ajax_add_group_to_page(){
         }
         ctx_ps_ajax_response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
     }
+    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
 }
 
 /**
@@ -454,14 +471,19 @@ function ctx_ps_ajax_add_group_to_page(){
  */
 function ctx_ps_ajax_remove_group_from_page(){
     global $wpdb;
-    if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
-        $response['code'] = '1';
-        $response['message'] = 'Group removed';
-    }else{
-        $response['code'] = '0';
-        $response['message'] = 'Query failed';
+    
+    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(current_user_can('manage_options')){
+        if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
+            $response['code'] = '1';
+            $response['message'] = 'Group removed';
+        }else{
+            $response['code'] = '0';
+            $response['message'] = 'Query failed';
+        }
+        ctx_ps_ajax_response($response);
     }
-    die(ctx_ps_ajax_response($response));
+    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
 }
 
 
@@ -483,32 +505,38 @@ function ctx_ps_ajax_response($AssocArray=''){
     die($response);
 }
 
+
 /**
  * Toggles page security on or off - removes all groups from page if toggled off
  */
 function ctx_ps_ajax_security_update(){
     global $wpdb;
-    $response = array();
-    switch($_GET['setting']){
-        case 'on':
-            $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
-            $response['message'] = 'Security enabled';
-            break;
-        case 'off':
-            if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']}") !== false){
-                $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
-                $response['message'] = 'Security disabled';
-            }else{
+    
+    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(current_user_can('manage_options')){
+        $response = array();
+        switch($_GET['setting']){
+            case 'on':
+                $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
+                $response['message'] = 'Security enabled';
+                break;
+            case 'off':
+                if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']}") !== false){
+                    $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
+                    $response['message'] = 'Security disabled';
+                }else{
+                    $response['code'] = '0';
+                    $response['message'] = 'Query failed';
+                }
+                break;
+            default:
                 $response['code'] = '0';
-                $response['message'] = 'Query failed';
-            }
-            break;
-        default:
-            $response['code'] = '0';
-            $response['message'] = 'Data does not validate';
-            break;
+                $response['message'] = 'Data does not validate';
+                break;
+        }
+        ctx_ps_ajax_response($response);
     }
-    ctx_ps_ajax_response($response);
+    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
 }
 
 
@@ -528,6 +556,7 @@ function ctx_ps_count_groups($memberid=''){
         ");
     }
 }
+
 
 /**
  * Gets a count of the number of users currently in a group
@@ -572,6 +601,7 @@ function ctx_ps_create_group($name, $description){
     }
 }
 
+
 /**
  * Adds the "Groups" functionality to the admin section under "Users"
  */
@@ -581,7 +611,9 @@ function ctx_ps_create_menus(){
     add_submenu_page('users.php', 'Add a Group', 'Add Group', 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
     add_submenu_page('', 'Edit Group', 'Edit Group', 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
     add_submenu_page('', 'Delete Group', 'Delete Group', 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
+    add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_groups_settings', 'ctx_ps_page_settings');
 }
+
 
 /**
  * This function takes an array of user groups and an array of page-required groups
@@ -673,6 +705,7 @@ function ctx_ps_display_group_list($memberid=''){
     return $html;
 }
 
+
 /**
  * Returns html for tbody element of group member list.
  *
@@ -681,8 +714,6 @@ function ctx_ps_display_group_list($memberid=''){
  */
 function ctx_ps_display_member_list($GroupID){
     global $wpdb;
-
-
 
     $sqlGetMembers = "
         SELECT
@@ -717,6 +748,7 @@ function ctx_ps_display_member_list($GroupID){
     return $html;
 }
 
+
 /**
  * Gets an array with all the groups that the user belongs to.
  * 
@@ -750,6 +782,7 @@ function ctx_ps_get_usergroups($userid){
     return $array;
 }
 
+
 /**
  * Gets database record for the specified system group
  *
@@ -765,6 +798,7 @@ function ctx_ps_get_sysgroup($system_id){
     ");
     return $array[0];
 }
+
 
 /**
  * This function will check the security for the specified page and all parent pages.
@@ -834,6 +868,7 @@ function ctx_ps_getprotection($postid){
     return $array;
 }
 
+
 /**
  * Filters menu made by WP3 custom menu system (NOT IMPLEMENTED)
  * @param array $args
@@ -844,6 +879,7 @@ function ctx_ps_menu_filter_custom($array){
     return $array;
 }
 
+
 /**
  * Creates the "Add Group" page
  */
@@ -851,6 +887,7 @@ function ctx_ps_page_groups_add(){
     global $wpdb;
     require_once 'group-new.php';
 }
+
 
 /**
  * Creates the "Groups" page
@@ -860,6 +897,7 @@ function ctx_ps_page_groups_view(){
     require_once 'groups.php';
 }
 
+
 /**
  * Creates the "Edit Group" page
  */
@@ -868,12 +906,20 @@ function ctx_ps_page_groups_edit(){
     require_once 'group-edit.php';
 }
 
+
 /**
  * Creates the "Delete Group" page
  */
 function ctx_ps_page_groups_delete(){
     global $wpdb;
     require_once 'group-delete.php';
+}
+
+/**
+ * Creates the "Settings" page
+ */
+function ctx_ps_page_settings(){
+    require_once 'options.php';
 }
 
 /**
@@ -885,6 +931,7 @@ function ctx_ps_page_groups_delete(){
 function ctx_ps_isprotected($postid){
     return (bool)get_post_meta($postid,'ctx_ps_security');
 }
+
 
 /**
  * Recursively checks security for this page/post and it's ancestors. Returns true
@@ -979,6 +1026,7 @@ function ctx_ps_sidebar_security(){
     }
 }
 
+
 /**
  * Adds the important tables to the wordpress database
  */
@@ -1052,24 +1100,23 @@ function ctx_ps_activate(){
     }
 }
 
+
 /**
- *
- * @param <type> $content
- * @return <type> 
+ * Left in for backwards-compatibility purposes. Ensure we can remove.
  */
 function ctx_ps_filter_checksecurity($content){
-    
     return $content;
 }
 
 
 /**
- * 
+ * Generates the user-edit-groups feature
  */
 function ctx_ps_generate_usergroupslist(){
     require_once("user-edit-groups.php");
     //echo "<h3 style=\"color:red;font-weight:bold;\">Hello world!!!</h3>";
 }
+
 
  /**
  * Removes custom tables and options from the WP database.
@@ -1082,18 +1129,18 @@ function ctx_ps_uninstall(){
     $table_group_relationships = $wpdb->prefix . "ps_group_relationships";
     $table_security = $wpdb->prefix . "ps_security";
 
-    //Build our SQL scripts to create the new db tables
+    //Build our SQL scripts to delete the old db tables
     $sql_drop_groups = "DROP TABLE IF EXISTS `" . $table_groups . "`";
     $sql_drop_group_relationships = "DROP TABLE IF EXISTS `" . $table_group_relationships . "`";
     $sql_drop_security = "DROP TABLE IF EXISTS `" . $table_security . "`";
 
-    //Use dbDelta to create the tables
+    //Run our cleanup queries
     $wpdb->show_errors();
     $wpdb->query($sql_drop_groups);
     $wpdb->query($sql_drop_group_relationships);
     $wpdb->query($sql_drop_security);
 
-    //Record what version of the db we're using
+    //Remove our db version reference from options
     delete_option("contexture_ps_db_version");
 
 }
