@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.1.01
+Version: 1.1.2
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -30,7 +30,7 @@ License: GPL2
 /** TODO: Implement "Advanced Features" for restrict access toolbar (ie: Show in menu, show in RSS, etc) */
 /** TODO: Allow admins to specify specific access denied pages for specific restricted pages */
 /** TODO: Create template tag that can be used to output group requirement info to page */
-/** TODO: */
+/** TODO: Allow admins to add GROUPS to USERS via the EDIT USER page (ajax load)*/
 
 // Install new tables (on activate)
 register_activation_hook(__FILE__,'ctx_ps_activate');
@@ -79,7 +79,7 @@ function ctx_ps_security_action(){
     global $current_user;
     $secureallowed = true;
 
-    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag()) {
+    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_admin()) {
         /**Groups that this user is a member of*/
         $useraccess = ctx_ps_get_usergroups($current_user->ID);
         /**Groups required to access this page*/
@@ -98,18 +98,16 @@ function ctx_ps_security_action(){
             }else{
                 //If we're NOT allowed to access this page
 
-                /**TODO: Handle custom AD pages **/
-
                 //Get AD messages from options
-                $ADMsg = get_option('contexture_ps_options');
+                //$ADMsg = get_option('contexture_ps_options');
 
                 if($current_user->ID == 0){
                     //If user is anonymous, show this message
                     $blogurl = get_bloginfo('url');
-                    wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    wp_die(/*$ADMsg['ad_msg_anon'].*/'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }else{
                     //If user is authenticated, show this message
-                    wp_die($ADMsg['ad_msg_auth'].'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    wp_die(/*$ADMsg['ad_msg_auth'].*/'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }
             }
         }
@@ -130,7 +128,7 @@ function ctx_ps_security_action(){
 function ctx_ps_security_filter_blog($content){
     global $current_user;
 
-    if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() ) ) {
+    if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
         foreach($content as $post->key => $post->value){
             //Fun with manipulating the array
             //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
@@ -174,7 +172,7 @@ function ctx_ps_security_filter_menu($content){
     global $current_user;
 
     //Do this filtering only if the user isn't an admin
-    if( !current_user_can('manage_options') ) { 
+    if( !current_user_can('manage_options')  && !is_admin()) {
 
         //Loop through the content array
         foreach($content as $post->key => $post->value){
@@ -219,7 +217,7 @@ function ctx_ps_security_filter_menu_custom($content){
     global $current_user;
 
     //Do this filtering only if user isn't an admin
-    if( !current_user_can('manage_options') ) {
+    if( !current_user_can('manage_options') && !is_admin() ) {
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
@@ -889,48 +887,6 @@ function ctx_ps_menu_filter_custom($array){
     return $array;
 }
 
-/**
- * Handles creating or updating the options array
- * 
- * @param array $array_overrides An associative array containing key=>value pairs to override originals
- * @return string
- */
-function ctx_ps_set_options($arrayOverrides=false){
-    global $wpdb;
-
-    /** GOOGLE 2 **/
-
-    //Set defaults
-    $defaultOpts = array(
-        "ad_msg_usepages"=>"false",
-        "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'/wp-login.php">logging in</a> or contact an administrator for assistance.<a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>',
-        "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.'
-    );
-
-    //Let's see if the options already exist...
-    $dbOpts = get_options('contexture_ps_options');
-
-    if(!$dbOpts){
-        //There's no options! Let's build them...
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        //Now add them to the db
-        return add_option('contexture_ps_options',$defaultOpts);
-    }else{
-        //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
-        $defaultOpts = array_merge($defaultOpts, $dbOpts);
-        //Now let's add our custom settings (if appropriate)
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        return update_option('contexture_ps_options',$defaultOpts);
-    }
-
-}
-
 
 /**
  * Creates the "Add Group" page
@@ -1137,7 +1093,7 @@ function ctx_ps_activate(){
     //Record what version of the db we're using (only works if option not already set)
     add_option("contexture_ps_db_version", "1.1");
     
-    //Set plugin options
+    //Set plugin options (not db version)
     ctx_ps_set_options();
 
     /********* START UPGRADE PATH ***********/
@@ -1154,6 +1110,48 @@ function ctx_ps_activate(){
         //Adds the Registered Users system group (if it doesnt exist)
         $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
     }
+}
+
+
+/**
+ * Handles creating or updating the options array
+ *
+ * @param array $array_overrides An associative array containing key=>value pairs to override originals
+ * @return string
+ */
+function ctx_ps_set_options($arrayOverrides=false){
+
+    //Set defaults
+    $defaultOpts = array(
+        "ad_msg_usepages"=>"false",
+        "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'">logging in</a> or contact an administrator for assistance.',
+        "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.',
+        "ad_page_anon_id"=>"",
+        "ad_page_auth_id"=>""
+    );
+
+    //Let's see if the options already exist...
+    $dbOpts = get_option('contexture_ps_options');
+
+    if(!$dbOpts){
+        //There's no options! Let's build them...
+        if($arrayOverrides!=false && is_array($arrayOverrides)){
+            //If we have some custom settings, use those
+            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+        }
+        //Now add them to the db
+        return add_option('contexture_ps_options',$defaultOpts);
+    }else{
+        //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
+        $defaultOpts = array_merge($defaultOpts, $dbOpts);
+        //Now let's add our custom settings (if appropriate)
+        if($arrayOverrides!=false && is_array($arrayOverrides)){
+            //If we have some custom settings, use those
+            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+        }
+        return update_option('contexture_ps_options',$defaultOpts);
+    }
+
 }
 
 
@@ -1198,7 +1196,7 @@ function ctx_ps_uninstall(){
 
     //Remove our db version reference from options
     delete_option("contexture_ps_db_version");
-
+    delete_option("contexture_ps_options");
 }
 
 

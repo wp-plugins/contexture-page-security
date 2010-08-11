@@ -15,6 +15,8 @@ if(empty($_POST['action'])){
     }
 }
 
+//Get AD messages from options
+$ADMsg = get_option('contexture_ps_options');
 
 
 ?>
@@ -83,7 +85,7 @@ if(empty($_POST['action'])){
                         <label for="ad-msg-auth">Authenticated Users:</label>
                     </th>
                     <td>
-                        <input type="text" name="ad-msg-auth" id="ad-msg-auth" value="" /><br/>
+                        <input type="text" name="ad-msg-auth" id="ad-msg-auth" value="<?php echo $ADMsg['ad_msg_auth']; ?>" /><br/>
                         <div>The &quot;access denied&quot; message to show to users who are logged in (HTML OK).</div>
                     </td>
                 </tr>
@@ -92,7 +94,7 @@ if(empty($_POST['action'])){
                         <label for="ad-msg-anon">Anonymous Users:</label>
                     </th>
                     <td>
-                        <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="" /><br/>
+                        <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="<?php echo $ADMsg['ad_msg_anon']; ?>" /><br/>
                         <div>The &quot;access denied&quot; message to show to users who are <span style="text-decoration:underline"><em>not</em></span> logged in (HTML OK).</div>
                     </td>
                 </tr>
