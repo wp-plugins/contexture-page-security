@@ -37,6 +37,7 @@ License: GPL2
 
 /** TODO: x.x - Ability to set membership expirations for individual users in a group (date where user is automatically removed from group) */
 
+/************************* HOOKS *********************************/
 // Install new tables (on activate)
 register_activation_hook(__FILE__,'ctx_ps_activate');
 // Remove tables from db (on delete)
@@ -50,10 +51,14 @@ add_action('show_user_profile', 'ctx_ps_generate_usergroupslist');
 //Add the security box sidebar to the pages section
 add_action('admin_init', 'ctx_ps_admin_init');
 
-//Handle Ajax when adding group to a page
+//Handle Ajax for Edit Page/Post page
 add_action('wp_ajax_ctx_ps_add2page','ctx_ps_ajax_add_group_to_page');
 add_action('wp_ajax_ctx_ps_removefrompage','ctx_ps_ajax_remove_group_from_page');
 add_action('wp_ajax_ctx_ps_security_update','ctx_ps_ajax_security_update');
+
+//Handle Ajax for Edit User page
+add_action('wp_ajax_ctx_ps_add2user','ctx_ps_ajax_add_group_to_user');
+add_action('wp_ajax_ctx_ps_removefromuser','ctx_ps_ajax_remove_group_from_user');
 
 //Add basic security to all public "static" pages and posts
 add_action('wp','ctx_ps_security_action');
@@ -67,8 +72,7 @@ add_filter('get_pages','ctx_ps_security_filter_menu');
 add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
 
 
-
-
+/*********************** FUNCTIONS **********************************/
 
 /**
  * Adds the important tables to the wordpress database
@@ -144,6 +148,182 @@ function ctx_ps_activate(){
         //Adds the Registered Users system group (if it doesnt exist)
         $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
     }
+}
+
+
+/**
+ * Handles ajax requests to add a group to a page
+ */
+function ctx_ps_ajax_add_group_to_page(){
+    global $wpdb;
+
+    $result=false; //Assume result is false
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+    }
+
+    $qryAddSec = "INSERT INTO {$wpdb->prefix}ps_security (
+        sec_protect_type,
+        sec_protect_id,
+        sec_access_type,
+        sec_access_id)
+        VALUES (
+        'page',
+        '{$wpdb->escape($_GET['postid'])}',
+        'group',
+        '{$wpdb->escape($_GET['groupid'])}'
+        )";
+    $result = $wpdb->query($qryAddSec);
+
+    if(!!$result){
+        //See what groups are already attached to the page
+        $currentGroups = array();
+        $OutputHTML = '';
+        $qryGetGroups = "
+            SELECT *
+            FROM {$wpdb->prefix}ps_security
+            JOIN {$wpdb->prefix}ps_groups
+                ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID
+            WHERE sec_protect_id = '{$wpdb->escape($_GET['postid'])}'
+        ";
+        foreach($wpdb->get_results($qryGetGroups) as $curGrp){
+            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$curGrp->group_title.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$curGrp->sec_access_id.',jQuery(this))">remove</span></div>';
+        }
+        ctx_ps_ajax_response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
+    }
+}
+
+/**
+ * Handles ajax requests to remove a group from a specified page
+ */
+function ctx_ps_ajax_remove_group_from_page(){
+    global $wpdb;
+    
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+    }
+
+    if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
+        ctx_ps_ajax_response(array('code'=>'1','message'=>'Group removed'));
+    }else{
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Query failed'));
+    }
+    ctx_ps_ajax_response($response);
+}
+
+
+
+/**
+ * Handles ajax requests to add a user to a group
+ */
+function ctx_ps_ajax_add_group_to_user(){
+    global $wpdb;
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+    }
+
+    //Make sure user exists in db
+    $UserInfo = (int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '{$wpdb->escape($_GET['user_id'])}'");
+
+    //If this user doesn't exist
+    if($UserInfo === 0){
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found (add2user)'));
+    } else {
+        //Add user to group
+        $sqlUpdateGroup = "INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('{$wpdb->escape($_GET['groupid'])}','{$wpdb->escape($_GET['user_id'])}');";
+        if($wpdb->query($sqlUpdateGroup) === false){
+            ctx_ps_ajax_response(array('code'=>'0','message'=>'Query failed'));
+        } else {
+            ctx_ps_ajax_response(array('code'=>'1','message'=>'User enrolled in group','html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>'));
+        }
+    }
+
+}
+
+
+/**
+ * Handles ajax requests to remove a group from a users account
+ */
+function ctx_ps_ajax_remove_group_from_user(){
+    global $wpdb;
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+    }
+
+    $sqlRemoveUserRel = "DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE ID = '{$wpdb->escape($_GET['relid'])}' AND grel_group_id = '{$wpdb->escape($_GET['groupid'])}' AND grel_user_id = '{$wpdb->escape($_GET['usrid'])}';";
+    if($wpdb->query($sqlRemoveUserRel) == 0){
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
+    } else {
+        ctx_ps_ajax_response(array('code'=>'1','message'=>'User unenrolled from group'));
+    }
+}
+
+
+/**
+ * Takes an associative array and outputs xml
+ */
+function ctx_ps_ajax_response($AssocArray=''){
+    if(!isset($AssocArray['code'])){
+        $AssocArray['code'] = 0;
+    }
+
+    @header('Content-Type: text/xml; charset=' . get_option('blog_charset'));
+    $response = "<?xml version='1.0' standalone='yes'?><ajax>";
+    foreach($AssocArray as $element=>$value){
+        $element = strtolower($element);
+        $response .= "<{$element}>{$value}</{$element}>";
+    }
+    $response .= "</ajax>";
+    die($response);
+}
+
+
+/**
+ * Toggles page security on or off - removes all groups from page if toggled off
+ */
+function ctx_ps_ajax_security_update(){
+    global $wpdb;
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+    }
+
+
+    $response = array();
+    switch($_GET['setting']){
+        case 'on':
+            $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
+            $response['message'] = 'Security enabled';
+            break;
+        case 'off':
+            if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']}") !== false){
+                $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
+                $response['message'] = 'Security disabled';
+            }else{
+                $response['code'] = '0';
+                $response['message'] = 'Query failed';
+            }
+            break;
+        default:
+            $response['code'] = '0';
+            $response['message'] = 'Data does not validate';
+            break;
+    }
+    ctx_ps_ajax_response($response);
 }
 
 
@@ -390,17 +570,19 @@ function ctx_ps_admin_init(){
 function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
+        //When DOM Ready...
         jQuery(function(){
-            jQuery('#groups_available')
-                .data('options',jQuery('#groups_available').html())
+            jQuery('#groups-available') //On restrict-access sidebar AND edit-users page
+                .data('options',jQuery('#groups-available').html())
                 .children('.detach')
                     .remove();
             jQuery('#add_group_page').click(function(){ctx_ps_add_group_to_page()});
             jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
+            jQuery('#btn-add-grp-2-user').click(function(){ctx_ps_add_group_to_user()});
         });
 
         //Will display a "Security Updated" message in the sidebar when successful change to security
-        function showSavemsg(){
+        function ctx_showSavemsg(){
             if(jQuery('#ctx_ps_sidebar_security h3.hndle .ctx-ajax-status').length==0){
                 jQuery('#ctx_ps_sidebar_security h3.hndle')
                     .append('<span class="ctx-ajax-status">Saved</span>')
@@ -429,7 +611,7 @@ function ctx_ps_admin_head_js(){
                     function(data){ data = jQuery(data);
                         if(data.find('code').text() == '1'){
                             jQuery("#ctx_ps_pagegroupoptions").show();
-                            showSavemsg();
+                            ctx_showSavemsg();
                         }
                     },'xml'
                 );
@@ -446,7 +628,7 @@ function ctx_ps_admin_head_js(){
                             data = jQuery(data);
                             if(data.find('code').text() =='1'){
                                 jQuery("#ctx_ps_pagegroupoptions").hide();
-                                showSavemsg();
+                                ctx_showSavemsg();
                             }
                         },'xml'
                     );
@@ -458,9 +640,84 @@ function ctx_ps_admin_head_js(){
             
         }
 
+        //Adds a group to a user
+        function ctx_ps_add_group_to_user(){
+            var igroupid = parseInt(jQuery('#groups-available').val());
+            var iusrid = parseInt(jQuery('#ctx-group-user-id').val());
+            if(igroupid!=0){
+                //alert("The group you want to add is: "+$groupid);
+                jQuery.get('admin-ajax.php',
+                    {
+                        action:'ctx_ps_add2user',
+                        groupid:igroupid,
+                        user_id:iusrid
+                    },
+                    function(response){
+                        response = jQuery(response);
+                        if(response.find('html').length > 0){
+                            
+                            //Add group to the Allowed Groups list from our stored data
+                            jQuery('#grouptable > tbody').html(response.find('html').text());
+
+                            //Load the select drop down list
+                            var grpsAvail = jQuery('#groups-available');
+
+                            grpsAvail
+                                .html(grpsAvail.data('options')) //Set the ddl content = saved data
+                                .children('option[value="'+igroupid+'"]') //Select option that we just added
+                                    .addClass('detach') //Add detach class to it
+                                .end() //Reselect ddl again
+                                .data('options',grpsAvail.html()) //Re-save the options html as data
+                                .children('.detach') //Select all detached options
+                                    .remove(); //Remove them
+
+                            ctx_showSavemsg();
+                        }
+                    },'xml'
+                );
+            }else{
+                alert('You must select a group to add.');
+            }
+        }
+
+        //Removes a group from a user
+        function ctx_ps_remove_group_from_user(igroupid,iuserid,me){
+            var iusrid = parseInt(jQuery('#ctx-group-user-id').val());
+            //alert("The group you want to add is: "+$groupid);
+            jQuery.get('admin-ajax.php',
+                {
+                    action:'ctx_ps_removefromuser',
+                    groupid:igroupid,
+                    user_id:iusrid
+                },
+                function(response){
+                    response = jQuery(response);
+                    if(response.find('code').text() == '1'){
+
+                       var grpsAvail = jQuery('#groups-available');
+                        grpsAvail
+                            .html(grpsAvail.data('options'))
+                            .children('option[value="'+igroupid+'"]')
+                                .removeClass('detach')
+                            .end()
+                            .data('options',grpsAvail.html())
+                            .children('.detach')
+                                .remove();
+
+                        //Take me out of the table
+                        me.parent().remove();
+
+                        ctx_showSavemsg();
+                    }
+                },'xml'
+            );
+                
+        }
+
+
         //Adds a group to a page with security
         function ctx_ps_add_group_to_page(){
-            var igroupid = parseInt(jQuery('#groups_available').val());
+            var igroupid = parseInt(jQuery('#groups-available').val());
             var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
             if(igroupid!=0){
                 //alert("The group you want to add is: "+$groupid);
@@ -476,7 +733,7 @@ function ctx_ps_admin_head_js(){
                             //Add group to the Allowed Groups list
                             jQuery('#ctx-ps-page-group-list').html(data.find('html').text());
 
-                            var grpsAvail = jQuery('#groups_available');
+                            var grpsAvail = jQuery('#groups-available');
 
                             grpsAvail
                                 .html(grpsAvail.data('options'))
@@ -487,7 +744,7 @@ function ctx_ps_admin_head_js(){
                                 .children('.detach')
                                     .remove();
 
-                            showSavemsg();
+                            ctx_showSavemsg();
                         }
                     },'xml'
                 );
@@ -511,7 +768,7 @@ function ctx_ps_admin_head_js(){
                         data = jQuery(data);
                         if(data.find('code').text() == '1'){
                             
-                           var grpsAvail = jQuery('#groups_available');
+                           var grpsAvail = jQuery('#groups-available');
                             grpsAvail
                                 .html(grpsAvail.data('options'))
                                 .children('option[value="'+igroupid+'"]')
@@ -522,7 +779,7 @@ function ctx_ps_admin_head_js(){
                                     .remove();
                             me.parent().remove();
 
-                            showSavemsg();
+                            ctx_showSavemsg();
                         }
                     },'xml'
                 );
@@ -551,127 +808,10 @@ function ctx_ps_admin_head_css(){
         option.cts-ps-system-group { font-weight:bold; }
         .ctx-ps-sidebar-group { padding-bottom:2px; }
         .ctx-ps-sidebar-group:hover { background:#FFFCE0; }
-        #groups_available .detach { display:none; visibility:hidden; }
+        #groups-available .detach { display:none; visibility:hidden; }
     </style>
     <?php
 }
-
-/**
- * Handles ajax requests to add a group to a page
- */
-function ctx_ps_ajax_add_group_to_page(){
-    global $wpdb;
-
-    $result=false; //Assume result is false
-    
-    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(current_user_can('manage_options')){
-        $qryAddSec = "INSERT INTO {$wpdb->prefix}ps_security (
-            sec_protect_type,
-            sec_protect_id,
-            sec_access_type,
-            sec_access_id)
-            VALUES (
-            'page',
-            '{$wpdb->escape($_GET['postid'])}',
-            'group',
-            '{$wpdb->escape($_GET['groupid'])}'
-            )";
-        $result = $wpdb->query($qryAddSec);
-    }
-
-    if(!!$result){
-        //See what groups are already attached to the page
-        $currentGroups = array();
-        $OutputHTML = '';
-        $qryGetGroups = "
-            SELECT *
-            FROM {$wpdb->prefix}ps_security
-            JOIN {$wpdb->prefix}ps_groups
-                ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID
-            WHERE sec_protect_id = '{$wpdb->escape($_GET['postid'])}'
-        ";
-        foreach($wpdb->get_results($qryGetGroups) as $curGrp){
-            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$curGrp->group_title.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$curGrp->sec_access_id.',jQuery(this))">remove</span></div>';
-        }
-        ctx_ps_ajax_response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
-    }
-    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
-}
-
-/**
- * Handles ajax requests to remove a group from a specified page
- */
-function ctx_ps_ajax_remove_group_from_page(){
-    global $wpdb;
-    
-    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(current_user_can('manage_options')){
-        if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
-            $response['code'] = '1';
-            $response['message'] = 'Group removed';
-        }else{
-            $response['code'] = '0';
-            $response['message'] = 'Query failed';
-        }
-        ctx_ps_ajax_response($response);
-    }
-    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
-}
-
-
-/**
- * Takes an associative array and outputs xml
- */
-function ctx_ps_ajax_response($AssocArray=''){
-    if(!isset($AssocArray['code'])){
-        $AssocArray['code'] = 0;
-    }
-
-    @header('Content-Type: text/xml; charset=' . get_option('blog_charset'));
-    $response = "<?xml version='1.0' standalone='yes'?><ajax>";
-    foreach($AssocArray as $element=>$value){
-        $element = strtolower($element);
-        $response .= "<{$element}>{$value}</{$element}>";
-    }
-    $response .= "</ajax>";
-    die($response);
-}
-
-
-/**
- * Toggles page security on or off - removes all groups from page if toggled off
- */
-function ctx_ps_ajax_security_update(){
-    global $wpdb;
-    
-    //Added in 1.0.5 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(current_user_can('manage_options')){
-        $response = array();
-        switch($_GET['setting']){
-            case 'on':
-                $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
-                $response['message'] = 'Security enabled';
-                break;
-            case 'off':
-                if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']}") !== false){
-                    $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
-                    $response['message'] = 'Security disabled';
-                }else{
-                    $response['code'] = '0';
-                    $response['message'] = 'Query failed';
-                }
-                break;
-            default:
-                $response['code'] = '0';
-                $response['message'] = 'Data does not validate';
-                break;
-        }
-        ctx_ps_ajax_response($response);
-    }
-    ctx_ps_ajax_response(array('code'=>1,'message'=>'Admin user is unauthorized.'));
-}
-
 
 /**
  * Gets a count of the number of groups currently in the db
@@ -685,7 +825,6 @@ function ctx_ps_count_groups($memberid=''){
         return $wpdb->get_var("
             SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships
             WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$memberid}'
-            AND group_system_id IS NULL
         ");
     }
 }
@@ -798,8 +937,9 @@ function ctx_ps_determine_access($UserGroupsArray,$PageSecurityArray){
  *
  * @return string Returns the html
  */
-function ctx_ps_display_group_list($memberid='',$showactions=true){
+function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=true){
     global $wpdb;
+    
     $linkBack = admin_url();
 
     if($memberid==''){
@@ -818,6 +958,7 @@ function ctx_ps_display_group_list($memberid='',$showactions=true){
     }
 
     $html = '';
+    $htmlactions = '';
     $countmembers = '';
     $alternatecss = ' class="alternate" ';
     $countusers = count_users();
@@ -825,17 +966,32 @@ function ctx_ps_display_group_list($memberid='',$showactions=true){
     foreach($groups as $group){
         $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
 
-        //If showactions is false, we dont show the actions row
-        $htmlactions = ($showactions)
-            ? "<div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>"
-            : "";
+        //Only create the actions if $showactions is true
+        if($showactions){
+            switch($forpage){
+                case 'users':
+                    //Button for "Remove" takes user out of group (ajax)/*GOOGLE*/
+                    $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"ctx_ps_remove_group_from_user({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
+                    break;
+                case 'groups':
+                    //Button for "Delete" removes group from db (postback)
+                    //If $showactions is false, we dont show the actions row at all
+                    $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>";
+                    break;
+                default:break;
+            }
+        }
 
         //If user isnt admin, we wont even link to group edit page (useful for profile pages)
         if ( current_user_can('manage_options') ){
+            //User is admin - determined if link is system or not
             $grouplink = (!isset($group->group_system_id))
-                ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a>" //User group
-                : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>"; //System group
+                //This is a user group (editable)
+                ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a>{$htmlactions}"
+                //This is a system group (not editable)
+                : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>";
         }else{
+            //User is not admin - no links
             $grouplink = "<a id=\"$group->group_system_id\"><strong>{$group->group_title}</strong></a>";
         }
 
@@ -1140,7 +1296,7 @@ function ctx_ps_sidebar_security(){
             echo ' display:block ';
         echo '">';
         echo '      <h5>Available Groups</h5>';
-        echo '      <select id="groups_available" name="groups_available">';
+        echo '      <select id="groups-available" name="groups-available">';
         echo            '<option value="0">-- Select -- </option>';
         //Loop through all groups in the db to populate the drop-down list
         foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){

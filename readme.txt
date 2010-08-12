@@ -57,9 +57,11 @@ hosting dashboard).
 == Changelog ==
 
 = 1.1 =
-* New feature: Add users to groups from the Edit User page
-* New feature: Customize your access denied messages
-* New feature: Added [mygroups] and [allgroups] shortcodes to reveal permissions requirements for the current page/post
+* New feature: Manage a user's groups from the Edit User page
+* New feature: Admins can now customize their default access denied messages
+* New feature: Added [mygroups] and [allgroups] shortcodes, which print permissions requirements for the current page/post
+* New feature: The "Restrict Access" sidebar now lists inherited permissions
+* Numerous bug fixes (hopefully no new ones)
 
 = 1.0.4 =
 * Fixed a restricted access message that pointed to incorrect login page url

@@ -40,7 +40,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
         <h3>Group Membership</h3>
         <?php if ( current_user_can('manage_options') ) { ?>
         <div class="tablenav">
-            <select id="groups_available">
+            <select id="groups-available">
                 <option value="0">-- Select -- </option>
                 <?php
                 //Loop through all groups in the db to populate the drop-down list
@@ -50,9 +50,14 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                 }
                 ?>
             </select>
-            <input type="button" class="button-secondary action" value="Add to Group" />
+            <input type="hidden" id="ctx-group-user-id" value="<?php echo $_GET['user_id'];  ?>" />
+            <input type="button" class="button-secondary action" id="btn-add-grp-2-user" value="Add to Group" />
         </div>
-        <?php } //end check for admin priviledges ?>
+        <?php 
+        }else{ //end check for admin priviledges
+            //echo "<p>Group membership is managed by site administrators. To be added or removed from a group, please contact an administrator.</p>";
+        } //end else
+        ?>
         <table id="grouptable" class="widefat fixed" cellspacing="0">
             <thead>
                 <tr class="thead">
@@ -77,14 +82,14 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                         if(ctx_ps_count_groups($current_user->ID) == '0'){
                             echo '<td colspan="4">You are not currently a member of any groups. '.$current_user->ID.'</td>';
                         } else {
-                            echo ctx_ps_display_group_list($current_user->ID,false);
+                            echo ctx_ps_display_group_list($current_user->ID,'users',false);
                         }
                     }else{
                         //IF THIS IS A USER-EDIT PAGE (admin version)
                         if(ctx_ps_count_groups($_GET['user_id']) == '0'){
                             echo '<td colspan="4">This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>';
                         } else {
-                            echo ctx_ps_display_group_list($_GET['user_id'],false);
+                            echo ctx_ps_display_group_list($_GET['user_id'],'users',true);
                         }
                     }
                 ?>
