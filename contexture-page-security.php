@@ -25,12 +25,17 @@ License: GPL2
 */
 
 
-/** TODO: Implement custom access denied messages */
-/** TODO: Implement custom access denied PAGES */
-/** TODO: Implement "Advanced Features" for restrict access toolbar (ie: Show in menu, show in RSS, etc) */
-/** TODO: Allow admins to specify specific access denied pages for specific restricted pages */
-/** TODO: Create template tag that can be used to output group requirement info to page */
-/** TODO: Allow admins to add GROUPS to USERS via the EDIT USER page (ajax load)*/
+/** TODO: 1.1 - Implement custom access denied messages */
+/** TODO: 1.1 - Create template tag that can be used to output group requirement info to page */
+/** TODO: 1.1 - Allow admins to add GROUPS to USERS via the EDIT USER page (ajax load) */
+
+/** TODO: 1.2 - Implement custom access denied PAGES */
+/** TODO: 1.2 - Implement "Advanced Features" for restrict access toolbar (see below) */
+/** TODO: 1.2 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
+/** TODO: 1.2 - Restrict Access Advanced: "Allow on menus" */
+/** TODO: 1.2 - Restrict Access Advanced: "Set custom access denied page" option */
+
+/** TODO: x.x - Ability to set membership expirations for individual users in a group (date where user is automatically removed from group) */
 
 // Install new tables (on activate)
 register_activation_hook(__FILE__,'ctx_ps_activate');
@@ -61,6 +66,127 @@ add_filter('get_pages','ctx_ps_security_filter_menu');
 //Ensure that menus do not display protected pages (when using WP3 custom menus only)
 add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
 
+
+
+
+
+/**
+ * Adds the important tables to the wordpress database
+ */
+function ctx_ps_activate(){
+    global $wpdb;
+
+    $linkBack = admin_url();
+
+    //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
+    if (version_compare(PHP_VERSION, '5', '<')) {
+        deactivate_plugins(__FILE__);
+        wp_die("<span style=\"color:red;font-weight:bold;\">Missing Requirement: </span> Page Security by Contexture requires PHP5 or higher. Your server is running ".PHP_VERSION.". Please contact your hosting service about enabling PHP5 support. <a href=\"{$linkBack}plugins.php\"> Return to plugin page &gt;&gt;</a>");
+    }
+
+    //Name our tables
+    $table_groups = $wpdb->prefix . "ps_groups";
+    $table_group_relationships = $wpdb->prefix . "ps_group_relationships";
+    $table_security = $wpdb->prefix . "ps_security";
+
+    //Build our SQL scripts to create the new db tables
+    $sql_create_groups = "CREATE TABLE IF NOT EXISTS `$table_groups` (
+        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
+        `group_description` text COMMENT 'A description of or notes about the group',
+        `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
+        `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
+        `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
+        PRIMARY KEY (`ID`)
+    )";
+
+    $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `$table_group_relationships` (
+        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+        `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
+        `grel_user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The user id to attach to the group',
+        PRIMARY KEY (`ID`)
+    )";
+
+    $sql_create_security = "CREATE TABLE IF NOT EXISTS `$table_security` (
+        `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
+        `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
+        `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
+        `sec_access_type` varchar(10) NOT NULL default 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
+        `sec_access_id` bigint(20) NOT NULL COMMENT 'The id of the user, group, or role this pertains to.',
+        `sec_setting` varchar(10) NOT NULL default 'allow' COMMENT 'Set to either allow or restrict',
+        `sec_cascades` tinyint(1) NOT NULL default '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
+        PRIMARY KEY (`ID`)
+    )";
+
+    //Create the tables
+    $wpdb->show_errors();
+    $wpdb->query($sql_create_groups);
+    $wpdb->query($sql_create_group_relationships);
+    $wpdb->query($sql_create_security);
+
+    //Record what version of the db we're using (only works if option not already set)
+    add_option("contexture_ps_db_version", "1.1");
+
+    //Set plugin options (not db version)
+    ctx_ps_set_options();
+
+    /********* START UPGRADE PATH ***********/
+    $dbver = get_option("contexture_ps_db_version");
+    if($dbver == "" || (float)$dbver < 1.1){
+        $wpdb->query("ALTER TABLE `$table_groups` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
+        update_option("contexture_ps_db_version", "1.1");
+    }
+    /******** END UPGRADE PATH **************/
+
+    //Check if our "Registered Users" group already exists
+    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `$table_groups` WHERE `group_system_id` = 'CPS01' LIMIT 1");
+    if(!$CntRegSmrtGrp){
+        //Adds the Registered Users system group (if it doesnt exist)
+        $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
+    }
+}
+
+
+/**
+ * Handles creating or updating the options array
+ *
+ * @param array $array_overrides An associative array containing key=>value pairs to override originals
+ * @return string
+ */
+function ctx_ps_set_options($arrayOverrides=false){
+
+    //Set defaults
+    $defaultOpts = array(
+        "ad_msg_usepages"=>"false",
+        "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'">logging in</a> or contact an administrator for assistance.',
+        "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.',
+        "ad_page_anon_id"=>"",
+        "ad_page_auth_id"=>""
+    );
+
+    //Let's see if the options already exist...
+    $dbOpts = get_option('contexture_ps_options');
+
+    if(!$dbOpts){
+        //There's no options! Let's build them...
+        if($arrayOverrides!=false && is_array($arrayOverrides)){
+            //If we have some custom settings, use those
+            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+        }
+        //Now add them to the db
+        return add_option('contexture_ps_options',$defaultOpts);
+    }else{
+        //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
+        $defaultOpts = array_merge($defaultOpts, $dbOpts);
+        //Now let's add our custom settings (if appropriate)
+        if($arrayOverrides!=false && is_array($arrayOverrides)){
+            //If we have some custom settings, use those
+            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+        }
+        return update_option('contexture_ps_options',$defaultOpts);
+    }
+
+}
 
 
 /**
@@ -99,15 +225,15 @@ function ctx_ps_security_action(){
                 //If we're NOT allowed to access this page
 
                 //Get AD messages from options
-                //$ADMsg = get_option('contexture_ps_options');
+                $ADMsg = get_option('contexture_ps_options');
 
                 if($current_user->ID == 0){
                     //If user is anonymous, show this message
                     $blogurl = get_bloginfo('url');
-                    wp_die(/*$ADMsg['ad_msg_anon'].*/'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }else{
                     //If user is authenticated, show this message
-                    wp_die(/*$ADMsg['ad_msg_auth'].*/'<a style="display:block;font-size:0.7em;padding-top:1em;" href="javascript:history.go(-1)">&lt;&lt; Last page viewed</a><a style="display:block;font-size:0.7em;padding-top:1em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    wp_die($ADMsg['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                 }
             }
         }
@@ -128,6 +254,7 @@ function ctx_ps_security_action(){
 function ctx_ps_security_filter_blog($content){
     global $current_user;
 
+    //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
     if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
         foreach($content as $post->key => $post->value){
             //Fun with manipulating the array
@@ -671,7 +798,7 @@ function ctx_ps_determine_access($UserGroupsArray,$PageSecurityArray){
  *
  * @return string Returns the html
  */
-function ctx_ps_display_group_list($memberid=''){
+function ctx_ps_display_group_list($memberid='',$showactions=true){
     global $wpdb;
     $linkBack = admin_url();
 
@@ -697,9 +824,21 @@ function ctx_ps_display_group_list($memberid=''){
 
     foreach($groups as $group){
         $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
-        $grouplink = (!isset($group->group_system_id)) 
-                ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a><div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>" //User group
+
+        //If showactions is false, we dont show the actions row
+        $htmlactions = ($showactions)
+            ? "<div class=\"row-actions\"><span class=\"edit\"><a href=\"?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>"
+            : "";
+
+        //If user isnt admin, we wont even link to group edit page (useful for profile pages)
+        if ( current_user_can('manage_options') ){
+            $grouplink = (!isset($group->group_system_id))
+                ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a>" //User group
                 : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>"; //System group
+        }else{
+            $grouplink = "<a id=\"$group->group_system_id\"><strong>{$group->group_title}</strong></a>";
+        }
+
         $html .= "<tr {$alternatecss}>
             <td class=\"id\">{$group->ID}</td>
             <td class=\"name\">{$grouplink}</td>
@@ -979,8 +1118,10 @@ function ctx_ps_sidebar_security(){
         $securityStatus = ctx_ps_getprotection( $_GET['post'] );
         //print_r($securityStatus);
 
+        //START BUILDING HTML
         echo '<div class="new-admin-wp25">';
         echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
+        //Build "Protect this page" label
         echo '  <label for="ctx_ps_protectmy">';
         echo '      <input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy"';
         if ( !!$securityStatus )
@@ -990,7 +1131,10 @@ function ctx_ps_sidebar_security(){
         echo '/>';
         echo ' Protect this page and it\'s descendants';
         echo '  </label>';
-        /**TODO: Add link to parent that has this setting enabled, if this isnt that page*/
+        /** TODO: Add "Use as Access Denied page" option */
+        /** TODO: Add link to parent that has this setting enabled, if this isnt that page*/
+        
+        //Start on "Available Groups" select box
         echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
         if ( !!$securityStatus )
             echo ' display:block ';
@@ -1034,126 +1178,6 @@ function ctx_ps_sidebar_security(){
         echo '</div>';
     }
 }
-
-
-/**
- * Adds the important tables to the wordpress database
- */
-function ctx_ps_activate(){
-    global $wpdb;
-
-    $linkBack = admin_url();
-
-    //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
-    if (version_compare(PHP_VERSION, '5', '<')) {
-        deactivate_plugins(__FILE__);
-        wp_die("<span style=\"color:red;font-weight:bold;\">Missing Requirement: </span> Page Security by Contexture requires PHP5 or higher. Your server is running ".PHP_VERSION.". Please contact your hosting service about enabling PHP5 support. <a href=\"{$linkBack}plugins.php\"> Return to plugin page &gt;&gt;</a>");
-    }
-
-    //Name our tables
-    $table_groups = $wpdb->prefix . "ps_groups";
-    $table_group_relationships = $wpdb->prefix . "ps_group_relationships";
-    $table_security = $wpdb->prefix . "ps_security";
-
-    //Build our SQL scripts to create the new db tables
-    $sql_create_groups = "CREATE TABLE IF NOT EXISTS `$table_groups` (
-        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
-        `group_description` text COMMENT 'A description of or notes about the group',
-        `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
-        `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
-        `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
-        PRIMARY KEY (`ID`)
-    )";
-    
-    $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `$table_group_relationships` (
-        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
-        `grel_user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The user id to attach to the group',
-        PRIMARY KEY (`ID`)
-    )";
-
-    $sql_create_security = "CREATE TABLE IF NOT EXISTS `$table_security` (
-        `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
-        `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
-        `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
-        `sec_access_type` varchar(10) NOT NULL default 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
-        `sec_access_id` bigint(20) NOT NULL COMMENT 'The id of the user, group, or role this pertains to.',
-        `sec_setting` varchar(10) NOT NULL default 'allow' COMMENT 'Set to either allow or restrict',
-        `sec_cascades` tinyint(1) NOT NULL default '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
-        PRIMARY KEY (`ID`)
-    )";
-
-    //Create the tables
-    $wpdb->show_errors();
-    $wpdb->query($sql_create_groups);
-    $wpdb->query($sql_create_group_relationships);
-    $wpdb->query($sql_create_security);
-
-    //Record what version of the db we're using (only works if option not already set)
-    add_option("contexture_ps_db_version", "1.1");
-    
-    //Set plugin options (not db version)
-    ctx_ps_set_options();
-
-    /********* START UPGRADE PATH ***********/
-    $dbver = get_option("contexture_ps_db_version");
-    if($dbver == "" || (float)$dbver < 1.1){
-        $wpdb->query("ALTER TABLE `$table_groups` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
-        update_option("contexture_ps_db_version", "1.1");
-    }
-    /******** END UPGRADE PATH **************/
-
-    //Check if our "Registered Users" group already exists
-    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `$table_groups` WHERE `group_system_id` = 'CPS01' LIMIT 1");
-    if(!$CntRegSmrtGrp){
-        //Adds the Registered Users system group (if it doesnt exist)
-        $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('Registered Users','This group automatically applies to all authenticated users.','0','CPS01')");
-    }
-}
-
-
-/**
- * Handles creating or updating the options array
- *
- * @param array $array_overrides An associative array containing key=>value pairs to override originals
- * @return string
- */
-function ctx_ps_set_options($arrayOverrides=false){
-
-    //Set defaults
-    $defaultOpts = array(
-        "ad_msg_usepages"=>"false",
-        "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'">logging in</a> or contact an administrator for assistance.',
-        "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.',
-        "ad_page_anon_id"=>"",
-        "ad_page_auth_id"=>""
-    );
-
-    //Let's see if the options already exist...
-    $dbOpts = get_option('contexture_ps_options');
-
-    if(!$dbOpts){
-        //There's no options! Let's build them...
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        //Now add them to the db
-        return add_option('contexture_ps_options',$defaultOpts);
-    }else{
-        //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
-        $defaultOpts = array_merge($defaultOpts, $dbOpts);
-        //Now let's add our custom settings (if appropriate)
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        return update_option('contexture_ps_options',$defaultOpts);
-    }
-
-}
-
 
 /**
  * Left in for backwards-compatibility purposes. Ensure we can remove.

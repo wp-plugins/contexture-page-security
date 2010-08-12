@@ -1,5 +1,8 @@
 <?php
 
+if ( ! current_user_can( 'manage_options' ) )
+    wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+
 $sqlGetGroupInfo = "SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '{$wpdb->escape($_GET['groupid'])}'";
 $sqlGetGroupPageCount = "SELECT COUNT(*) FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '{$wpdb->escape($_GET['groupid'])}' AND `sec_access_type` = 'group'";
 

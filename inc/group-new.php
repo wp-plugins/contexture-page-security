@@ -1,4 +1,7 @@
-
+<?php
+    if ( ! current_user_can( 'manage_options' ) )
+	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+?>
     <div class="wrap">
         <div class="icon32" id="icon-users"><br/></div>
         <h2>Add New Group</h2>

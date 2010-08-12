@@ -46,14 +46,20 @@ While we believe this plugin is secure, we make no warranty about it's effective
 1. screenshot-1.png
 1. screenshot-2.png
 
-== Other Notes ==
+== Frequently Asked Questions ==
 
-= PHP5 is Required =
+= I get an error about PHP5 when I activate your plugin. What gives? =
 
-PSC requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation. If you are using a
-web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your hosting dashboard).
+PSC requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
+If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
+hosting dashboard).
 
 == Changelog ==
+
+= 1.1 =
+* New feature: Add users to groups from the Edit User page
+* New feature: Customize your access denied messages
+* New feature: Added [mygroups] and [allgroups] shortcodes to reveal permissions requirements for the current page/post
 
 = 1.0.4 =
 * Fixed a restricted access message that pointed to incorrect login page url
@@ -68,7 +74,7 @@ web hosting service, simply contact your hosting provider about updating your de
 * Fixed a bug where group count was incorrectly including smart groups
 * Updated readme to reflect PHP5 requirement
 
-= 1.0.0 =
+= 1.0 =
 * Added a system-owned "Registered Users" smart group so admins can easily limit access to logged-in users only
 * Fixed a webkit-only bug where "Restrict Access" sidebar was not being properly updated when changes were made
 * Groups can now be deleted

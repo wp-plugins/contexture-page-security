@@ -1,5 +1,8 @@
 <?php
 
+if ( ! current_user_can( 'manage_options' ) )
+    wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+
 $sqlGetGroupInfo = "SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '{$wpdb->escape($_GET['groupid'])}'";
 $actionmessage = '';
 
@@ -110,7 +113,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 <input id="action" name="action" type="hidden" value="addusr" />
                 <input id="groupid" name="groupid" type="hidden" value="<?php echo $wpdb->escape($_GET['groupid']); ?>" />
                 <input id="add-username" name="add-username" class="regular-text" type="text" value="username" onclick="if(jQuery(this).val()=='username'){jQuery(this).val('')}" onblur="if(jQuery(this).val().replace(' ','')==''){jQuery(this).val('username')}" /> <input type="submit" class="button-secondary action" value="Add User" onclick="if(jQuery('#add-username').val().replace(' ','') != '' && jQuery('#add-username').val().replace(' ','') != 'username'){return true;}else{ jQuery('#add-username').css({'border-color':'#CC0000','background-color':'pink'});return false; }" />
-                <?php wp_nonce_field('add-user'); ?>
+                <?php wp_nonce_field('ps-add-user'); ?>
             </div>
             <table id="grouptable" class="widefat fixed" cellspacing="0">
                 <thead>
