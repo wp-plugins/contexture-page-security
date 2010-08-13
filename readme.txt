@@ -59,8 +59,9 @@ hosting dashboard).
 = 1.1 =
 * New feature: Manage a user's groups from the Edit User page
 * New feature: Admins can now customize their default access denied messages
-* New feature: Added [mygroups] and [allgroups] shortcodes, which print permissions requirements for the current page/post
+* New feature: Added [groups_attached] and [groups_required] shortcodes, which print permissions requirements for the current page/post
 * New feature: The "Restrict Access" sidebar now lists inherited permissions
+* Various usability improvements
 * Numerous bug fixes (hopefully no new ones)
 
 = 1.0.4 =

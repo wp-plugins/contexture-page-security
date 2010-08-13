@@ -29,9 +29,11 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
         #grouptable .description {}
         #grouptable .user-count {width:60px;}
 
-        #grouptable tbody .name a {font-weight:bold}
+        #grouptable tbody .name a {}
+        #grouptable .delete { cursor:pointer; }
 
         .profile-php #grouptable a:hover {color:#21759B !important;}
+        .ctx-ps-tablenav .ctx-ajax-status {float:right;}
     </style>
     <script type="text/javascript">
         /**/
@@ -39,7 +41,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
     <div class="wrap">
         <h3>Group Membership</h3>
         <?php if ( current_user_can('manage_options') ) { ?>
-        <div class="tablenav">
+        <div class="tablenav ctx-ps-tablenav">
             <select id="groups-available">
                 <option value="0">-- Select -- </option>
                 <?php
