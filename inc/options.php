@@ -36,11 +36,11 @@ $ADMsg = get_option('contexture_ps_options');
         #ad-msg-auth, #ad-msg-anon { width:500px; }
         .toggle-opts-ad {display:none;} /*Hide this until "custom ad pages" feature is implemented */
         .toggle-opts-ad-page {display:none;}
-        #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:20px;margin-right:20px;margin-left:10px;}
+        #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:25px;margin-right:20px;margin-left:10px;}
         #ctx-about a.img-block {display:block;text-align:center;}
         #ctx-about p, #ctx-about div {padding-left:10px;color:#9c9c9c;}
         #ctx-about p a { color:gray; }
-        #ctx-ps-opts-form {float:left;width:750px;margin-top:-35px;}
+        #ctx-ps-opts-form {float:left;width:750px;}
     </style>
     <script type="text/javascript">
         jQuery(function(){
@@ -75,7 +75,7 @@ $ADMsg = get_option('contexture_ps_options');
         });
     </script>
 
-<table cellpadding="0" cellspacing="0" style="border:none;width:100%;">
+<table cellpadding="0" cellspacing="0" style="border:none;width:100%;margin-top:-20px;">
     <tr>
         <td id="ctx-ps-opts-form">
             <div class="wrap">
