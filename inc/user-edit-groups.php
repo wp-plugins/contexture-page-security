@@ -33,7 +33,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
         #grouptable .delete { cursor:pointer; }
 
         .profile-php #grouptable a:hover {color:#21759B !important;}
-        .ctx-ps-tablenav .ctx-ajax-status {float:right;}
+        .ctx-ps-tablenav .ctx-ajax-status {float:right;padding-top:20px;}
     </style>
     <script type="text/javascript">
         /**/

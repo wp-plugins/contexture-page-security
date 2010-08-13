@@ -157,11 +157,10 @@ function ctx_ps_activate(){
 /**
  * Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
  * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
+ * GOOGLE
  */
 function ctx_ps_ajax_add_group_to_page(){
     global $wpdb;
-
-    $result=false; //Assume result is false
 
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
@@ -184,18 +183,18 @@ function ctx_ps_ajax_add_group_to_page(){
     $result = $wpdb->query($qryAddSec);
 
     if(!!$result){
-        //See what groups are already attached to the page
-        $currentGroups = array();
+        //Start with blank HTML output
         $OutputHTML = '';
         
         //Get security info for the specified page and it's parents
         $securityStatus = ctx_ps_getprotection( $_GET['postid'] );
 
-        //Set this to 0, because we are about to count the number of groups attached to THIS page...
+        //Set $groupcount to 0, because we are about to count the number of groups attached to THIS page...
         $groupcount = 0;
         //If there's any security, count the number of groups attached to this page (including inherited groups from ancestors)
         if(!!$securityStatus) {
             foreach($securityStatus as $securityGroups){
+                //Increment $groupcount by the number of groups
                 $groupcount = $groupcount+count($securityGroups);
             }
         }
@@ -204,14 +203,18 @@ function ctx_ps_ajax_add_group_to_page(){
             //Display this if we have no groups (inherited or otherwise)
             $OutputHTML = '<div><em>No groups have been added yet.</em></div>';
         }else{
+            //Loop through each PAGE (starting with this one and working our way up)
             foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
+                //If the pageid in the array is this page (ie: current page)
                 if($securityArray->pageid == $_GET['postid']){
+                    //Loop through all groups for the CURRENT page
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        $OutputHTML = '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
+                        $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
                     }
                 }else{
+                    //Loop through all groups for the ANCESTOR page
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        $OutputHTML = '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
+                        $OutputHTML .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >ancestor</a></div>';
                     }
                 }
             }
@@ -291,7 +294,11 @@ function ctx_ps_ajax_remove_group_from_user(){
     if($wpdb->query($sqlRemoveUserRel) == 0){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
     } else {
-        ctx_ps_ajax_response(array('code'=>'1','message'=>'User unenrolled from group','html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>'));
+        $html = ctx_ps_display_group_list($_GET['user_id'],'users');
+        if(empty($html)){
+            $html = '<td colspan="4">This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>';
+        }
+        ctx_ps_ajax_response(array('code'=>'1','message'=>'User unenrolled from group','html'=>'<![CDATA['.$html.']]>'));
     }
 }
 
@@ -715,8 +722,6 @@ function ctx_ps_admin_head_js(){
 
         //Removes a group from a user
         function ctx_ps_remove_group_from_user(igroupid,iuserid,me){
-            var iusrid = parseInt(jQuery('#ctx-group-user-id').val());
-            //alert("The group you want to add is: "+$groupid);
             jQuery.get('admin-ajax.php',
                 {
                     action:'ctx_ps_removefromuser',
@@ -739,7 +744,7 @@ function ctx_ps_admin_head_js(){
 
                         //Take me out of the table
                         me.parents('tr:first').fadeOut(500,function(){
-                            //Add group to the Allowed Groups list from our stored data
+                            //Rebuild the group
                             jQuery('#grouptable > tbody').html(response.find('html').text());
                         });
 
@@ -1319,8 +1324,8 @@ function ctx_ps_sidebar_security(){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
+        //Get array with security requirements for this page
         $securityStatus = ctx_ps_getprotection( $_GET['post'] );
-        //print_r($securityStatus);
 
         //START BUILDING HTML
         echo '<div class="new-admin-wp25">';
@@ -1367,16 +1372,16 @@ function ctx_ps_sidebar_security(){
         //Show groups that are already added to this page
         if($groupcount===0){
             //Display this if we have no groups (inherited or otherwise)
-            echo '          <div><em>No groups have been added yet.</em></div>';
+            echo '<div><em>No groups have been added yet.</em></div>';
         }else{
             foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
                 if($securityArray->pageid == $_GET['post']){
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '          <div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
+                        echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">remove</span></div>';
                     }
                 }else{
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '          <div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >view</a></div>';
+                        echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >ancestor</a></div>';
                     }
                 }
             }
