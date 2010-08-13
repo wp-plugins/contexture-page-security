@@ -24,11 +24,6 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-
-/** TODO: 1.1 - Implement custom access denied messages */
-/** TODO: 1.1 - Create template tag that can be used to output group requirement info to page */
-/** TODO: 1.1 - Allow admins to add GROUPS to USERS via the EDIT USER page (ajax load) */
-
 /** TODO: 1.2 - Implement custom access denied PAGES */
 /** TODO: 1.2 - Implement "Advanced Features" for restrict access toolbar (see below) */
 /** TODO: 1.2 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */

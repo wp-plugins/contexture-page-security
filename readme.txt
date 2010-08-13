@@ -54,15 +54,19 @@ PSC requires PHP5 to work. If you receive an error message while activating/inst
 If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
 hosting dashboard).
 
+= Does Page Security work with WordPress 2.9 or earlier? =
+
+PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier version
+
 == Changelog ==
 
 = 1.1 =
-* New feature: Manage a user's groups from the Edit User page
-* New feature: Admins can now customize their default access denied messages
-* New feature: Added [groups_attached] and [groups_required] shortcodes, which print permissions requirements for the current page/post
-* New feature: The "Restrict Access" sidebar now lists inherited permissions
-* Various usability improvements
-* Numerous bug fixes (hopefully no new ones)
+* New feature: Easily manage a user's group memberships from the Edit User page
+* New feature: Admins can now customize their default access denied messages!
+* New feature: Added [groups_attached] and [groups_required] shortcodes, which print permissions requirements for the current page/post (great troubleshooting tool for folks with complex permissions)
+* New feature: The "Restrict Access" sidebar now lists inherited permissions for easy management of security
+* Lots and lots of other small usability improvements
+* Numerous bug fixes (and hopefully no new ones)
 
 = 1.0.4 =
 * Fixed a restricted access message that pointed to incorrect login page url
