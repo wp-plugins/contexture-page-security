@@ -24,6 +24,9 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/** TODO: 1.2 - Show protected status on WP default admin page list */
+/** TODO: 1.2 - AJAX username hinting in Groups > Edit add user field. */
+/** TODO: 1.2 - Make plugin localization friendly */
 /** TODO: 1.2 - Implement custom access denied PAGES */
 /** TODO: 1.2 - Implement "Advanced Features" for restrict access toolbar (see below) */
 /** TODO: 1.2 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
