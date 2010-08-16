@@ -147,11 +147,11 @@ $ADMsg = get_option('contexture_ps_options');
         </td>
         <td>
             <div id="ctx-about">
-                <a class="img-block" href="http://www.contextureintl.com/?ref=pagesec"><img src="<?php get_bloginfo('url') ?>/wp-content/plugins/contexture-page-security/ctx-logo.gif" alt="Contexture International" /></a>
-                <p>Contexture International is an all-in-one agency specializing in <a href="http://www.contextureintl.com/portfolio/graphic-design/?ref=pagesec">graphic design</a>, <a href="http://www.contextureintl.com/portfolio/web-interactive/?ref=pagesec">web design</a>, and <a href="http://www.contextureintl.com/portfolio/broadcast-video-production/?ref=pagesec">broadcast and video production</a>, with an unparalleled ability to connect with the heart of your audience.</p>
-                <p>Contexture's staff has successfully promoted organizations and visionaries for more than 2 decades through exceptional storytelling, in just the right contexts for their respective audiences, with overwhelming returns on investment.  See the proof in our <a href="http://www.contextureintl.com/portfolio/?ref=pagesec">portfolio </a>or learn more <a href="http://www.contextureintl.com/about-us/?ref=pagesec">about us</a>.</p>
-                <div><a href="http://www.contextureintl.com/offers/?ref=pagesec">Need a custom web or video project?</a></div>
-                <div><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/?ref=pagesec">Need help with Page Security?</a></div>
+                <a class="img-block" href="http://www.contextureintl.com/#pagesec"><img src="<?php get_bloginfo('url') ?>/wp-content/plugins/contexture-page-security/ctx-logo.gif" alt="Contexture International" /></a>
+                <p>Contexture International is an all-in-one agency specializing in <a href="http://www.contextureintl.com/portfolio/graphic-design/#pagesec">graphic design</a>, <a href="http://www.contextureintl.com/portfolio/web-interactive/#pagesec">web design</a>, and <a href="http://www.contextureintl.com/portfolio/broadcast-video-production/#pagesec">broadcast and video production</a>, with an unparalleled ability to connect with the heart of your audience.</p>
+                <p>Contexture's staff has successfully promoted organizations and visionaries for more than 2 decades through exceptional storytelling, in just the right contexts for their respective audiences, with overwhelming returns on investment.  See the proof in our <a href="http://www.contextureintl.com/portfolio/#pagesec">portfolio </a>or learn more <a href="http://www.contextureintl.com/about-us/#pagesec">about us</a>.</p>
+                <div><a href="http://www.contextureintl.com/offers/#ref=pagesec">Need a custom web or video project?</a></div>
+                <div><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/#pagesec">Need help with Page Security?</a></div>
             </div>
         </td>
     </tr>
