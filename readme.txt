@@ -1,5 +1,5 @@
 === Page Security by Contexture ===
-Contributors: Contexture Intl, Matt VanAndel, Jerrol Krause
+Contributors: Contexture International, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
@@ -13,14 +13,14 @@ Allows admins to restrict access to posts, pages, or entire sections of a site t
 Page Security by Contexture (PSC) adds some much-needed "page security" to WordPress. With Contexture Page Security you can now limit access
 to posts, pages, or entire sections of your website.
 
-Easily create "Members-only" sections of your site with PSC' built-in "Registered Users" smart group - or create your own custom user groups
+Easily create "Members-only" sections of your site with Page Security's built-in "Registered Users" smart group - or create your own custom user groups
 to limit access only to users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
 secure entire sections of your site with plenty of flexibility.
 
-PSC also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
+Page Security also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
 creep onto your site because of an overlooked WordPress option.
 
-PSC is simple and easy to use. Visible changes made to the Dashboard are:
+Page Security is simple and easy to use. Visible changes made to the Dashboard are:
 
 1. Two new options are located under the Users category. This includes "Groups" and "Add Group".
 1. A "Restrict Access" sidebar is available when editing any page or post.
@@ -50,7 +50,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 
 = I get an error about PHP5 when I activate your plugin. What gives? =
 
-PSC requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
+Page Security requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
 If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
 hosting dashboard).
 
