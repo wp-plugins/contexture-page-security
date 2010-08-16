@@ -3,13 +3,16 @@
 if ( ! current_user_can( 'manage_options' ) )
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
-$sqlGetGroupInfo = "SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '{$wpdb->escape($_GET['groupid'])}'";
+$sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $actionmessage = '';
 
 if(!empty($_GET['action'])){
     switch($_GET['action']){
         case 'updtgrp':
-            $sqlUpdateGroup = "UPDATE `{$wpdb->prefix}ps_groups` SET group_title = '{$wpdb->escape($_GET['group_name'])}', group_description = '{$wpdb->escape($_GET['group_description'])}' WHERE ID = '{$wpdb->escape($_GET['groupid'])}';";
+            $sqlUpdateGroup = $wpdb->prepare("UPDATE `{$wpdb->prefix}ps_groups` SET group_title = '%s', group_description = '%s' WHERE ID = '%s';",
+                    $_GET['group_name'],
+                    $_GET['group_description'],
+                    $_GET['groupid']);
             if($wpdb->query($sqlUpdateGroup) === false){
                 $actionmessage = '<div class="error below-h2"><p>An error occurred. Group Details could not be updated.</p></div>';
             } else {
@@ -19,13 +22,13 @@ if(!empty($_GET['action'])){
             break;
         case 'addusr':
             //Make sure user exists in db
-            $sqlCheckUserExists = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE user_login = '{$wpdb->escape($_GET['add-username'])}'");
+            $sqlCheckUserExists = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE user_login = '%s'",$_GET['add-username']);
             $UserInfo = $wpdb->query($sqlCheckUserExists);
             if($UserInfo == 0){
                 $actionmessage = '<div class="error below-h2"><p>User &quot;'.$_GET['add-username'].'&quot; does not exist.</p></div>';
             } else {
                 //Add user to group
-                $sqlUpdateGroup = "INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('{$wpdb->escape($_GET['groupid'])}','{$wpdb->get_var($sqlCheckUserExists,0,0)}');";
+                $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",$_GET['groupid'],$wpdb->get_var($sqlCheckUserExists,0,0));
                 if($wpdb->query($sqlUpdateGroup) === false){
                     $actionmessage = '<div class="error below-h2"><p>An error occurred. User could not be added to the group.</p></div>';
                 } else {
@@ -34,7 +37,7 @@ if(!empty($_GET['action'])){
             }
             break;
         case 'rmvusr':
-            $sqlRemoveUserRel = "DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE ID = '{$wpdb->escape($_GET['relid'])}' AND grel_group_id = '{$wpdb->escape($_GET['groupid'])}' AND grel_user_id = '{$wpdb->escape($_GET['usrid'])}';";
+            $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE ID = '%s' AND grel_group_id = '%s' AND grel_user_id = '%s';",$_GET['relid'],$_GET['groupid'],$_GET['usrid']);
             if($wpdb->query($sqlRemoveUserRel) == 0){
                 $actionmessage = '<div class="error below-h2"><p>An error occurred. User could not be removed from group.</p></div>';
             } else {
@@ -77,7 +80,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             <h3>Group Details</h3>
             <input id="action" name="page" type="hidden" value="ps_groups_edit" />
             <input id="action" name="action" type="hidden" value="updtgrp" />
-            <input id="groupid" name="groupid" type="hidden" value="<?php echo $wpdb->escape($_GET['groupid']); ?>" />
+            <input id="groupid" name="groupid" type="hidden" value="<?php echo $_GET['groupid']; ?>" />
             <?php wp_nonce_field('edit-group'); ?>
             <table class="form-table">
                 <tr class="form-field form-required">
@@ -111,7 +114,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             <div class="tablenav">
                 <input id="action" name="page" type="hidden" value="ps_groups_edit" />
                 <input id="action" name="action" type="hidden" value="addusr" />
-                <input id="groupid" name="groupid" type="hidden" value="<?php echo $wpdb->escape($_GET['groupid']); ?>" />
+                <input id="groupid" name="groupid" type="hidden" value="<?php echo $_GET['groupid']; ?>" />
                 <input id="add-username" name="add-username" class="regular-text" type="text" value="username" onclick="if(jQuery(this).val()=='username'){jQuery(this).val('')}" onblur="if(jQuery(this).val().replace(' ','')==''){jQuery(this).val('username')}" /> <input type="submit" class="button-secondary action" value="Add User" onclick="if(jQuery('#add-username').val().replace(' ','') != '' && jQuery('#add-username').val().replace(' ','') != 'username'){return true;}else{ jQuery('#add-username').css({'border-color':'#CC0000','background-color':'pink'});return false; }" />
                 <?php wp_nonce_field('ps-add-user'); ?>
             </div>

@@ -3,8 +3,8 @@
 if ( ! current_user_can( 'manage_options' ) )
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
-$sqlGetGroupInfo = "SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '{$wpdb->escape($_GET['groupid'])}'";
-$sqlGetGroupPageCount = "SELECT COUNT(*) FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '{$wpdb->escape($_GET['groupid'])}' AND `sec_access_type` = 'group'";
+$sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
+$sqlGetGroupPageCount = $wpdb->prepare("SELECT COUNT(*) FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '%s' AND `sec_access_type` = 'group'",$_GET['groupid']);
 
 $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
 $groupPageCount = $wpdb->get_var($sqlGetGroupPageCount);
@@ -14,9 +14,9 @@ $actionmessage2 = '';
 
 if(!empty($_GET['action']) && !empty($_GET['submit']) && $_GET['action'] == "delete" && $_GET['submit']=="Confirm Deletion"){
 
-    $sqlDeleteGroupRelat = "DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE `grel_group_id` = '{$wpdb->escape($_GET['groupid'])}'";
-    $sqlDeleteGroupSecur = "DELETE FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '{$wpdb->escape($_GET['groupid'])}' AND `sec_access_type` = 'group'";
-    $sqlDeleteGroup = "DELETE FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '{$wpdb->escape($_GET['groupid'])}'";
+    $sqlDeleteGroupRelat = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE `grel_group_id` = '%s'",$_GET['groupid']);
+    $sqlDeleteGroupSecur = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '%s' AND `sec_access_type` = 'group'",$_GET['groupid']);
+    $sqlDeleteGroup = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 
     $sqlstatus1 = $wpdb->query($sqlDeleteGroupRelat);
     $sqlstatus2 = $wpdb->query($sqlDeleteGroupSecur);

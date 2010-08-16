@@ -5,15 +5,15 @@ global $current_user, $wpdb;
 
 //Create an array of groups that are already attached to this user
 $currGroups = array();
-$sqlCurrGroups = "
+$sqlCurrGroups = $wpdb->prepare("
     SELECT 
         {$wpdb->prefix}ps_groups.ID,
         {$wpdb->prefix}ps_groups.group_title
     FROM {$wpdb->prefix}ps_groups
     JOIN {$wpdb->prefix}ps_group_relationships
         ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
-    WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$wpdb->escape($_GET['user_id'])}'
-";
+    WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '%s'
+",$_GET['user_id']);
 foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
     $currentGroups[$curGrp->ID] = $curGrp->group_title;
 }

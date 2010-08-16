@@ -164,17 +164,21 @@ function ctx_ps_ajax_add_group_to_page(){
     }
 
     //Add new security to the database
-    $qryAddSec = "INSERT INTO {$wpdb->prefix}ps_security (
+    $qryAddSec = $wpdb->prepare(
+        "INSERT INTO {$wpdb->prefix}ps_security (
         sec_protect_type,
         sec_protect_id,
         sec_access_type,
         sec_access_id)
         VALUES (
         'page',
-        '{$wpdb->escape($_GET['postid'])}',
+        '%s',
         'group',
-        '{$wpdb->escape($_GET['groupid'])}'
-        )";
+        '%s'
+        )",
+        $_GET['postid'],
+        $_GET['groupid']
+    );
     $result = $wpdb->query($qryAddSec);
 
     if(!!$result){
@@ -255,14 +259,18 @@ function ctx_ps_ajax_add_group_to_user(){
     }
 
     //Make sure user exists in db
-    $UserInfo = (int)$wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '{$wpdb->escape($_GET['user_id'])}'");
+    $UserInfo = (int)$wpdb->get_var(
+            $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '%s'",
+                    $_GET['user_id']));
 
     //If this user doesn't exist
     if($UserInfo === 0){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found (add2user)'));
     } else {
         //Add user to group
-        $sqlUpdateGroup = "INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('{$wpdb->escape($_GET['groupid'])}','{$wpdb->escape($_GET['user_id'])}');";
+        $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
+                $_GET['groupid'],
+                $_GET['user_id']);
         if($wpdb->query($sqlUpdateGroup) === false){
             ctx_ps_ajax_response(array('code'=>'0','message'=>'Query failed'));
         } else {
@@ -285,7 +293,9 @@ function ctx_ps_ajax_remove_group_from_user(){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
     }
 
-    $sqlRemoveUserRel = "DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '{$wpdb->escape($_GET['groupid'])}' AND grel_user_id = '{$wpdb->escape($_GET['user_id'])}';";
+    $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
+            $_GET['groupid'],
+            $_GET['user_id']);
     if($wpdb->query($sqlRemoveUserRel) == 0){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
     } else {
@@ -504,6 +514,8 @@ function ctx_ps_security_filter_blog($content){
  */
 function ctx_ps_security_filter_menu($content){
     global $current_user;
+
+    //print_r($content);
 
     //Do this filtering only if the user isn't an admin
     if( !current_user_can('manage_options')  && !is_admin()) {
@@ -887,18 +899,21 @@ function ctx_ps_count_members($groupid){
 function ctx_ps_create_group($name, $description){
     global $wpdb;
 
-    if($wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_title = '{$wpdb->escape($name)}'") == '0'){
+    if($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_title = '%s'",$name)) == '0'){
         $current_user = wp_get_current_user();
-        $sql_addgroup = "
+        $sql_addgroup = $wpdb->prepare("
             INSERT INTO {$wpdb->prefix}ps_groups
             (`group_title`,
             `group_description`,
             `group_creator`)
             VALUES
-            ('{$wpdb->escape($name)}',
-            '{$wpdb->escape($description)}',
-            '{$current_user->ID}')
-        ";
+            ('%s',
+            '%s',
+            '%s')
+        ",
+        $name,
+        $description,
+        $current_user->ID);
         if($wpdb->query($sql_addgroup) !== FALSE){
             return '<div id="message" class="updated"><p>New group created</p></div>';
         }else{
@@ -1066,7 +1081,7 @@ function ctx_ps_generate_usergroupslist(){
 function ctx_ps_display_member_list($GroupID){
     global $wpdb;
 
-    $sqlGetMembers = "
+    $sqlGetMembers = $wpdb->prepare("
         SELECT
             {$wpdb->users}.ID AS ID,
             {$wpdb->prefix}ps_group_relationships.id AS rel_id,
@@ -1075,7 +1090,9 @@ function ctx_ps_display_member_list($GroupID){
         FROM `{$wpdb->prefix}ps_group_relationships`
         JOIN `{$wpdb->users}`
             ON {$wpdb->prefix}ps_group_relationships.grel_user_id = {$wpdb->users}.ID
-        WHERE grel_group_id = '{$wpdb->escape($GroupID)}'";
+        WHERE grel_group_id = '%s'",
+    $GroupID);
+
     $members = $wpdb->get_results($sqlGetMembers);
 
     $html = '';
@@ -1172,14 +1189,14 @@ function ctx_ps_getprotection($postid){
     $array = array();
     $grouparray = array();
     /**Gets the parent id of the current page/post*/
-    $parentid = $wpdb->get_var("SELECT post_parent FROM {$wpdb->posts} WHERE `ID` = {$wpdb->escape($postid)}");
+    $parentid = $wpdb->get_var($wpdb->prepare("SELECT post_parent FROM {$wpdb->posts} WHERE `ID` = '%s'",$postid));
     /**Gets the ctx_ps_security data for this post (if it exists) - used to determine if this is the topmost secured page*/
     //$amisecure = get_post_meta($postid,'ctx_ps_security',true);
 
     //1. If I am secure, get my groups
     //if(!empty($amisecure)){
         //Get Group relationship info for this page from wp_ps_security, join wp_posts on postid
-        $query = "
+        $query = $wpdb->prepare("
             SELECT
                 {$wpdb->posts}.id AS post_id,
                 {$wpdb->posts}.post_parent AS post_parent_id,
@@ -1190,8 +1207,8 @@ function ctx_ps_getprotection($postid){
                 ON {$wpdb->prefix}ps_security.sec_protect_id = {$wpdb->posts}.ID
             JOIN {$wpdb->prefix}ps_groups
                 ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID
-            WHERE {$wpdb->prefix}ps_security.sec_protect_id = '{$postid}'
-        ";
+            WHERE {$wpdb->prefix}ps_security.sec_protect_id = '%s'
+        ",$postid);
         $groups = $wpdb->get_results($query);
 
         //If 0 results, dont do anything. Otherwise...
@@ -1315,7 +1332,12 @@ function ctx_ps_sidebar_security(){
 
         //Create an array of groups that are already attached to the page
         $currentGroups = array();
-        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$wpdb->escape($_GET['post'])}'") as $curGrp){
+        foreach($wpdb->get_results(
+                $wpdb->prepare(
+                    "SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '%s'",
+                        $_GET['post']
+                )
+            ) as $curGrp){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
@@ -1468,6 +1490,8 @@ function ctx_ps_tag_groups_required($atts){
         return (current_user_can('manage_options')) ? $return : '';
     }
 }
+
+
 
  /**
  * Removes custom tables and options from the WP database.
