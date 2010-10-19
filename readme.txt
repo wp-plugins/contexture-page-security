@@ -60,6 +60,13 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 
 == Changelog ==
 
+= 1.2 =
+
+* New feature: You can now use any page as a custom default "access denied" screen
+* New feature: Create specialized access denied pages for any protected page, post, or section
+* New feature: You can now control whether menus or RSS feeds get filtered, globally or on a per-item basis
+* Plugin is now localization-friendly
+
 = 1.1 =
 * New feature: Easily manage a user's group memberships from the Edit User page
 * New feature: Admins can now customize their default access denied messages!

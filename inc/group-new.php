@@ -12,7 +12,7 @@
                 <tr class="form-field form-required">
                     <th scope="row">
                         <label for="group_name">
-                            Group Name <span class="description">(required)</span>
+                            <?php _e('Group Name <span class="description">(required)</span>'); ?>
                         </label>
                     </th>
                     <td>
@@ -22,7 +22,7 @@
                 <tr class="form-field">
                     <th scope="row">
                         <label for="group_description">
-                            Description
+                            <?php _e('Description'); ?>
                         </label>
                     </th>
                     <td>
