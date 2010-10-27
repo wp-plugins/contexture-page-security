@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.0
+Version: 1.2.0.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -447,12 +447,26 @@ function ctx_ps_security_action(){
                 $ADMsg = get_option('contexture_ps_options');
 
                 if($current_user->ID == 0){
-                    //If user is anonymous, show this message
-                    $blogurl = get_bloginfo('url');
-                    wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    //Check options to determine if we're using a PAGE or a MESSAGE
+                    if($ADMsg['ad_msg_usepages']==='true'){
+                        //Send user to the new page
+                        //wp_die('Access_denied_page_auth_triggered');
+                        wp_safe_redirect('/?page_id='.$ADMsg['ad_page_auth_id']);
+                    }else{
+                        //If user is anonymous, show this message
+                        $blogurl = get_bloginfo('url');
+                        wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    }
                 }else{
-                    //If user is authenticated, show this message
-                    wp_die($ADMsg['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    //Check options to determine if we're using a PAGE or a MESSAGE
+                    if($ADMsg['ad_msg_usepages']==='true'){
+                        //Send user to the new page
+                        //wp_die('Access_denied_page_anon_triggered');
+                        wp_safe_redirect('/?page_id='.$ADMsg['ad_page_anon_id']);
+                    }else{
+                        //If user is authenticated, show this message
+                        wp_die($ADMsg['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                    }
                 }
             }
         }

@@ -104,11 +104,11 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens') ?>
+                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens') ?>
                                 </label>
                             </td>
                         </tr>
-                        <tr valign="top" class="toggle-opts-ad-page">
+                        <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-page-auth"><?php _e('Authenticated Users:') ?></label>
                             </th>
@@ -118,7 +118,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who <strong><em>are logged in</em></strong>.') ?></div>
                             </td>
                         </tr>
-                        <tr valign="top" class="toggle-opts-ad-page">
+                        <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-page-anon"><?php _e('Anonymous Users:') ?></label>
                             </th>
@@ -128,7 +128,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who are <strong><em>not</em></strong> logged in.') ?></div>
                             </td>
                         </tr>
-                        <tr valign="top" class="toggle-opts-ad-msg">
+                        <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-msg-auth"><?php _e('Authenticated Users:') ?></label>
                             </th>
@@ -137,7 +137,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                                 <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are logged in (HTML OK).') ?></div>
                             </td>
                         </tr>
-                        <tr valign="top" class="toggle-opts-ad-msg">
+                        <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-msg-anon"><?php _e('Anonymous Users:') ?></label>
                             </th>
@@ -157,7 +157,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             <td>
                                 <label>
                                     <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated') ?></div>
+                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from non-browser RSS readers.') ?></div>
                                 </label>
                             </td>
                         </tr>
