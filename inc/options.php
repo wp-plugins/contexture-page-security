@@ -20,7 +20,13 @@ if(empty($_POST['action'])){
 
     //Add page selections if
     if(isset($_POST['ad-msg-enable'])){
-        $newopts['ad_msg_usepages'] = 'true';
+        if(is_numeric($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-anon'])){
+            $newopts['ad_msg_usepages'] = 'true';
+        }else{
+            $newopts['ad_msg_usepages'] = 'false';
+            $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.').'</strong></p></div>';
+        }
+        
         $newopts['ad_page_auth_id'] = $_POST['ad-page-auth'];
         $newopts['ad_page_anon_id'] = $_POST['ad-page-anon'];
     }
@@ -29,17 +35,18 @@ if(empty($_POST['action'])){
     $saveStatus = ctx_ps_set_options($newopts);
 
     //If save was successful, show the message
-    if($saveStatus){
-        $updatesettingsMessage = '<div id="message" class="updated below-h2 fade"><p><strong>Page Security settings saved</strong>.</p></div>';
+    if(isset($saveStatus)){
+        $updatesettingsMessage = '<div id="message" class="updated below-h2 fade"><p><strong>'.__('Page Security settings saved.').'</strong></p></div>';
     }
 }
 
 //Get AD messages from options
 $ADMsg = get_option('contexture_ps_options');
+$ProtPages = ctx_ps_get_protected_pages('string');
 
 //Generate ddls with page heirarchy
-$pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0));
-$pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_anon_id'], 'echo' => 0));
+$pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0, 'exclude'=>$ProtPages));
+$pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_anon_id'], 'echo' => 0, 'exclude'=>$ProtPages));
 
 ?>
     <style type="text/css">
@@ -91,7 +98,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
             <div class="wrap">
                 <div class="icon32" id="icon-users"><br/></div>
                 <h2>Page Security Options</h2>
-                <?php echo $updatesettingsMessage; ?>
+                <?php echo $updatesettingsMessage,$InvADPagesMsg; ?>
                 <p></p>
                 <form method="post" action="">
                     <input type="hidden" name="action" id="action" value="updateopts" />
@@ -152,23 +159,23 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                     <table class="form-table">
                         <tr valign="top">
                             <th scope="row">
-                                <label for="filter-rss"><?php _e('Enable RSS Filtering:') ?></label>
-                            </th>
-                            <td>
-                                <label>
-                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from non-browser RSS readers.') ?></div>
-                                </label>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <th scope="row">
                                 <label for="filter-menu"><?php _e('Enable Menu Filtering:') ?></label>
                             </th>
                             <td>
                                 <label>
                                     <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter menu items*') ?><br/>
                                     <div class="ctx-footnote"><?php _e('*Restricted content will be removed from menus unless user is authenticated') ?></div>
+                                </label>
+                            </td>
+                        </tr>
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="filter-rss"><?php _e('Enable RSS Filtering:') ?></label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from non-browser RSS readers.') ?></div>
                                 </label>
                             </td>
                         </tr>

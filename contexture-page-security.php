@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.0.2 
+Version: 1.2.0.2
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -25,9 +25,6 @@ License: GPL2
 */
 
 /** TODO: 1.2 - Show protected status on WP default admin page list */
-/** TODO: 1.2 - Add filter to prevent AD pages from showing on menu */
-/** TODO: 1.2 - Implement custom access denied PAGES */
-/** TODO: 1.2 - AD page list should NOT include protected pages */
 
 /** TODO: 1.3 - Implement "Advanced Features" for restrict access toolbar (see below) */
 /** TODO: 1.3 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
@@ -521,7 +518,7 @@ function ctx_ps_security_filter_blog($content){
 
 /**
  * When the default menu is being used, this checks restrictions for each page
- * in the menu and removes it if it's restricted to the current user.
+ * in the menu and removes it if it's restricted for the current user.
  *
  * @global object $post
  * @global <type> $page
@@ -535,7 +532,7 @@ function ctx_ps_security_filter_menu($content){
 
     //print_r($content);
 
-    //Do this filtering only if the user isn't an admin
+    //Do this filtering only if the user isn't an admin (and isn't in admin section)
     if( !current_user_can('manage_options')  && !is_admin()) {
 
         //Loop through the content array
@@ -559,9 +556,16 @@ function ctx_ps_security_filter_menu($content){
                     unset($content[$post->key]); //Remove content from array
                 }
             }
+            
+            //If this is an AD page, strip it too
+            if($dbOpts['ad_msg_usepages']==='true'){
+                if($post->value->object_id==$dbOpts['ad_page_auth_id'] || $post->value->object_id==$dbOpts['ad_page_anon_id']){
+                    unset($content[$post->key]);
+                }
+            }
         }
-
     }
+
     return $content;
 }
 
@@ -582,6 +586,10 @@ function ctx_ps_security_filter_menu_custom($content){
 
     //Do this filtering only if user isn't an admin
     if( !current_user_can('manage_options') && !is_admin() ) {
+
+        //Get options (in case we need to strip access denied pages)
+        $dbOpts = get_option('contexture_ps_options');
+
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
@@ -599,6 +607,12 @@ function ctx_ps_security_filter_menu_custom($content){
                     //If we're allowed to access this page
                 }else{
                     //If we're NOT allowed to access this page
+                    unset($content[$post->key]);
+                }
+            }
+            //If this is an AD page, strip it too
+            if($dbOpts['ad_msg_usepages']==='true'){
+                if($post->value->object_id==$dbOpts['ad_page_auth_id'] || $post->value->object_id==$dbOpts['ad_page_anon_id']){
                     unset($content[$post->key]);
                 }
             }
@@ -674,7 +688,7 @@ function ctx_ps_admin_head_js(){
                     function(data){ data = jQuery(data);
                         if(data.find('code').text() == '1'){
                             jQuery("#ctx_ps_pagegroupoptions").show();
-                            ctx_showSavemsg();
+                            ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
                         }
                     },'xml'
                 );
@@ -691,7 +705,7 @@ function ctx_ps_admin_head_js(){
                             data = jQuery(data);
                             if(data.find('code').text() =='1'){
                                 jQuery("#ctx_ps_pagegroupoptions").hide();
-                                ctx_showSavemsg();
+                                ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
                             }
                         },'xml'
                     );
@@ -1168,6 +1182,32 @@ function ctx_ps_get_usergroups($userid){
     return $array;
 }
 
+/**
+ * Returns an array containing all pages with protection
+ * @param string $type The return type. String or array (array is default)
+ */
+function ctx_ps_get_protected_pages($type='array'){
+    global $wpdb;
+    $results = $wpdb->get_results("SELECT DISTINCT(post_id) FROM `{$wpdb->postmeta}` WHERE `meta_key` = 'ctx_ps_security'",ARRAY_N);
+    //IF WE WANT A STRING (CSV)
+    if($type==='string'){
+        $string = '';
+        foreach($results as $page){
+            $string .= "{$page[0]},";
+        }
+        //get rid of the last comma before returning
+        return preg_replace('/,$/','',$string);
+    //HANDLE DEFAULT (ARRAY)
+    }else{
+        //We get back an unnecessary multidimensional array, so we will collapse this into a simple array
+        $array = array();
+        foreach($results as $page){
+            $array[] = $page[0];
+        }
+        return $array;
+    }
+    
+}
 
 /**
  * Gets database record for the specified system group
@@ -1397,7 +1437,7 @@ function ctx_ps_sidebar_security(){
             if ( !!$securityStatus )
                 echo ' display:block ';
             echo '">';
-            echo    __('<h5>Available Groups</h5>');
+            echo    sprintf(__('<h5>Available Groups <a href="%s" title="New Group" style="text-decoration:none;">+</a></h5>'),admin_url('users.php?page=ps_groups_add'));
             echo '      <select id="groups-available" name="groups-available">';
             echo '<option value="0">-- '.__('Select').' -- </option>';
             //Loop through all groups in the db to populate the drop-down list
