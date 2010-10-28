@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.0.1
+Version: 1.2.0.2
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -25,13 +25,16 @@ License: GPL2
 */
 
 /** TODO: 1.2 - Show protected status on WP default admin page list */
-/** TODO: 1.2 - AJAX username hinting in Groups > Edit add user field. */
-/** TODO: 1.2 - Make plugin localization friendly */
+/** TODO: 1.2 - Add filter to prevent AD pages from showing on menu */
 /** TODO: 1.2 - Implement custom access denied PAGES */
-/** TODO: 1.2 - Implement "Advanced Features" for restrict access toolbar (see below) */
-/** TODO: 1.2 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
-/** TODO: 1.2 - Restrict Access Advanced: "Allow on menus" */
-/** TODO: 1.2 - Restrict Access Advanced: "Set custom access denied page" option */
+/** TODO: 1.2 - AD page list should NOT include protected pages */
+
+/** TODO: 1.3 - Implement "Advanced Features" for restrict access toolbar (see below) */
+/** TODO: 1.3 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
+/** TODO: 1.3 - AJAX username hinting in Groups > Edit add user field. */
+/** TODO: 1.3 - Make plugin localization friendly */
+/** TODO: 1.3 - Restrict Access Advanced: "Allow on menus" */
+/** TODO: 1.3 - Restrict Access Advanced: "Set custom access denied page" option */
 
 /** TODO: x.x - Ability to set membership expirations for individual users in a group (date where user is automatically removed from group) */
 
@@ -158,7 +161,6 @@ function ctx_ps_activate(){
 /**
  * Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
  * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
- * GOOGLE
  */
 function ctx_ps_ajax_add_group_to_page(){
     global $wpdb;
@@ -1350,7 +1352,10 @@ function ctx_ps_sidebar_security(){
         $currentGroups = array();
         foreach($wpdb->get_results(
                 $wpdb->prepare(
-                    "SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '%s'",
+                    "SELECT * FROM {$wpdb->prefix}ps_security
+                        JOIN {$wpdb->prefix}ps_groups
+                            ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID
+                        WHERE sec_protect_id = '%s'",
                         $_GET['post']
                 )
             ) as $curGrp){
@@ -1360,68 +1365,79 @@ function ctx_ps_sidebar_security(){
         //Get array with security requirements for this page
         $securityStatus = ctx_ps_getprotection( $_GET['post'] );
 
-        //START BUILDING HTML
+        //Get options
+        $dbOpts = get_option('contexture_ps_options');
+        //ad_page_auth_id     ad_page_anon_id
+
+        /***START BUILDING HTML****************************/
         echo '<div class="new-admin-wp25">';
-        echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
-        //Build "Protect this page" label
-        echo '  <label for="ctx_ps_protectmy">';
-        echo '      <input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy"';
-        if ( !!$securityStatus )
-            echo ' checked="checked" ';
-        if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
-            echo ' disabled="disabled" ';
-        }
-        echo '/>';
-        echo __(' Protect this page and it\'s descendants');
-        echo '  </label>';
-        /** TODO: Add "Use as Access Denied page" option */
-        
-        //If the checkbox is disabled, give admin the option to go straight to the parent
-        if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
-            echo '<a href="'.admin_url().'post.php?post='.$post->post_parent.'&action=edit" style="display:block;font-size:0.75em;text-align:left;padding-left:20px;">',__('Edit Parent'),'</a>';
-        }
-        //Start on "Available Groups" select box
-        echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
-        if ( !!$securityStatus )
-            echo ' display:block ';
-        echo '">';
-        echo    __('<h5>Available Groups</h5>');
-        echo '      <select id="groups-available" name="groups-available">';
-        echo '<option value="0">-- '.__('Select').' -- </option>';
-        //Loop through all groups in the db to populate the drop-down list
-        foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
-            //Generate the option HTML, hiding it if it's already in our $currentGroups array
-            echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
-        }
-        echo       '</select>';
-        echo       '<input type="button" id="add_group_page" class="button-secondary action" value="',__('Add'),'" />';
-        echo    __('<h5>Allowed Groups</h5>');
-        echo       '<div id="ctx-ps-page-group-list">';
-        //Set this to 0, we are going to count the number of groups attached to this page next...
-        $groupcount = 0;
-        //Count the number of groups attached to this page (including inherited groups)
-        if(!!$securityStatus)
-            foreach($securityStatus as $securityGroups){ $groupcount = $groupcount+count($securityGroups); }
-        //Show groups that are already added to this page
-        if($groupcount===0){
-            //Display this if we have no groups (inherited or otherwise)
-            echo '<div><em>'.__('No groups have been added yet.').'</em></div>';
-        }else{
-            foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
-                if($securityArray->pageid == $_GET['post']){
-                    foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
-                    }
-                }else{
-                    foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >'.__('ancestor').'</a></div>';
+
+        //Only print restriction options if this ISN'T set as an access denied page
+        if($dbOpts['ad_page_anon_id']!=$_GET['post'] && $dbOpts['ad_page_auth_id']!=$_GET['post']){
+            echo '  <input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="'.$_GET['post'].'" />';
+            //Build "Protect this page" label
+            echo '  <label for="ctx_ps_protectmy">';
+            echo '      <input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy"';
+            if ( !!$securityStatus )
+                echo ' checked="checked" ';
+            if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
+                echo ' disabled="disabled" ';
+            }
+            echo '/>';
+            echo __(' Protect this page and it\'s descendants');
+            echo '  </label>';
+            /** TODO: Add "Use as Access Denied page" option */
+
+            //If the checkbox is disabled, give admin the option to go straight to the parent
+            if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
+                echo '<a href="'.admin_url().'post.php?post='.$post->post_parent.'&action=edit" style="display:block;font-size:0.75em;text-align:left;padding-left:20px;">',__('Edit Parent'),'</a>';
+            }
+            //Start on "Available Groups" select box
+            echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
+            if ( !!$securityStatus )
+                echo ' display:block ';
+            echo '">';
+            echo    __('<h5>Available Groups</h5>');
+            echo '      <select id="groups-available" name="groups-available">';
+            echo '<option value="0">-- '.__('Select').' -- </option>';
+            //Loop through all groups in the db to populate the drop-down list
+            foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
+                //Generate the option HTML, hiding it if it's already in our $currentGroups array
+                echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
+            }
+            echo       '</select>';
+            echo       '<input type="button" id="add_group_page" class="button-secondary action" value="',__('Add'),'" />';
+            echo    __('<h5>Allowed Groups</h5>');
+            echo       '<div id="ctx-ps-page-group-list">';
+            //Set this to 0, we are going to count the number of groups attached to this page next...
+            $groupcount = 0;
+            //Count the number of groups attached to this page (including inherited groups)
+            if(!!$securityStatus)
+                foreach($securityStatus as $securityGroups){ $groupcount = $groupcount+count($securityGroups); }
+            //Show groups that are already added to this page
+            if($groupcount===0){
+                //Display this if we have no groups (inherited or otherwise)
+                echo '<div><em>'.__('No groups have been added yet.').'</em></div>';
+            }else{
+                foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
+                    if($securityArray->pageid == $_GET['post']){
+                        foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
+                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
+                        }
+                    }else{
+                        foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
+                            echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >'.__('ancestor').'</a></div>';
+                        }
                     }
                 }
             }
+            echo '      </div>';
+            echo '  </div>';
+        }else{
+            echo '<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a href="'.admin_url('options-general.php?page=ps_manage_opts').'">View Security Settings</a></p>';
         }
-        echo '      </div>';
-        echo '  </div>';
         echo '</div>';
+        /***END BUILDING HTML****************************/
     }
 }
 

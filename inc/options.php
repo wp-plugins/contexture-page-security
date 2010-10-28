@@ -114,7 +114,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <!-- NOTE: Should show only pages marked as "Use as Access Denied" -->
-                                <?php echo $pageDDLAuth; ?><br/>
+                                <?php echo $pageDDLAuth; ?> <?php echo '<a href="'.admin_url("post.php?post={$ADMsg['ad_page_auth_id']}&action=edit").'">Edit Page</a>' ?><br/>
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who <strong><em>are logged in</em></strong>.') ?></div>
                             </td>
                         </tr>
@@ -124,7 +124,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <!-- NOTE: Should show only pages marked as "Use as Access Denied" -->
-                                <?php echo $pageDDLAnon; ?><br/>
+                                <?php echo $pageDDLAnon; ?> <?php echo '<a href="'.admin_url("post.php?post={$ADMsg['ad_page_anon_id']}&action=edit").'">Edit Page</a>' ?><br/>
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who are <strong><em>not</em></strong> logged in.') ?></div>
                             </td>
                         </tr>
