@@ -73,6 +73,9 @@ add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
 add_shortcode('groups_attached', 'ctx_ps_tag_groups_attached'); //Current page permissions only
 add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permissions for current page
 
+//Update the edit.php pages list to include a "Protected" column
+add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
+
 /*********************** FUNCTIONS **********************************/
 
 /**
@@ -889,6 +892,8 @@ function ctx_ps_admin_head_css(){
         .ctx-ps-sidebar-group { padding-bottom:2px; }
         .ctx-ps-sidebar-group:hover { background:#FFFCE0; }
         #groups-available .detach { display:none; visibility:hidden; }
+
+        .widefat th#protected { vertical-align:middle; width:30px; }
     </style>
     <?php
 }
@@ -1564,6 +1569,22 @@ function ctx_ps_tag_groups_required($atts){
 }
 
 
+/**
+ * Updated the admin pages/posts columns with an icon if a page is protected. This adds
+ * a "Protected" icon (lock) immediately after the "Comments" icon (word bubble).
+ */
+function ctx_ps_usability_showprotection($columns){
+
+    //Peel of the date (set temp var, remove from array)
+    //$date = $columns['date'];
+    //unset($columns['date']);
+    //Add new column
+    $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',__FILE__).'" /></div>';
+    //Add date back on (now at end of array);
+    //$columns['date'] = $date;
+
+    return $columns;
+}
 
  /**
  * Removes custom tables and options from the WP database.
