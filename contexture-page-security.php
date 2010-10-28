@@ -33,6 +33,8 @@ License: GPL2
 /** TODO: 1.3 - Restrict Access Advanced: "Allow on menus" */
 /** TODO: 1.3 - Restrict Access Advanced: "Set custom access denied page" option */
 
+/** TODO: 1.4 - Allow CATEGORIES to be restricted. */
+
 /** TODO: x.x - Ability to set membership expirations for individual users in a group (date where user is automatically removed from group) */
 
 /************************* HOOKS *********************************/
@@ -75,6 +77,8 @@ add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permi
 
 //Update the edit.php pages list to include a "Protected" column
 add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
+add_filter('manage_posts_columns','ctx_ps_usability_showprotection');
+add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content');
 
 /*********************** FUNCTIONS **********************************/
 
@@ -426,7 +430,7 @@ function ctx_ps_security_action(){
     global $current_user;
     $secureallowed = true;
 
-    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_admin()) {
+    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_admin() && !is_404()) {
         /**Groups that this user is a member of*/
         $useraccess = ctx_ps_get_usergroups($current_user->ID);
         /**Groups required to access this page*/
@@ -1177,7 +1181,7 @@ function ctx_ps_get_usergroups($userid){
 
     /*** ADD SMART GROUPS (AKA SYSTEM GROUPS ***/
     //Registered Users Smart Group
-    if($current_user->ID != 0){
+    if($current_user->ID != 0 && is_user_member_of_blog($current_user->ID)){
         //Get the ID for CPS01
         $newArray = ctx_ps_get_sysgroup('CPS01');
         //Add CPS01 to the current users permissions array
@@ -1576,14 +1580,23 @@ function ctx_ps_tag_groups_required($atts){
 function ctx_ps_usability_showprotection($columns){
 
     //Peel of the date (set temp var, remove from array)
-    //$date = $columns['date'];
-    //unset($columns['date']);
+    $date = $columns['date'];
+    unset($columns['date']);
     //Add new column
     $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',__FILE__).'" /></div>';
     //Add date back on (now at end of array);
-    //$columns['date'] = $date;
+    $columns['date'] = $date;
 
     return $columns;
+}
+
+/**
+ * Generates the "lock" symbol for protected pages. See template.php -> display_page_row() for  more.
+ */
+function ctx_ps_usability_showprotection_content($rows){
+
+
+    return $rows;
 }
 
  /**
