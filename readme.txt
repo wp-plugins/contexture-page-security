@@ -63,7 +63,7 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 == Changelog ==
 
 = 1.2.1 =
-* To improve usability, the "Restrict Access" sidebar now appears on "New Page" screens.
+* New feature: To improve usability, the "Restrict Access" sidebar now appears on "New..." screens.
 
 = 1.2 =
 
