@@ -1,5 +1,6 @@
 <?php
 /**Creates the "Page Security Options" page**/
+global $wpdb;
 
 if ( !current_user_can('manage_options') )
 	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
@@ -18,7 +19,7 @@ if(empty($_POST['action'])){
         "ad_msg_auth"=>stripslashes($_POST['ad-msg-auth'])
     );
 
-    //Add page selections if
+    //Add page selections if the checkbox is checked
     if(isset($_POST['ad-msg-enable'])){
         if(is_numeric($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-anon'])){
             $newopts['ad_msg_usepages'] = 'true';
@@ -34,8 +35,8 @@ if(empty($_POST['action'])){
         //Disable comments and trackbacks for AD pages
         if(is_numeric($_POST['ad-page-auth']))
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
-        if(is_numeric($_POST['ad-page-auth']))
-            $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
+        if(is_numeric($_POST['ad-page-anon']))
+            $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-anon']));
     }
 
     //Update the options array
