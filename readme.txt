@@ -46,6 +46,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 
 1. screenshot-1.png
 1. screenshot-2.png
+1. screenshot-3.png
 
 == Frequently Asked Questions ==
 
