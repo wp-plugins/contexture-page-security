@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.0.2
+Version: 1.2.0.4
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -75,10 +75,11 @@ add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
 add_shortcode('groups_attached', 'ctx_ps_tag_groups_attached'); //Current page permissions only
 add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permissions for current page
 
-//Update the edit.php pages list to include a "Protected" column
+//Update the edit.php pages & posts lists to include a "Protected" column
 add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
 add_filter('manage_posts_columns','ctx_ps_usability_showprotection');
-add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content');
+add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
+add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
 
 /*********************** FUNCTIONS **********************************/
 
@@ -450,14 +451,15 @@ function ctx_ps_security_action(){
                 //If we're NOT allowed to access this page
 
                 //Get AD messages from options
-                $ADMsg = get_option('contexture_ps_options');
+                $dbOpt = get_option('contexture_ps_options');
 
-                if($current_user->ID == 0){
+                //If user is NOT logged in...
+                if($current_user->ID == 0 && !is_user_logged_in()){
                     //Check options to determine if we're using a PAGE or a MESSAGE
-                    if($ADMsg['ad_msg_usepages']==='true'){
+                    if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        //wp_die('Access_denied_page_auth_triggered');
-                        wp_safe_redirect('/?page_id='.$ADMsg['ad_page_auth_id']);
+                        //wp_die('Access_denied_page_anon_triggered');
+                        wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);
                     }else{
                         //If user is anonymous, show this message
                         $blogurl = get_bloginfo('url');
@@ -465,13 +467,13 @@ function ctx_ps_security_action(){
                     }
                 }else{
                     //Check options to determine if we're using a PAGE or a MESSAGE
-                    if($ADMsg['ad_msg_usepages']==='true'){
+                    if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        //wp_die('Access_denied_page_anon_triggered');
-                        wp_safe_redirect('/?page_id='.$ADMsg['ad_page_anon_id']);
+                        //wp_die('Access_denied_page_auth_triggered');
+                        wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']);
                     }else{
                         //If user is authenticated, show this message
-                        wp_die($ADMsg['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                     }
                 }
             }
@@ -898,6 +900,8 @@ function ctx_ps_admin_head_css(){
         #groups-available .detach { display:none; visibility:hidden; }
 
         .widefat th#protected { vertical-align:middle; width:30px; }
+        .widefat td.protected { vertical-align:top; }
+        .widefat td.protected img { margin-top:4px; }
     </style>
     <?php
 }
@@ -1181,7 +1185,7 @@ function ctx_ps_get_usergroups($userid){
 
     /*** ADD SMART GROUPS (AKA SYSTEM GROUPS ***/
     //Registered Users Smart Group
-    if($current_user->ID != 0 && is_user_member_of_blog($current_user->ID)){
+    if($current_user->ID != 0/* && is_user_member_of_blog($current_user->ID)*/){
         //Get the ID for CPS01
         $newArray = ctx_ps_get_sysgroup('CPS01');
         //Add CPS01 to the current users permissions array
@@ -1593,10 +1597,19 @@ function ctx_ps_usability_showprotection($columns){
 /**
  * Generates the "lock" symbol for protected pages. See template.php -> display_page_row() for  more.
  */
-function ctx_ps_usability_showprotection_content($rows){
+function ctx_ps_usability_showprotection_content($column_name, $pageid){
 
+    //wp_die($columnname.' GOOGLE '.$pageid);
 
-    return $rows;
+    //Only do this if we've got the right column
+    if($column_name==='protected'){
+        //If page is protected, return lock icon
+        if(ctx_ps_isprotected($pageid))
+            echo '<img alt="Protected" title="Protected" src="'.plugins_url('protected-inline.png',__FILE__).'" />';
+        //If this page isnt protected, but an ancestor is, return a lighter icon
+        else if(ctx_ps_isprotected_section($pageid))
+            echo '<img alt="Protected (inherited)" title="Inheriting an ancestors protection" src="'.plugins_url('protected-inline-descendant.png',__FILE__).'" />';
+    }
 }
 
  /**

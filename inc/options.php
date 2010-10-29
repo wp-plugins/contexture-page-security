@@ -26,9 +26,16 @@ if(empty($_POST['action'])){
             $newopts['ad_msg_usepages'] = 'false';
             $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.').'</strong></p></div>';
         }
-        
+
+        //Set new page ids
         $newopts['ad_page_auth_id'] = $_POST['ad-page-auth'];
         $newopts['ad_page_anon_id'] = $_POST['ad-page-anon'];
+
+        //Disable comments and trackbacks for AD pages
+        if(is_numeric($_POST['ad-page-auth']))
+            $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
+        if(is_numeric($_POST['ad-page-auth']))
+            $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
     }
 
     //Update the options array
