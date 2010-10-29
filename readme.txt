@@ -69,7 +69,7 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 
 * New feature: All-new settings screen with lots of new customization options.
 * New feature: You can now use any page as a custom "access denied" screen
-* New feature: You can now control whether menus or RSS feeds get filtered, globally or on a per-item basis
+* New feature: You can now control whether menus or RSS feeds get filtered
 * LOTS of new usability improvements
 * Bug fixes!
 
