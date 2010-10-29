@@ -1504,7 +1504,7 @@ function ctx_ps_sidebar_security(){
         /***END BUILDING HTML****************************/
     }else{
         echo '<div class="new-admin-wp25">';
-        echo '<p>Security settings can not be added to unpublished items.</p>';
+        echo '<p>You must publish before you can update security settings.</p>';
         echo '</div>';
     }
 }
