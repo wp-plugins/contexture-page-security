@@ -458,8 +458,11 @@ function ctx_ps_security_action(){
                     //Check options to determine if we're using a PAGE or a MESSAGE
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        //wp_die('Access_denied_page_anon_triggered');
-                        wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);
+                        if(is_numeric($dbOpt['ad_page_anon_id']))
+                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);
+                        else
+                            //Just in case theres a config problem...
+                            wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                     }else{
                         //If user is anonymous, show this message
                         $blogurl = get_bloginfo('url');
@@ -469,8 +472,11 @@ function ctx_ps_security_action(){
                     //Check options to determine if we're using a PAGE or a MESSAGE
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        //wp_die('Access_denied_page_auth_triggered');
-                        wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']);
+                        if(is_numeric($dbOpt['ad_page_auth_id']))
+                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']);
+                        else
+                            //Just in case theres a config problem...
+                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                     }else{
                         //If user is authenticated, show this message
                         wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
@@ -1183,9 +1189,16 @@ function ctx_ps_get_usergroups($userid){
         $array += array($group->ID => $group->group_title);
     }
 
+    //If multisite is enabled we can better support it...
+    if(function_exists('is_user_member_of_blog')){
+        $multisitemember = is_user_member_of_blog($current_user->ID);
+    }else{
+        $multisitemember = true;
+    }
+
     /*** ADD SMART GROUPS (AKA SYSTEM GROUPS ***/
     //Registered Users Smart Group
-    if($current_user->ID != 0/* && is_user_member_of_blog($current_user->ID)*/){
+    if($current_user->ID != 0 && $multisitemember){
         //Get the ID for CPS01
         $newArray = ctx_ps_get_sysgroup('CPS01');
         //Add CPS01 to the current users permissions array
