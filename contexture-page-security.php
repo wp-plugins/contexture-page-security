@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.0
+Version: 1.2.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -23,8 +23,6 @@ License: GPL2
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-/** TODO: 1.2 - Show protected status on WP default admin page list */
 
 /** TODO: 1.3 - Implement "Advanced Features" for restrict access toolbar (see below) */
 /** TODO: 1.3 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
@@ -1506,7 +1504,7 @@ function ctx_ps_sidebar_security(){
         /***END BUILDING HTML****************************/
     }else{
         echo '<div class="new-admin-wp25">';
-        echo '<p>You must save before you can edit security settings.</p>';
+        echo '<p>Security settings can not be added to unpublished items.</p>';
         echo '</div>';
     }
 }
