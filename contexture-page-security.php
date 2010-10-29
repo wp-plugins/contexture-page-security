@@ -643,11 +643,9 @@ function ctx_ps_security_filter_menu_custom($content){
 function ctx_ps_admin_init(){
     add_action('admin_head', 'ctx_ps_admin_head_js');
     add_action('admin_head', 'ctx_ps_admin_head_css');
-    //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
-    if(isset($_GET['post']) && intval($_GET['post']) == $_GET['post']){
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
-    }
+
+    add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
+    add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
 }
 
 /**
@@ -1412,7 +1410,9 @@ function ctx_ps_isprotected_section($postid){
 function ctx_ps_sidebar_security(){
     global $wpdb, $post;
 
-    if(!empty($_GET['post'])){
+
+        //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
+    if(!empty($_GET['post']) && intval($_GET['post']) == $_GET['post']){
 
         //Create an array of groups that are already attached to the page
         $currentGroups = array();
