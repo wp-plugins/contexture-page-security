@@ -14,24 +14,25 @@ Page Security by Contexture International adds some much-needed "page security" 
 to posts, pages, or entire sections of your website.
 
 Easily create "Members-only" sections of your site with Page Security's built-in "Registered Users" smart group - or create your own custom user groups
-to limit access only to users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
-secure entire sections of your site with plenty of flexibility.
+to limit access only to the users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
+secure entire sections of your site with extraordinary flexibility.
 
 Page Security also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
 creep onto your site because of an overlooked WordPress option.
 
-Page Security is simple and easy to use. Visible changes made to the Dashboard are:
+Page Security is simple, easy to use, and integrates seamlessly with WordPress. Visible changes made to the Dashboard are:
 
 1. Two new options are located under the Users category. This includes "Groups" and "Add Group".
 1. A "Restrict Access" sidebar is available when editing any page or post.
 1. A "Group Membership" overview is added to the "Edit User" pages.
+1. See at a glance what's protected from your admin's pages and posts screens.
 
 Additional features:
 
-1. The "Restrict Access" sidebar is AJAX-loaded, so any changes you make to security are saved immediately! You do not need to click
-the "Update" button to save changes to the page's security.
+1. The "Restrict Access" sidebar is AJAX-loaded, so any changes you make to security are saved immediately! There's no need to click
+the "Update" button to save changes to a page's security.
 1. Any page or post can be easily made "admin only". When editing a page, check the "Protect this page it's descendants" checkbox but don't add any groups. By default,
-all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to all non-admin users.
+all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to non-admin users.
 
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK!
 
@@ -56,16 +57,17 @@ hosting dashboard).
 
 = Does Page Security work with WordPress 2.9 or earlier? =
 
-PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier version
+PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
 
 == Changelog ==
 
 = 1.2 =
 
-* New feature: You can now use any page as a custom default "access denied" screen
-* New feature: Create specialized access denied pages for any protected page, post, or section
+* New feature: All-new settings screen with lots of new customization options.
+* New feature: You can now use any page as a custom "access denied" screen
 * New feature: You can now control whether menus or RSS feeds get filtered, globally or on a per-item basis
-* Plugin is now localization-friendly
+* LOTS of new usability improvements
+* Bug fixes!
 
 = 1.1 =
 * New feature: Easily manage a user's group memberships from the Edit User page
