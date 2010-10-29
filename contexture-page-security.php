@@ -1504,6 +1504,10 @@ function ctx_ps_sidebar_security(){
         }
         echo '</div>';
         /***END BUILDING HTML****************************/
+    }else{
+        echo '<div class="new-admin-wp25">';
+        echo '<p>You must save before you can edit security settings.</p>';
+        echo '</div>';
     }
 }
 
