@@ -37,6 +37,8 @@ if(empty($_POST['action'])){
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
         if(is_numeric($_POST['ad-page-anon']))
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-anon']));
+    }else{
+        $newopts['ad_msg_usepages'] = 'false';
     }
 
     //Update the options array
