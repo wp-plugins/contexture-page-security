@@ -385,7 +385,9 @@ function ctx_ps_set_options($arrayOverrides=false){
         "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'">logging in</a> or contact an administrator for assistance.',
         "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.',
         "ad_page_anon_id"=>"",
-        "ad_page_auth_id"=>""
+        "ad_page_auth_id"=>"",
+        "ad_msg_usefilter_menus"=>"true",
+        "ad_msg_usefilter_rss"=>"true"
     );
 
     //Let's see if the options already exist...
@@ -429,7 +431,7 @@ function ctx_ps_security_action(){
     global $current_user;
     $secureallowed = true;
 
-    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_admin() && !is_404()) {
+    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404()) {
         /**Groups that this user is a member of*/
         $useraccess = ctx_ps_get_usergroups($current_user->ID);
         /**Groups required to access this page*/
@@ -454,10 +456,10 @@ function ctx_ps_security_action(){
                 //If user is NOT logged in...
                 if($current_user->ID == 0 && !is_user_logged_in()){
                     //Check options to determine if we're using a PAGE or a MESSAGE
-                    if($dbOpt['ad_msg_usepages']==='true'){
+                    if($dbOpt['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
-                            if(!is_feed()){wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);}
+                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
@@ -472,7 +474,7 @@ function ctx_ps_security_action(){
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
-                            if(!is_feed()){ wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']); }
+                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']);
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
@@ -504,8 +506,10 @@ function ctx_ps_security_filter_blog($content){
         //print_r($content);
     $dbOpts = get_option('contexture_ps_options');
 
-    if(is_feed() && $dbOpts['ad_msg_usefilter_rss']=='true'){}
-    else{
+    if(is_feed() && $dbOpts['ad_msg_usefilter_rss']=='false'){
+        //If this is a feed and it's filtering is explicitly disabled, do no filtering. Otherwise... filter as normal (below)
+        return $content;
+    }else{
         //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
         if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
             foreach($content as $post->key => $post->value){
@@ -554,7 +558,7 @@ function ctx_ps_security_filter_menu($content){
     //print_r($content);
     $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
-    //Do this filtering only if the user isn't an admin (and isn't in admin section)... and provided the user hasn't disabled this feature
+    //Do this filtering only if the user isn't an admin (and isn't in admin section)... and provided the user hasn't explicitly set menu filtering to false
     if( !current_user_can('manage_options')  && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false') {
 
         //Loop through the content array
@@ -609,7 +613,7 @@ function ctx_ps_security_filter_menu_custom($content){
     //print_r($content);
     $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
-    //Do this filtering only if user isn't an admin, in admin section, and provided the admin hasnt disabled this feature
+    //Do this filtering only if user isn't an admin, in admin section... and provided the user hasn't explicitly set menu filtering to false
     if( !current_user_can('manage_options') && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false' ) {
 
         //Get options (in case we need to strip access denied pages)
