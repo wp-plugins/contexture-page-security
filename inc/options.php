@@ -21,23 +21,26 @@ if(empty($_POST['action'])){
 
     //Add page selections if the checkbox is checked
     if(isset($_POST['ad-msg-enable'])){
+        //So long as valid pages are set for both AD types, successfully set usepages to true
         if(is_numeric($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-anon'])){
             $newopts['ad_msg_usepages'] = 'true';
         }else{
+            //User didn't select both AD pages, disable usepages
             $newopts['ad_msg_usepages'] = 'false';
             $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.').'</strong></p></div>';
         }
 
-        //Set new page ids
-        $newopts['ad_page_auth_id'] = $_POST['ad-page-auth'];
-        $newopts['ad_page_anon_id'] = $_POST['ad-page-anon'];
+        //Set new AD page ids
+        $newopts['ad_page_auth_id'] = (is_numeric($_POST['ad-page-auth'])) ? $_POST['ad-page-auth'] : ''; //If not numeric, use blank
+        $newopts['ad_page_anon_id'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
 
-        //Disable comments and trackbacks for AD pages
-        if(is_numeric($_POST['ad-page-auth']))
+        //Disable comments and trackbacks for currently set AD pages
+        if(!empty($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-auth']))
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-auth']));
-        if(is_numeric($_POST['ad-page-anon']))
+        if(!empty($_POST['ad-page-anon']) && is_numeric($_POST['ad-page-anon']))
             $wpdb->query($wpdb->prepare("UPDATE {$wpdb->posts} SET comment_status='closed', ping_status='closed' WHERE `ID`='%s'",$_POST['ad-page-anon']));
     }else{
+        //Checkbox is not set, so we're not using pages
         $newopts['ad_msg_usepages'] = 'false';
     }
 
@@ -121,7 +124,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens') ?>
+                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens') ?>
                                 </label>
                             </td>
                         </tr>
