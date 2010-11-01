@@ -62,6 +62,9 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 
 == Changelog ==
 
+= 1.2.3 =
+* Bug fixes
+
 = 1.2.2 =
 * Fixed a bug that sometimes prevented custom settings from being saved.
 

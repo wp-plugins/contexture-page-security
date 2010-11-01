@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.2.2
+Version: 1.2.3
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -456,25 +456,27 @@ function ctx_ps_security_action(){
                     //Check options to determine if we're using a PAGE or a MESSAGE
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        if(is_numeric($dbOpt['ad_page_anon_id']))
-                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);
-                        else
+                        if(is_numeric($dbOpt['ad_page_anon_id'])){
+                            if(!is_feed()){wp_safe_redirect('/?page_id='.$dbOpt['ad_page_anon_id']);}
+                        }else{
                             //Just in case theres a config problem...
-                            wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        }
                     }else{
                         //If user is anonymous, show this message
                         $blogurl = get_bloginfo('url');
-                        wp_die($ADMsg['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
                     }
                 }else{
                     //Check options to determine if we're using a PAGE or a MESSAGE
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
-                        if(is_numeric($dbOpt['ad_page_auth_id']))
-                            wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']);
-                        else
+                        if(is_numeric($dbOpt['ad_page_auth_id'])){
+                            if(!is_feed()){ wp_safe_redirect('/?page_id='.$dbOpt['ad_page_auth_id']); }
+                        }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        }
                     }else{
                         //If user is authenticated, show this message
                         wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
@@ -499,28 +501,34 @@ function ctx_ps_security_action(){
 function ctx_ps_security_filter_blog($content){
     global $current_user;
 
-    //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-    if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
-        foreach($content as $post->key => $post->value){
-            //Fun with manipulating the array
-            //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
-        
-            /**Groups that this user is a member of*/
-            $useraccess = ctx_ps_get_usergroups($current_user->ID);
-            /**Groups required to access this page*/
-            $pagereqs = ctx_ps_getprotection($post->value->ID);
+        //print_r($content);
+    $dbOpts = get_option('contexture_ps_options');
 
-            if(!!$pagereqs){
-                $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
+    if(is_feed() && $dbOpts['ad_msg_usefilter_rss']=='true'){}
+    else{
+        //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
+        if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
+            foreach($content as $post->key => $post->value){
+                //Fun with manipulating the array
+                //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
 
-                if($secureallowed){
-                    //If we're allowed to access this page
-                }else{
-                    //If we're NOT allowed to access this page
-                    unset($content[$post->key]);
+                /**Groups that this user is a member of*/
+                $useraccess = ctx_ps_get_usergroups($current_user->ID);
+                /**Groups required to access this page*/
+                $pagereqs = ctx_ps_getprotection($post->value->ID);
+
+                if(!!$pagereqs){
+                    $secureallowed = ctx_ps_determine_access($useraccess,$pagereqs);
+
+                    if($secureallowed){
+                        //If we're allowed to access this page
+                    }else{
+                        //If we're NOT allowed to access this page
+                        unset($content[$post->key]);
+                    }
                 }
-            }
-        }
+            }//End foreach
+        }//End appropriate section check
     }
 
     //Adjust top-level array key numbers to be concurrent (since a gap between numbers can cause wp to freak out)
@@ -544,9 +552,10 @@ function ctx_ps_security_filter_menu($content){
     global $current_user;
 
     //print_r($content);
+    $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
-    //Do this filtering only if the user isn't an admin (and isn't in admin section)
-    if( !current_user_can('manage_options')  && !is_admin()) {
+    //Do this filtering only if the user isn't an admin (and isn't in admin section)... and provided the user hasn't disabled this feature
+    if( !current_user_can('manage_options')  && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false') {
 
         //Loop through the content array
         foreach($content as $post->key => $post->value){
@@ -597,8 +606,11 @@ function ctx_ps_security_filter_menu($content){
 function ctx_ps_security_filter_menu_custom($content){
     global $current_user;
 
-    //Do this filtering only if user isn't an admin
-    if( !current_user_can('manage_options') && !is_admin() ) {
+    //print_r($content);
+    $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
+
+    //Do this filtering only if user isn't an admin, in admin section, and provided the admin hasnt disabled this feature
+    if( !current_user_can('manage_options') && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false' ) {
 
         //Get options (in case we need to strip access denied pages)
         $dbOpts = get_option('contexture_ps_options');

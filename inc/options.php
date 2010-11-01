@@ -44,6 +44,10 @@ if(empty($_POST['action'])){
         $newopts['ad_msg_usepages'] = 'false';
     }
 
+    //Update filtering options
+    $newopts['ad_msg_usefilter_menus'] = (isset($_POST['filter-menus'])) ? 'true' : 'false';
+    $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
+
     //Update the options array
     $saveStatus = ctx_ps_set_options($newopts);
 
@@ -111,7 +115,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
             <div class="wrap">
                 <div class="icon32" id="icon-users"><br/></div>
                 <h2>Page Security Options</h2>
-                <?php echo $updatesettingsMessage,$InvADPagesMsg; ?>
+                <?php echo $updatesettingsMessage,$InvADPagesMsg;/*print_r($ADMsg)*/ ?>
                 <p></p>
                 <form method="post" action="">
                     <input type="hidden" name="action" id="action" value="updateopts" />
@@ -176,7 +180,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter menu items*') ?><br/>
+                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_usefilter_menus']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter menu items*') ?><br/>
                                     <div class="ctx-footnote"><?php _e('*Restricted content will be removed from menus unless user is authenticated') ?></div>
                                 </label>
                             </td>
@@ -187,8 +191,8 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo 'checked="checked"'; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from non-browser RSS readers.') ?></div>
+                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Note: This will hide protected content from non-browser RSS readers.') ?></div>
                                 </label>
                             </td>
                         </tr>
