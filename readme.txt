@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.0.0
-Stable tag: 1.2.1
+Stable tag: 1.2.2
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
 
@@ -63,7 +63,7 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 == Changelog ==
 
 = 1.2.2 =
-* Fixed a bug that could prevent custom settings from being saved after an upgrade.
+* Fixed a bug that sometimes prevented custom settings from being saved.
 
 = 1.2.1 =
 * New feature: To improve usability, the "Restrict Access" sidebar now appears on "New..." screens.
