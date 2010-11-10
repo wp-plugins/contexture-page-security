@@ -1575,7 +1575,7 @@ function ctx_ps_tag_groups_required($atts){
     //Set this var to count groups for current page
     $groupcount = 0;
 
-    $return = "<div class=\"psc-output\"><h3>{$output['label']}</h3><p>{$output['description']}</p><ul>";
+    $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><p>{$output['description']}</p><ul>";
 
     foreach($requiredGroups as $pageGroup->ID => $pageGroups->groups){
 
