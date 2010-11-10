@@ -459,7 +459,7 @@ function ctx_ps_security_action(){
                     if($dbOpt['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
-                            wp_safe_redirect($blogurl.'/?page_id='.$dbOpt['ad_page_anon_id']);
+                            wp_safe_redirect(get_permalink($dbOpt['ad_page_anon_id']));
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
@@ -474,7 +474,7 @@ function ctx_ps_security_action(){
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
-                            wp_safe_redirect($blogurl.'/?page_id='.$dbOpt['ad_page_auth_id']);
+                            wp_safe_redirect(get_permalink($dbOpt['ad_page_auth_id']));
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
