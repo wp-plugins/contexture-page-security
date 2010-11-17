@@ -585,7 +585,7 @@ function ctx_ps_security_filter_menu($content){
             
             //If this is an AD page, strip it too
             if($dbOpts['ad_msg_usepages']==='true'){
-                if($post->value->object_id==$dbOpts['ad_page_auth_id'] || $post->value->object_id==$dbOpts['ad_page_anon_id']){
+                if($post->value->ID==$dbOpts['ad_page_auth_id'] || $post->value->ID==$dbOpts['ad_page_anon_id']){
                     unset($content[$post->key]);
                 }
             }
