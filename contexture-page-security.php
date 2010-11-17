@@ -1545,6 +1545,7 @@ function ctx_ps_tag_groups_attached($atts){
     foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$post->ID}'") as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
+    $currentGroups = (empty($currentGroups)) ? __('<li><em>No groups attached.</em></li>') : $currentGroups;
     $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><ol>{$currentGroups}</ol></div>";
     if($output['public']==='true'){
         return $return;
@@ -1588,7 +1589,7 @@ function ctx_ps_tag_groups_required($atts){
         }
 
         //If there were no groups attached, show that there's no access at that level
-        if($groupcount===0 && $output['showempty']==='true'){
+        if(empty($groupcount) && $output['showempty']==='true'){
             $return .= "<li><em>".__("No groups attached")."</em></li>";
         }
 
