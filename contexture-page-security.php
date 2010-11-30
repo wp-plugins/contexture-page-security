@@ -24,16 +24,7 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/** TODO: 1.3 - Allow CATEGORIES to be restricted. */
-/** TODO: 1.3 - Implement "Advanced Features" for restrict access toolbar (see below) */
-/** TODO: 1.3 - Restrict Access "Use me for 'Access Denied'" checkbox (should disable and nullify other restrict access options) */
-/** TODO: 1.3 - AJAX username hinting in Groups > Edit add user field. */
-/** TODO: 1.3 - Make plugin localization friendly */
-/** TODO: 1.3 - Restrict Access Advanced: "Allow on menus" */
-/** TODO: 1.3 - Restrict Access Advanced: "Set custom access denied page" option */
-
-
-/** TODO: x.x - Ability to set membership expirations for individual users in a group (date where user is automatically removed from group) */
+/** TODO: See basecamp todo lists **/
 
 /************************* HOOKS *********************************/
 // Install new tables (on activate)
@@ -461,7 +452,7 @@ function ctx_ps_security_action(){
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
                             $redir_anon_link = get_permalink($dbOpt['ad_page_anon_id']);
                             wp_safe_redirect($redir_anon_link);
-                            die(sprintf(__('Redirecting to %s'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
+                            die(sprintf(__('Access Denied. Redirecting to %s'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
@@ -478,7 +469,7 @@ function ctx_ps_security_action(){
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
                             $redir_auth_link = get_permalink($dbOpt['ad_page_auth_id']);
                             wp_safe_redirect($redir_auth_link);
-                            die(sprintf(__('Redirecting to %s'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
+                            die(sprintf(__('Access Denied. Redirecting to %s'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
