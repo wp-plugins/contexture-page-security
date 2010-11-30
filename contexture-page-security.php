@@ -459,9 +459,9 @@ function ctx_ps_security_action(){
                     if($dbOpt['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
-                            $redir_link = get_permalink($dbOpt['ad_page_anon_id']);
-                            wp_safe_redirect($redir_link);
-                            die(sprintf(__('Redirecting to %s'),$redir_link));
+                            $redir_anon_link = get_permalink($dbOpt['ad_page_anon_id']);
+                            wp_safe_redirect($redir_anon_link);
+                            die(sprintf(__('Redirecting to %s'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
@@ -476,9 +476,9 @@ function ctx_ps_security_action(){
                     if($dbOpt['ad_msg_usepages']==='true'){
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
-                            $redir_link = get_permalink($dbOpt['ad_page_auth_id']);
-                            wp_safe_redirect(get_permalink($dbOpt['ad_page_auth_id']));
-                            die(sprintf(__('Redirecting to %s'),$redir_link));
+                            $redir_auth_link = get_permalink($dbOpt['ad_page_auth_id']);
+                            wp_safe_redirect($redir_auth_link);
+                            die(sprintf(__('Redirecting to %s'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
