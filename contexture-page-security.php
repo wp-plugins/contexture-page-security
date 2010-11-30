@@ -171,7 +171,7 @@ function ctx_ps_ajax_add_group_to_page(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized, stop and return error
-        ctx_ps_ajax_response(array('code'=>'0','message'=>'Admin user is unauthorized.'));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
     }
 
     //Add new security to the database
@@ -248,9 +248,9 @@ function ctx_ps_ajax_remove_group_from_page(){
     }
 
     if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
-        ctx_ps_ajax_response(array('code'=>'1','message'=>'Group removed'));
+        ctx_ps_ajax_response(array('code'=>'1','message'=>__('Group removed')));
     }else{
-        ctx_ps_ajax_response(array('code'=>'0','message'=>'Query failed'));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Query failed')));
     }
     ctx_ps_ajax_response($response);
 }
@@ -382,8 +382,8 @@ function ctx_ps_set_options($arrayOverrides=false){
     //Set defaults
     $defaultOpts = array(
         "ad_msg_usepages"=>"false",
-        "ad_msg_anon"=>'You do not have the appropriate group permissions to access this page. Please try <a href="'.wp_login_url( get_permalink() ).'">logging in</a> or contact an administrator for assistance.',
-        "ad_msg_auth"=>'You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.',
+        "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.'),wp_login_url( get_permalink() )),
+        "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.'),
         "ad_page_anon_id"=>"",
         "ad_page_auth_id"=>"",
         "ad_msg_usefilter_menus"=>"true",
@@ -464,12 +464,12 @@ function ctx_ps_security_action(){
                             wp_die(sprintf(__('Redirecting to %s'),$redir_link));
                         }else{
                             //Just in case theres a config problem...
-                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
                         }
                     }else{
                         //If user is anonymous, show this message
                         $blogurl = get_bloginfo('url');
-                        wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
                     }
                 }else{
                     //Check options to determine if we're using a PAGE or a MESSAGE
@@ -481,11 +481,11 @@ function ctx_ps_security_action(){
                             wp_die(sprintf(__('Redirecting to %s'),$redir_link));
                         }else{
                             //Just in case theres a config problem...
-                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
                         }
                     }else{
                         //If user is authenticated, show this message
-                        wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; Go to home page</a>');
+                        wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
                     }
                 }
             }
