@@ -95,7 +95,7 @@ function ctx_ps_activate(){
     $table_security = $wpdb->prefix . "ps_security";
 
     //Build our SQL scripts to create the new db tables
-    $sql_create_groups = "CREATE TABLE IF NOT EXISTS `$table_groups` (
+    $sql_create_groups = "CREATE TABLE IF NOT EXISTS `{$table_groups}` (
         `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
         `group_description` text COMMENT 'A description of or notes about the group',
@@ -105,14 +105,15 @@ function ctx_ps_activate(){
         PRIMARY KEY (`ID`)
     )";
 
-    $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `$table_group_relationships` (
+    $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `{$table_group_relationships}` (
         `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
         `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
         `grel_user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The user id to attach to the group',
+        `grel_expires` datetime COMMENT 'If set, user cannot access content after this date'
         PRIMARY KEY (`ID`)
     )";
 
-    $sql_create_security = "CREATE TABLE IF NOT EXISTS `$table_security` (
+    $sql_create_security = "CREATE TABLE IF NOT EXISTS `{$table_security}` (
         `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
         `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
         `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
@@ -130,24 +131,32 @@ function ctx_ps_activate(){
     $wpdb->query($sql_create_security);
 
     //Record what version of the db we're using (only works if option not already set)
-    add_option("contexture_ps_db_version", "1.1");
+    add_option("contexture_ps_db_version", "1.2");
 
     //Set plugin options (not db version)
     ctx_ps_set_options();
 
-    /********* START UPGRADE PATH ***********/
+    /********* START UPGRADE PATH < 1.1 ***********/
     $dbver = get_option("contexture_ps_db_version");
     if($dbver == "" || (float)$dbver < 1.1){
-        $wpdb->query("ALTER TABLE `$table_groups` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
+        $wpdb->query("ALTER TABLE `{$table_groups}` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
         update_option("contexture_ps_db_version", "1.1");
     }
-    /******** END UPGRADE PATH **************/
+    /******** END UPGRADE PATH < 1.1 **************/
+    
+    /********* START UPGRADE PATH < 1.2 ***********/
+    $dbver = get_option("contexture_ps_db_version");
+    if($dbver == "" || (float)$dbver < 1.2){
+        $wpdb->query("ALTER TABLE `{$table_group_relationships}` ADD COLUMN `grel_expires` datetime COMMENT 'If set, user cannot access content after this date' AFTER `grel_user_id`");
+        update_option("contexture_ps_db_version", "1.2");
+    }
+    /******** END UPGRADE PATH < 1.2 **************/
 
     //Check if our "Registered Users" group already exists
-    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `$table_groups` WHERE `group_system_id` = 'CPS01' LIMIT 1");
+    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `{$table_groups}` WHERE `group_system_id` = 'CPS01' LIMIT 1");
     if(!$CntRegSmrtGrp){
         //Adds the Registered Users system group (if it doesnt exist)
-        $wpdb->query("INSERT INTO `$table_groups` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users')."','".__('This group automatically applies to all authenticated users.')."','0','CPS01')");
+        $wpdb->query("INSERT INTO `{$table_groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users')."','".__('This group automatically applies to all authenticated users.')."','0','CPS01')");
     }
 }
 
