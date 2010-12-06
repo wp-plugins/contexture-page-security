@@ -14,7 +14,7 @@ if(!empty($_GET['action'])){
                     $_GET['group_description'],
                     $_GET['groupid']);
             if($wpdb->query($sqlUpdateGroup) === false){
-                $actionmessage = __('<div class="error below-h2"><p>An error occurred. Group Details could not be updated.</p></div>');
+                $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. Group Details could not be updated.').'</p></div>';
             } else {
                 $linkBack = admin_url();
                 $actionmessage = '<div id="message" class="updated below-h2"><p>'.__('Group details have been saved.').' <a href="'.$linkBack.'users.php?page=ps_groups">'.__('Return to group list').' &gt;&gt;</a></p></div>';
@@ -25,23 +25,23 @@ if(!empty($_GET['action'])){
             $sqlCheckUserExists = $wpdb->prepare("SELECT * FROM {$wpdb->users} WHERE user_login = '%s'",$_GET['add-username']);
             $UserInfo = $wpdb->query($sqlCheckUserExists);
             if($UserInfo == 0){
-                $actionmessage = sprintf(__('<div class="error below-h2"><p>User &quot;%s&quot; does not exist.</p></div>'),$_GET['add-username']);
+                $actionmessage = sprintf('<div class="error below-h2"><p>'.__('User &quot;%s&quot; does not exist.').'</p></div>',$_GET['add-username']);
             } else {
                 //Add user to group
                 $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",$_GET['groupid'],$wpdb->get_var($sqlCheckUserExists,0,0));
                 if($wpdb->query($sqlUpdateGroup) === false){
-                    $actionmessage = __('<div class="error below-h2"><p>An error occurred. User could not be added to the group.</p></div>');
+                    $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. User could not be added to the group.').'</p></div>';
                 } else {
-                    $actionmessage = sprintf(__('<div id="message" class="updated below-h2"><p>User &quot;%s&quot; has been added to the group.</p></div>'),$_GET['add-username']);
+                    $actionmessage = sprintf('<div id="message" class="updated below-h2"><p>'.__('User &quot;%s&quot; has been added to the group.').'</p></div>',$_GET['add-username']);
                 }
             }
             break;
         case 'rmvusr':
             $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE ID = '%s' AND grel_group_id = '%s' AND grel_user_id = '%s';",$_GET['relid'],$_GET['groupid'],$_GET['usrid']);
             if($wpdb->query($sqlRemoveUserRel) == 0){
-                $actionmessage = __('<div class="error below-h2"><p>An error occurred. User could not be removed from group.</p></div>');
+                $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. User could not be removed from group.').'</p></div>';
             } else {
-                $actionmessage = sprintf(__('<div id="message" class="updated below-h2"><p>User &quot;%s&quot; was removed from the group.</p></div>'),$_GET['usrname']);
+                $actionmessage = sprintf('<div id="message" class="updated below-h2"><p>'.__('User &quot;%s&quot; was removed from the group.').'</p></div>',$_GET['usrname']);
             }
             break;
         default: break;
@@ -138,7 +138,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 <tbody id="users" class="list:user user-list">
                     <?php
                         if(ctx_ps_count_members($_GET['groupid']) == 0){
-                            echo __('<td colspan="4">No users have been added to this group.</td>');
+                            echo '<td colspan="4">'.__('No users have been added to this group.').'</td>';
                         } else {
                             echo ctx_ps_display_member_list($_GET['groupid']);
                         }

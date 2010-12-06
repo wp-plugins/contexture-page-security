@@ -64,7 +64,7 @@ if(!empty($_POST['action'])){
                 <?php
                     if(ctx_ps_count_groups() == 0){
                         echo ctx_ps_display_group_list();
-                        echo sprintf(__('<td colspan="4">You have not created any groups. Please <a href="%s">add a group</a>.</td>'),admin_url('users.php?page=ps_groups_add'));
+                        echo sprintf('<td colspan="4">'.__('You have not created any groups. Please <a href="%s">add a group</a>.').'</td>'),admin_url('users.php?page=ps_groups_add');
                     } else {
                         echo ctx_ps_display_group_list();
                 }

@@ -1493,7 +1493,7 @@ function ctx_ps_sidebar_security(){
             if ( !!$securityStatus )
                 echo ' display:block ';
             echo '">';
-            echo    sprintf(__('<h5>Available Groups <a href="%s" title="New Group" style="text-decoration:none;">+</a></h5>'),admin_url('users.php?page=ps_groups_add'));
+            echo    sprintf('<h5>%s <a href="%s" title="%s" style="text-decoration:none;">+</a></h5>',__('Available Groups'),__('New Group'),admin_url('users.php?page=ps_groups_add'));
             echo '      <select id="groups-available" name="groups-available">';
             echo '<option value="0">-- '.__('Select').' -- </option>';
             //Loop through all groups in the db to populate the drop-down list
@@ -1503,7 +1503,7 @@ function ctx_ps_sidebar_security(){
             }
             echo       '</select>';
             echo       '<input type="button" id="add_group_page" class="button-secondary action" value="',__('Add'),'" />';
-            echo    __('<h5>Allowed Groups</h5>');
+            echo       sprintf('<h5>%s</h5>',__('Allowed Groups'));
             echo       '<div id="ctx-ps-page-group-list">';
             //Set this to 0, we are going to count the number of groups attached to this page next...
             $groupcount = 0;
@@ -1561,7 +1561,7 @@ function ctx_ps_tag_groups_attached($atts){
     foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$post->ID}'") as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
-    $currentGroups = (empty($currentGroups)) ? __('<li><em>No groups attached.</em></li>') : $currentGroups;
+    $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.').'</em></li>' : $currentGroups;
     $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><ol>{$currentGroups}</ol></div>";
     if($output['public']==='true'){
         return $return;
