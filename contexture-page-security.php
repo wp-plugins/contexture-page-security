@@ -1429,7 +1429,7 @@ function ctx_ps_isprotected_section($postid){
  */
 function ctx_ps_localization(){
    if (function_exists('load_plugin_textdomain')) {
-      load_plugin_textdomain('contexture-page-security', false, dirname(plugin_basename(__FILE__)).'/translations' );
+      load_plugin_textdomain('contexture-page-security', false, dirname(plugin_basename(__FILE__)).'/languages' );
    }
 }
 
