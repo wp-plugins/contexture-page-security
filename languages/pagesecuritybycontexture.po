@@ -1,0 +1,396 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Page Security by Contexture\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-06 14:36-0800\n"
+"PO-Revision-Date: 2010-12-06 14:38-0800\n"
+"Last-Translator: Matt VanAndel <matt@contextureintl.com>\n"
+"Language-Team: Contexture Intl <webteam@contextureintl.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-KeywordsList: _;gettext;gettext_noop;__;_e\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-Language: English\n"
+"X-Poedit-Country: UNITED STATES\n"
+"X-Poedit-SearchPath-0: C:\\Xampp\\htdocs\\contexture-page-security\\trunk\n"
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:90
+msgid "Missing Requirement:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:91
+#, php-format
+msgid "Page Security requires PHP5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP5 support."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:92
+msgid "Return to plugin page"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:162
+msgid "Registered Users"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:162
+msgid "This group automatically applies to all authenticated users."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:177
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:250
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:270
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:304
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:349
+msgid "Admin user is unauthorized."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:217
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1516
+msgid "No groups have been added yet."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:225
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1521
+msgid "remove"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:230
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1525
+msgid "ancestor"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:254
+msgid "Group removed"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:256
+msgid "Query failed"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:289
+msgid "User enrolled in group"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:315
+msgid "This user has not been added to any static groups. Select a group above or visit any <a href=\"users.php?page=ps_groups\">group detail page</a>.</td>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:317
+msgid "User unenrolled from group"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:388
+#, php-format
+msgid "You do not have the appropriate group permissions to access this page. Please try <a href=\"%s\">logging in</a> or contact an administrator for assistance."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:389
+msgid "You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:467
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:484
+#, php-format
+msgid "Access Denied. Redirecting to %s"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:470
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:475
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:487
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:491
+msgid "Go to home page"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1003
+msgid "Group Management"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1003
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/groups.php:43
+msgid "Groups"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1004
+msgid "Add a Group"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1004
+msgid "Add Group"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1483
+msgid " Protect this page and it's descendants"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1489
+msgid "Edit Parent"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1496
+#, php-format
+msgid "<h5>Available Groups <a href=\"%s\" title=\"New Group\" style=\"text-decoration:none;\">+</a></h5>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1498
+msgid "Select"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1505
+msgid "Add"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1506
+msgid "<h5>Allowed Groups</h5>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1533
+#, php-format
+msgid "<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a href=\"%s\">View Security Settings</a></p>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1539
+msgid "<p>You need to publish before you can update security settings.</p>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1556
+msgid "Groups attached to this page:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1564
+msgid "<li><em>No groups attached.</em></li>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1585
+msgid "Groups Required:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1586
+msgid "To access this page, users must be a member of at least one group from each set of groups."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/contexture-page-security.php:1609
+msgid "No groups attached"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:4
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:4
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-new.php:3
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/groups.php:5
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:6
+msgid "You do not have sufficient permissions to manage options for this site."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:26
+msgid "An error occurred. The group was not fully deleted."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:28
+msgid "group was deleted."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:28
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:40
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:42
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:73
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:75
+msgid "View all groups"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:40
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:73
+msgid "A group with that id does not exist."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:42
+msgid "System groups cannot be deleted."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-delete.php:53
+msgid "Confirm Deletion"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:17
+msgid "<div class=\"error below-h2\"><p>An error occurred. Group Details could not be updated.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:20
+msgid "Group details have been saved."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:20
+msgid "Return to group list"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:28
+#, php-format
+msgid "<div class=\"error below-h2\"><p>User &quot;%s&quot; does not exist.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:33
+msgid "<div class=\"error below-h2\"><p>An error occurred. User could not be added to the group.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:35
+#, php-format
+msgid "<div id=\"message\" class=\"updated below-h2\"><p>User &quot;%s&quot; has been added to the group.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:42
+msgid "<div class=\"error below-h2\"><p>An error occurred. User could not be removed from group.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:44
+#, php-format
+msgid "<div id=\"message\" class=\"updated below-h2\"><p>User &quot;%s&quot; was removed from the group.</p></div>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:75
+msgid "System groups cannot be edited."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:80
+msgid "<h3>Group Details</h3>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:89
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-new.php:15
+msgid "Group Name <span class=\"description\">(required)</span>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:99
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-new.php:25
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:68
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:76
+msgid "Description"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:113
+msgid "<h3>Group Members</h3>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:118
+msgid "Add User"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/group-edit.php:141
+msgid "<td colspan=\"4\">No users have been added to this group.</td>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/groups.php:43
+msgid "Add New"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/groups.php:67
+#, php-format
+msgid "<td colspan=\"4\">You have not created any groups. Please <a href=\"%s\">add a group</a>.</td>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:30
+msgid "Custom pages were deactivated. You must select a valid page from each list."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:56
+msgid "Page Security settings saved."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:65
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:66
+msgid "-- Choose AD Message Page --"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:122
+msgid "Access Denied Messages"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:123
+msgid "You are able to set what messages your users see when they try to access content they are not allowed to view."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:127
+msgid "Use Custom Pages:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:131
+msgid "Use <strong>pages</strong> for default access denied screens"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:137
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:157
+msgid "Authenticated Users:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:142
+msgid "The \"access denied\" page to show users who <strong><em>are logged in</em></strong>."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:147
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:166
+msgid "Anonymous Users:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:152
+msgid "The \"access denied\" page to show users who are <strong><em>not</em></strong> logged in."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:161
+msgid "The \"access denied\" message to show users who are logged in (HTML OK)."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:170
+msgid "The \"access denied\" message to show users who are <strong><em>not</em></strong> logged in (HTML OK)."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:174
+msgid "Global Security Features"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:175
+msgid "These options selectively enable/disable Page Security features."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:179
+msgid "Enable Menu Filtering:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:183
+msgid "Use permissions to filter menu items*"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:184
+msgid "*Restricted content will be removed from menus unless user is authenticated"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:190
+msgid "Enable RSS Filtering:"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:194
+msgid "Use permissions to filter RSS content*"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:195
+msgid "*Feed content for restricted posts will be removed unless user is authenticated<br/> Note: This will hide protected content from non-browser RSS readers."
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/options.php:200
+msgid "Save Changes"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:67
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:75
+msgid "Name"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:69
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:77
+msgid "Users"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:85
+msgid "<td colspan=\"4\">You are not currently a member of any groups.</td>"
+msgstr ""
+
+#: C:\Xampp\htdocs\contexture-page-security\trunk/inc/user-edit-groups.php:92
+msgid "<td colspan=\"4\">This user has not been added to any static groups. Select a group above or visit any <a href=\"users.php?page=ps_groups\">group detail page</a>.</td>"
+msgstr ""
+
