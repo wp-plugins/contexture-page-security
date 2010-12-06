@@ -73,6 +73,9 @@ add_filter('manage_posts_columns','ctx_ps_usability_showprotection');
 add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
 add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
 
+//Add help to...
+//add_action('admin_head-appearance_page_theme-options','ctx_aj_help_theme_options');
+
 /*********************** FUNCTIONS **********************************/
 
 /**
@@ -163,6 +166,14 @@ function ctx_ps_activate(){
     }
 }
 
+
+/**
+ * Add help to admin pages
+ */
+function ctx_ps_add_plugin_help(){
+    //Add contextual help to this page
+    //add_contextual_help( 'appearance_page_theme-options', __('<p>Adventure Journal supports different page layouts without any additional coding. Simply select the layout you want to use on your site and click Save Changes.') );
+}
 
 /**
  * Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
