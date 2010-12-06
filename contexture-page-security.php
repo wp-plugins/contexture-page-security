@@ -40,6 +40,9 @@ add_action('show_user_profile', 'ctx_ps_generate_usergroupslist');
 //Add the security box sidebar to the pages section
 add_action('admin_init', 'ctx_ps_admin_init');
 
+//Load localized language files
+add_action('init','ctx_ps_localization');
+
 //Handle Ajax for Edit Page/Post page
 add_action('wp_ajax_ctx_ps_add2page','ctx_ps_ajax_add_group_to_page');
 add_action('wp_ajax_ctx_ps_removefrompage','ctx_ps_ajax_remove_group_from_page');
@@ -176,7 +179,7 @@ function ctx_ps_ajax_add_group_to_page(){
 
     //Add new security to the database
     $qryAddSec = $wpdb->prepare(
-        "INSERT INTO {$wpdb->prefix}ps_security (
+        "INSERT INTO `{$wpdb->prefix}ps_security` (
         sec_protect_type,
         sec_protect_id,
         sec_access_type,
@@ -1419,6 +1422,15 @@ function ctx_ps_isprotected_section($postid){
         else
             return false;
     }
+}
+
+/**
+ * Loads localized language files, if available
+ */
+function ctx_ps_localization(){
+   if (function_exists('load_plugin_textdomain')) {
+      load_plugin_textdomain('contexture-page-security', false, dirname(plugin_basename(__FILE__)).'/translations' );
+   }
 }
 
 
