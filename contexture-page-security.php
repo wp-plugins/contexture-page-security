@@ -668,14 +668,16 @@ function ctx_ps_admin_init(){
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
     
-    //Add our contextual help
-    /*
-    add_contextual_help( 'users_page_ps_groups', __('<p>TEST TEST TEST.</p>') );
-    add_contextual_help( 'users_page_ps_groups_add', __('<p>TEST TEST TEST.</p>') );
-    add_contextual_help( 'users_page_ps_groups_edit', __('<p>TEST TEST TEST.</p>') );
-    add_contextual_help( 'users_page_ps_groups_delete', __('<p>TEST TEST TEST.</p>') );
-    add_contextual_help( 'settings_page_ps_manage_opts', __('<p>TEST TEST TEST.</p>') );
-    */
+    if ( function_exists('add_contextual_help') ){
+        //Add our contextual help
+        /*
+        add_contextual_help( 'users_page_ps_groups', __('<p>TEST TEST TEST.</p>') );
+        add_contextual_help( 'users_page_ps_groups_add', __('<p>TEST TEST TEST.</p>') );
+        add_contextual_help( 'users_page_ps_groups_edit', __('<p>TEST TEST TEST.</p>') );
+        add_contextual_help( 'users_page_ps_groups_delete', __('<p>TEST TEST TEST.</p>') );
+        add_contextual_help( 'settings_page_ps_manage_opts', __('<p>TEST TEST TEST.</p>') );
+        */
+    }
 }
 
 /**
