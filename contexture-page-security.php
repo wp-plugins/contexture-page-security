@@ -70,11 +70,9 @@ add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permi
 //Update the edit.php pages & posts lists to include a "Protected" column
 add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
 add_filter('manage_posts_columns','ctx_ps_usability_showprotection');
-add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
-add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Takes 2 args
+add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args
+add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args
 
-//Add help to...
-//add_action('admin_head-appearance_page_theme-options','ctx_aj_help_theme_options');
 
 /*********************** FUNCTIONS **********************************/
 
@@ -164,15 +162,6 @@ function ctx_ps_activate(){
         //Adds the Registered Users system group (if it doesnt exist)
         $wpdb->query("INSERT INTO `{$table_groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users')."','".__('This group automatically applies to all authenticated users.')."','0','CPS01')");
     }
-}
-
-
-/**
- * Add help to admin pages
- */
-function ctx_ps_add_plugin_help(){
-    //Add contextual help to this page
-    //add_contextual_help( 'appearance_page_theme-options', __('<p>Adventure Journal supports different page layouts without any additional coding. Simply select the layout you want to use on your site and click Save Changes.') );
 }
 
 /**
@@ -678,6 +667,15 @@ function ctx_ps_admin_init(){
 
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
+    
+    //Add our contextual help
+    /*
+    add_contextual_help( 'users_page_ps_groups', __('<p>TEST TEST TEST.</p>') );
+    add_contextual_help( 'users_page_ps_groups_add', __('<p>TEST TEST TEST.</p>') );
+    add_contextual_help( 'users_page_ps_groups_edit', __('<p>TEST TEST TEST.</p>') );
+    add_contextual_help( 'users_page_ps_groups_delete', __('<p>TEST TEST TEST.</p>') );
+    add_contextual_help( 'settings_page_ps_manage_opts', __('<p>TEST TEST TEST.</p>') );
+    */
 }
 
 /**
