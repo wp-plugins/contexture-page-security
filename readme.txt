@@ -76,6 +76,10 @@ This can be called from within a theme file to remove a user from a group. Like 
 
 This function can be used to generate an associative array of groups. If you specify a user id, only groups that a user is a member of will be returned. If no parameter is provided, it will return all groups.
 
+= psc_has_protection($post_id) =
+
+This function can be used to determine if a specific page or post is protected. This includes any inherited restrictions. It requires one parameter, the id of the page or post to check.
+
 
 == Changelog ==
 
