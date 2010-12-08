@@ -11,9 +11,10 @@ if(!function_exists('psc_add_user_to_group')){
  * 
  * @param int $user_id The id of the user to add to a group.
  * @param int $group_id The id of the group to add the user to.
+ * @param datetime $expires Unused. If specified, the user wont be able to access restricted content after this date.
  * @return bool Returns true if user was successfully added to a group.
  */
-function psc_add_user_to_group($user_id,$group_id){
+function psc_add_user_to_group($user_id,$group_id,$expires=null){
     global $wpdb;
 
     //If either value isnt an int, fail
@@ -44,6 +45,22 @@ function psc_add_user_to_group($user_id,$group_id){
         }
     }
 
+}
+}
+
+if(!function_exists('psc_update_user_expires')){
+/**
+ * INCOMPLETE: Updates expiration date for a user's group membership.
+ * 
+ * @param datetime $expires Set datetime to include expiration dat. If null, no expiration.
+ * @return bool Returns true if record was updated. False if query fails.
+ */
+function psc_update_user_expires($user_id,$group_id,$expires=null){
+    global $wpdb;
+    
+    $query = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=\'%s\' WHERE `grel_group_id`=\'%s\' AND `grel_user_id`=\'%s\'',$wpdb->prefix,$expires,$group_id,$user_id);
+    
+    return false;
 }
 }
 

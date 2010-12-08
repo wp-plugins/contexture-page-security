@@ -86,7 +86,6 @@ This function can be used to determine if a specific page or post is protected. 
 = 1.3.0 =
 * New feature: Friendly theme functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
 * New feature: The contextual help tab now includes documentation for all PSC features!
-* New feature: Bulk-add users to groups from the Users page!
 * New feature: You can now create time-limited group memberships!
 
 = 1.2.4 =

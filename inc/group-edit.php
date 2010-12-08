@@ -52,16 +52,10 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
 
 ?>
     <style type="text/css">
-        .group-actions {
-            text-align:right;
-        }
-        .group-actions a {
-            color:red;
-            font-weight:bold;
-        }
-        #grouptable tbody tr:hover td {
-            background:#fffce0;
-        }
+        .group-actions { text-align:right; }
+        .group-actions a { color:red; font-weight:bold; }
+        #grouptable tbody tr:hover td { background:#fffce0; }
+        #pagetable th.protected { width:50px; }
     </style>
 
     <div class="wrap">
@@ -146,5 +140,29 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 </tbody>
             </table>
         </form>
+        <?php _e('<h3>Associated Pages</h3>'); ?>
+        <table id="pagetable" class="widefat fixed" cellspacing="0">
+            <thead>
+                <tr class="thead">
+                    <th class="title">Title</th>
+                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                </tr>
+            </thead>
+            <tfoot>
+                <tr class="thead">
+                    <th class="title">Title</th>
+                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                </tr>
+            </tfoot>
+            <tbody id="users" class="list:user user-list">
+                <?php
+                    if(ctx_ps_count_members($_GET['groupid']) == 0){
+                        echo '<td colspan="2">'.__('No pages are attached to this group.').'</td>';
+                    } else {
+                        echo ctx_ps_display_page_list($_GET['groupid']);
+                    }
+                ?>
+            </tbody>
+        </table>
         <?php } //ENDS : if (empty($groupInfo->group_title)) ?>
     </div>
