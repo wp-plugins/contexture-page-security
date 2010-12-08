@@ -60,6 +60,23 @@ hosting dashboard).
 
 PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
 
+== Theme Functions ==
+
+Some developers may find it useful to perform programmatic group-management tasks. For instance, have the website automatically add a user to a group. The following documentation should help.
+
+= psc_add_user_to_group($user_id, $group_id) =
+
+This can be called from within a theme file to add a user to a group. It requires two parameters, a userid and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine appropriate group ids.
+
+= psc_remove_user_from_group($user_id, $group_id) =
+
+This can be called from within a theme file to remove a user from a group. Like psc_add_user_to_group(), it requires two parameters, a user id and a group id.
+
+= psc_get_groups($user_id) =
+
+This function can be used to generate an associative array of groups. If you specify a user id, only groups that a user is a member of will be returned. If no parameter is provided, it will return all groups.
+
+
 == Changelog ==
 
 = 1.2.4 =

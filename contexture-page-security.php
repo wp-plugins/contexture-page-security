@@ -70,9 +70,11 @@ add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permi
 //Update the edit.php pages & posts lists to include a "Protected" column
 add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
 add_filter('manage_posts_columns','ctx_ps_usability_showprotection');
-add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args
-add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args
+add_action('manage_pages_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+add_action('manage_posts_custom_column','ctx_ps_usability_showprotection_content',10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
 
+//Modify the global help array so we can add extra help text to default WP pages
+add_action('admin_head', 'ctx_ps_append_contextual_help');
 
 /*********************** FUNCTIONS **********************************/
 
@@ -668,15 +670,33 @@ function ctx_ps_admin_init(){
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
     add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
     
+
+}
+
+/**
+ * Adds additional contextual help to WordPress' existing contextual help screens
+ * @global array $_wp_contextual_help 
+ */
+function ctx_ps_append_contextual_help(){
+    //We bring in the global help array so we can modify it
+    global $_wp_contextual_help;
+    
+    $supporturl = /*'<p><strong>'.__('For more information:').'</strong></p>'.*/'<p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">'.__('Official Page Security Support').'</a></p>';
+
+    //Append additional help to users page (use preg_replace to add it seamlessly before "Fore more information")
+    $_wp_contextual_help['users'] .= '<div style="border-top:1px solid silver;"></div>'.__('<p><strong>Page Security:</p><p>To add a user to a group, check the users to add, and select a group from the "Add to group..." drop down. Click "Add" to save the changes.</p>');
+$_wp_contextual_help['page'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this page, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a page is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the page. To give users access to the page, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+    $_wp_contextual_help['post'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this post, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a post is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the post. To give users access to the post, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+    
     if ( function_exists('add_contextual_help') ){
         //Add our contextual help
-        /*
-        add_contextual_help( 'users_page_ps_groups', __('<p>TEST TEST TEST.</p>') );
-        add_contextual_help( 'users_page_ps_groups_add', __('<p>TEST TEST TEST.</p>') );
-        add_contextual_help( 'users_page_ps_groups_edit', __('<p>TEST TEST TEST.</p>') );
-        add_contextual_help( 'users_page_ps_groups_delete', __('<p>TEST TEST TEST.</p>') );
-        add_contextual_help( 'settings_page_ps_manage_opts', __('<p>TEST TEST TEST.</p>') );
-        */
+        add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>').$supporturl );
+        add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>').$supporturl );
+        add_contextual_help( 'users_page_ps_groups_edit', __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p>Users may also be added to the group from this page, or from the user\'s individual pages.</p><p><strong>For more information:</strong></p>').$supporturl );
+        add_contextual_help( 'users_page_ps_groups_delete', __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>').$supporturl );
+        add_contextual_help( 'settings_page_ps_manage_opts', __('<p>This screen contains general settings for Page Security.</p><p><strong>For more information:</strong></p>').$supporturl );
+        //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>') );
+        
     }
 }
 
@@ -1199,7 +1219,7 @@ function ctx_ps_display_member_list($GroupID){
 
 
 /**
- * Gets an array with all the groups that the user belongs to.
+ * Gets an array with all the groups that a user belongs to.
  * 
  * @param int $userid The user id of the user to check
  * @return array Returns an array with all the groups that the specified user belongs to.
@@ -1671,6 +1691,7 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
     }
 }
 
+
  /**
  * Removes custom tables and options from the WP database.
  */
@@ -1699,6 +1720,120 @@ function ctx_ps_uninstall(){
 }
 
 
+/************** DEVELOPER FUNCTIONS *******************/
+
+if(!function_exists('psc_add_user_to_group')){
+/**
+ * Can be used by developers to add a user to a group programatically.
+ * 
+ * @param int $user_id The id of the user to add to a group.
+ * @param int $group_id The id of the group to add the user to.
+ * @return bool Returns true if user was successfully added to a group.
+ */
+function psc_add_user_to_group($user_id,$group_id){
+    global $wpdb;
+
+    //If either value isnt an int, fail
+    if(!is_numeric($user_id) || !is_numeric($group_id)){
+        return false;
+    }
+    
+    //Make sure user exists in db
+    $UserInfo = (int)$wpdb->get_var(
+        $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '%s'",
+            $user_id
+        )
+    );
+
+    //If this user doesn't exist
+    if($UserInfo === 0){
+        return false;
+    } else {
+        //Add user to group
+        $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
+            $group_id,
+            $user_id
+        );
+        if($wpdb->query($sqlUpdateGroup) === false){
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+}
+}
+
+if(!function_exists('psc_remove_user_from_group')){
+/**
+ * Removes a user from a group.
+ *
+ * @param int $user_id
+ * @param int $group_id
+ * @return bool Returns true if the query succeeded. False if it failed. 
+ */
+function psc_remove_user_from_group($user_id,$group_id){
+    global $wpdb;
+    //If either value isnt an int, fail
+    if(!is_numeric($user_id) || !is_numeric($group_id)){
+        return false;
+    }
+    $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
+            $group_id,
+            $user_id);
+    return $wpdb->query($sqlRemoveUserRel) == 0;
+}
+}
+
+if(!function_exists('psc_get_groups')){
+/**
+ * Gets an assoc array with all the groups.
+ * 
+ * @param int $user_id Optional. Include if you want groups a user is attached to. Leave blank for all groups.
+ * @return array Associative array with groups. Format: Group_ID => Group_Title
+ */
+function psc_get_groups($user_id=null){
+    global $wpdb, $current_user;
+    $array = array();
+    
+    //Determine if we're looking up groups for a user, or all groups
+    if(is_numeric($userid)){
+        $groups = $wpdb->get_results("
+            SELECT * FROM `{$wpdb->prefix}ps_group_relationships`
+            JOIN `{$wpdb->prefix}ps_groups`
+                ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
+            WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$userid}'
+        ");
+    }else{
+        $groups = $wpdb->get_results("SELECT * FROM `{$wpdb->prefix}ps_groups`");
+    }
+
+    //We only need an ID and a name as a key/value..., so we'll build a new array
+    foreach($groups as $group){
+        $array += array($group->ID => $group->group_title);
+    }
+
+    //If multisite is enabled we can better support it...
+    if(function_exists('is_user_member_of_blog')){
+        //Make sure user is a member of this blog (in addition to being logged in)
+        $multisitemember = is_user_member_of_blog($current_user->ID);
+    }else{
+        //Assume user is member of blog
+        $multisitemember = true;
+    }
+
+    /*** ADD SMART GROUPS (AKA SYSTEM GROUPS) ***/
+    //Registered Users Smart Group
+    if($current_user->ID != 0 && $multisitemember){
+        //Get the ID for CPS01 (added in 1.1, so cant assume 1)
+        $newArray = ctx_ps_get_sysgroup('CPS01');
+        //Add CPS01 to the current users permissions array
+        $array += array($newArray->ID => $newArray->group_title);
+    }
+
+    return $array;
+}
+}
 
 
 ?>

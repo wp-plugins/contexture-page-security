@@ -120,7 +120,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                 <form method="post" action="">
                     <input type="hidden" name="action" id="action" value="updateopts" />
                     <h3 class="title"><?php _e('Access Denied Messages') ?></h3>
-                    <p><?php _e('You are able to set what messages your users see when they try to access content they are not allowed to view.') ?></p>
+                    <p><?php _e('Use these settings to determine what your users will see when accessing content they are not allowed to view.') ?></p>
                     <table class="form-table">
                         <tr valign="top" class="toggle-opts-ad">
                             <th scope="row">
@@ -192,7 +192,7 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                             <td>
                                 <label>
                                     <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Note: This will hide protected content from non-browser RSS readers.') ?></div>
+                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from most RSS readers.') ?></div>
                                 </label>
                             </td>
                         </tr>
