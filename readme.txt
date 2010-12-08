@@ -3,7 +3,7 @@ Contributors: Contexture International, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
-Tested up to: 3.0.0
+Tested up to: 3.0.2
 Stable tag: 1.2.4
 
 Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
@@ -82,6 +82,12 @@ This function can be used to determine if a specific page or post is protected. 
 
 
 == Changelog ==
+
+= 1.3.0 =
+* New feature: Friendly theme functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
+* New feature: The contextual help tab now includes documentation for all PSC features!
+* New feature: Bulk-add users to groups from the Users page!
+* New feature: You can now create time-limited group memberships!
 
 = 1.2.4 =
 * Fixed a redirect bug reported by the community.
