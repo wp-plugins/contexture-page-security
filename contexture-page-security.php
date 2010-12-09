@@ -970,12 +970,12 @@ function ctx_ps_admin_head_css(){
  * Gets a count of the number of groups currently in the db
  * @return int The number of groups in the db
  */
-function ctx_ps_count_groups($memberid=''){
+function ctx_ps_count_groups($user_id=''){
     global $wpdb;
-    if(is_numeric($groupid) && !empty($memberid)){
+    if(is_numeric($user_id) && !empty($user_id)){
         return $wpdb->get_var("
             SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships
-            WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$memberid}'
+            WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$user_id}'
         ");
     }
     return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_system_id IS NULL"));
@@ -983,13 +983,13 @@ function ctx_ps_count_groups($memberid=''){
 
 /**
  * 
- * @param int $groupid The id of the group to count for pages.
+ * @param int $group_id The id of the group to count for pages.
  * @return int The number of groups attached to this page. 
  */
-function ctx_ps_count_protected_pages($groupid=''){
+function ctx_ps_count_protected_pages($group_id=''){
     global $wpdb;
-    if(is_numeric($groupid) && !empty($groupid)){
-        return $wpdb->get_var("SELECT COUNT(DISTINCT(sec_protect_id)) FROM `{$wpdb->prefix}ps_security` WHERE sec_access_id='{$groupid}'");
+    if(is_numeric($group_id) && !empty($group_id)){
+        return $wpdb->get_var("SELECT COUNT(DISTINCT(sec_protect_id)) FROM `{$wpdb->prefix}ps_security` WHERE sec_access_id='{$group_id}'");
     }
     return $wpdb->get_var("SELECT COUNT(DISTINCT(sec_protect_id)) FROM `{$wpdb->prefix}ps_security`");
 }
@@ -997,13 +997,13 @@ function ctx_ps_count_protected_pages($groupid=''){
 
 /**
  * Gets a count of the number of users currently in a group
- * @param int $groupid The group id to count users for
+ * @param int $group_id The group id to count users for
  * @return int The number of users attached to the group
  */
-function ctx_ps_count_members($groupid){
+function ctx_ps_count_members($group_id){
     global $wpdb;
-    if(is_numeric($groupid) && !empty($groupid)){
-        return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships WHERE grel_group_id = '{$groupid}'"));
+    if(is_numeric($group_id) && !empty($group_id)){
+        return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships WHERE grel_group_id = '{$group_id}'"));
     }
     return 0;
 }
@@ -1248,6 +1248,8 @@ function ctx_ps_display_member_list($GroupID){
 function ctx_ps_display_page_list($group_id){
     global $wpdb;
 
+    $sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `####`=\'$$$\'', $wpdb->prefix.'ps_security', $wpdb->posts);
+    
     /*
     $sqlGetMembers = $wpdb->prepare("
         SELECT
