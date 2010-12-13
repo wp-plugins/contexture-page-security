@@ -89,7 +89,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                     }else{
                         //IF THIS IS A USER-EDIT PAGE (admin version)
                         if(ctx_ps_count_groups($_GET['user_id']) == '0'){
-                            _e('<td colspan="4">This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>');
+                            echo '<td colspan="4">'.sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.'),admin_url('users.php?page=ps_groups')).'</td>';
                         } else {
                             echo ctx_ps_display_group_list($_GET['user_id'],'users',true);
                         }
