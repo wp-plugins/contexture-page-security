@@ -145,13 +145,13 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             <thead>
                 <tr class="thead">
                     <th class="title">Title</th>
-                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="thead">
                     <th class="title">Title</th>
-                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
                 </tr>
             </tfoot>
             <tbody id="users" class="list:user user-list">

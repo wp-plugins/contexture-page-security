@@ -1736,7 +1736,7 @@ function ctx_ps_usability_showprotection($columns){
     $date = $columns['date'];
     unset($columns['date']);
     //Add new column
-    $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.plugins_url('protected.png',__FILE__).'" /></div>';
+    $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',__FILE__).'" /></div>';
     //Add date back on (now at end of array);
     $columns['date'] = $date;
 
@@ -1754,10 +1754,10 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
     if($column_name==='protected'){
         //If page is protected, return lock icon
         if(ctx_ps_isprotected($pageid))
-            echo '<img alt="Protected" title="Protected" src="'.plugins_url('protected-inline.png',__FILE__).'" />';
+            echo '<img alt="Protected" title="Protected" src="'.plugins_url('images/protected-inline.png',__FILE__).'" />';
         //If this page isnt protected, but an ancestor is, return a lighter icon
         else if(ctx_ps_isprotected_section($pageid))
-            echo '<img alt="Protected (inherited)" title="Inheriting an ancestors protection" src="'.plugins_url('protected-inline-descendant.png',__FILE__).'" />';
+            echo '<img alt="Protected (inherited)" title="Inheriting an ancestors protection" src="'.plugins_url('images/protected-inline-descendant.png',__FILE__).'" />';
     }
 }
 
