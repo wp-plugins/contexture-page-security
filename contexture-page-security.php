@@ -1270,7 +1270,7 @@ function ctx_ps_display_page_list($group_id){
             <td class="post-title page-title column-title">
                 <strong><a href="%3$s">%4$s</a></strong>
                 <div class="row-actions">
-                    <span class="view"><a href="#" title="View the page">View</a> | </span>
+                    <span class="view"><a href="%7$s" title="View the page">View</a> | </span>
                     <span class="edit"><a href="post.php?post=%1$s&action=edit" title="Edit this page">Edit</a> | </span>
                     <span class="trash"><a href="javascript:alert(\'Not implemented\')" title="Remove current group from this page\'s security">Remove</a></span>
                 </div>
@@ -1283,7 +1283,8 @@ function ctx_ps_display_page_list($group_id){
             /*3*/admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
             /*4*/$page_title,
             /*5*/'',
-            /*6*/$page->post_type
+            /*6*/$page->post_type,
+            /*7*/get_permalink($page->sec_protect_id)
         );
 
         //Alternate css style for odd-numbered rows
