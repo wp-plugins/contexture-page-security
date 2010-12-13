@@ -56,6 +56,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         .group-actions a { color:red; font-weight:bold; }
         #grouptable tbody tr:hover td { background:#fffce0; }
         #pagetable th.protected { width:50px; }
+        #pagetable th.type { width:60px; }
     </style>
 
     <div class="wrap">
@@ -84,7 +85,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         </label>
                     </th>
                     <td>
-                        <input id="group_name" name="group_name" type="text" aria-required="true" class="regular-text" value="<?php echo $groupInfo->group_title; ?>" maxlength="30" />
+                        <input id="group_name" name="group_name" type="text" aria-required="true" class="regular-text" value="<?php echo $groupInfo->group_title; ?>" maxlength="30" /> <span style="color:silver;">id: <?php echo $groupInfo->ID; ?></span>
                     </td>
                 </tr>
                 <tr class="form-field">
@@ -131,7 +132,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
                     <?php
-                        if(ctx_ps_count_members($_GET['groupid']) == 0){
+                        if(ctx_ps_count_members($_GET['groupid']) < 1){
                             echo '<td colspan="4">'.__('No users have been added to this group.').'</td>';
                         } else {
                             echo ctx_ps_display_member_list($_GET['groupid']);
@@ -140,24 +141,26 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 </tbody>
             </table>
         </form>
-        <?php _e('<h3>Associated Pages</h3>'); ?>
+        <?php _e('<h3>Associated Content</h3>'); ?>
         <table id="pagetable" class="widefat fixed" cellspacing="0">
             <thead>
                 <tr class="thead">
                     <th class="title">Title</th>
                     <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="type">Type</th>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="thead">
                     <th class="title">Title</th>
                     <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="type">Type</th>
                 </tr>
             </tfoot>
             <tbody id="users" class="list:user user-list">
                 <?php
-                    if(ctx_ps_count_members($_GET['groupid']) == 0){
-                        echo '<td colspan="2">'.__('No pages are attached to this group.').'</td>';
+                    if(ctx_ps_count_protected_pages($_GET['groupid']) < 1){
+                        echo '<td colspan="3">'.__('No pages are attached to this group.').'</td>';
                     } else {
                         echo ctx_ps_display_page_list($_GET['groupid']);
                     }

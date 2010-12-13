@@ -6,35 +6,26 @@ Requires at least: 3.0.0
 Tested up to: 3.0.2
 Stable tag: 1.2.4
 
-Allows admins to restrict access to posts, pages, or entire sections of a site to approved user groups.
+Allows admins to create user groups and set access restrictions for any post, page or section.
 
 == Description ==
 
-Page Security by Contexture International adds some much-needed "page security" to WordPress. With Contexture Page Security you can now limit access
-to posts, pages, or entire sections of your website.
+Page Security by Contexture International adds some much-needed user groups and permissions to WordPress! Now you can easily limit access to posts, pages, or 
+entire sections of your website. Create an intranet or a members-only area with just a few clicks. You can even create tiered sections with multiple levels of 
+security. Page Security by Contexture (PSC) lets YOU decide which users can access which content.
 
-Easily create "Members-only" sections of your site with Page Security's built-in "Registered Users" smart group - or create your own custom user groups
-to limit access only to the users that you want. Any security restrictions you add are automatically inherited by sub-pages, enabling you to quickly
-secure entire sections of your site with extraordinary flexibility.
+PSC is designed to integrate seamlessly and intuitively with WordPress. 
 
-Page Security also applies your security settings to menu links, RSS feeds, and blog post excerpts as well, ensuring your secure content doesn't accidentally
-creep onto your site because of an overlooked WordPress option.
+Features:
 
-Page Security is simple, easy to use, and integrates seamlessly with WordPress. Visible changes made to the Dashboard are:
+1. Fully AJAX-loaded! Any changes you make to security are saved immediately!
+1. Use the "Registered Users" smart group to create special "registered users only" sections!
+1. Contextual help is available for every PSC feature (via WordPress's 'Help' tab)!
+1. Use simple, well-documented theme functions to easily automate your group memberships (You could even create an automatic subscription system)!
+1. Frequent updates and improvements!
 
-1. Two new options are located under the Users category. This includes "Groups" and "Add Group".
-1. A "Restrict Access" sidebar is available when editing any page or post.
-1. A "Group Membership" overview is added to the "Edit User" pages.
-1. See at a glance what's protected from your admin's pages and posts screens.
-
-Additional features:
-
-1. The "Restrict Access" sidebar is AJAX-loaded, so any changes you make to security are saved immediately! There's no need to click
-the "Update" button to save changes to a page's security.
-1. Any page or post can be easily made "admin only". When editing a page, check the "Protect this page it's descendants" checkbox but don't add any groups. By default,
-all protected pages can be seen by admins - but if you don't add any groups, they will be invisible to non-admin users.
-
-While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. USE AT YOUR OWN RISK!
+Notice:
+While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
 
 == Installation ==
 
@@ -60,13 +51,21 @@ hosting dashboard).
 
 PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
 
+= Can I help translate PSC into my language? =
+
+Absolutely! PO files are now included with each PSC download. You can use a WordPress plugin like "CodeStyling Localization" or a program like "Poedit" to easily create language-specific translations. If you'd like us to include your translation in the official release, simply email it to opensource@contextureintl.com!
+
+= Is there an easy way to make some sections admin-only? =
+
+Yes! This is particularly handy if you're working on a new section of your website but you aren't quite ready to share it with the world. From the page's edit screen, simply find the "Restrict Access" sidebar and check "Protect this page and it's descendants". That's it! Even if you don't assign any groups, anyone who's logged in as an admin will still have full access to that page.
+
 == Theme Functions ==
 
-Some developers may find it useful to perform programmatic group-management tasks. For instance, have the website automatically add a user to a group. The following documentation should help.
+Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help.
 
 = psc_add_user_to_group($user_id, $group_id) =
 
-This can be called from within a theme file to add a user to a group. It requires two parameters, a userid and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine appropriate group ids.
+This can be called from within a theme file to add a specific user to a specific group. It requires two parameters, a user id and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id.
 
 = psc_remove_user_from_group($user_id, $group_id) =
 
@@ -85,8 +84,9 @@ This function can be used to determine if a specific page or post is protected. 
 
 = 1.3.0 =
 * New feature: Friendly theme functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
+* New feature: You can now view any group to easily see what pages it is attached to!
 * New feature: The contextual help tab now includes documentation for all PSC features!
-* New feature: You can now create time-limited group memberships!
+* New feature: Subscriptions! You can now create time-limited/expiring group memberships!
 
 = 1.2.4 =
 * Fixed a redirect bug reported by the community.

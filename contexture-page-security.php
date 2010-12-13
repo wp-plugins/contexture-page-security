@@ -701,7 +701,7 @@ function ctx_ps_append_contextual_help(){
         //Add our contextual help
         add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>').$supporturl );
         add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>').$supporturl );
-        add_contextual_help( 'dashboard_page_ps_groups_edit', __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Pages</strong> - A list of all the pages this group is attached to. Click a page name to edit that page.</p><p><strong>For more information:</strong></p>').$supporturl );
+        add_contextual_help( 'dashboard_page_ps_groups_edit', __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages/posts this group is attached to. Click a page name to edit that page.</p><p><strong>For more information:</strong></p>').$supporturl );
         add_contextual_help( 'dashboard_page_ps_groups_delete', __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>').$supporturl );
         add_contextual_help( 'settings_page_ps_manage_opts', __('<p>This screen contains general settings for Page Security.</p><p><strong>For more information:</strong></p>').$supporturl );
         //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>') );
@@ -1253,42 +1253,43 @@ function ctx_ps_display_member_list($GroupID){
 function ctx_ps_display_page_list($group_id){
     global $wpdb;
 
-    $sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `####`=\'$$$\'', $wpdb->prefix.'ps_security', $wpdb->posts);
+    $sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `sec_access_id`=\'%3$s\'', $wpdb->prefix.'ps_security', $wpdb->posts, $group_id);
     
-    /*
-    $sqlGetMembers = $wpdb->prepare("
-        SELECT
-            {$wpdb->users}.ID AS ID,
-            {$wpdb->prefix}ps_group_relationships.id AS rel_id,
-            {$wpdb->users}.user_login,
-            {$wpdb->users}.user_email
-        FROM `{$wpdb->prefix}ps_group_relationships`
-        JOIN `{$wpdb->users}`
-            ON {$wpdb->prefix}ps_group_relationships.grel_user_id = {$wpdb->users}.ID
-        WHERE grel_group_id = '%s'",
-    $group_id);
-
-    $members = $wpdb->get_results($sqlGetMembers);
+    $pagelist = $wpdb->get_results($sql);
 
     $html = '';
-    $countmembers = '';
+    $countpages = '';
     $alternatecss = ' class="alternate" ';
+    
+    /**TODO: Must detect if this page is directly protected, or inherrited.*/
 
-    foreach($members as $member){
-        $fname = get_user_meta($member->ID, 'first_name', true);
-        $lname = get_user_meta($member->ID, 'last_name', true);
-        $html .= "
-        <tr id=\"user-{$member->ID}\" {$alternatecss}>
-            <td class=\"username column-username\"><a href=\"user-edit.php?user_id={$member->ID}&wp_httpd_referer=\"><strong>{$member->user_login}</strong></a></td>
-            <td class=\"name column-name\">{$fname} {$lname}</td>
-            <td class=\"email column-email\"><a href=\"mailto:{$member->user_email}\">{$member->user_email}</a></td>
-            <td class=\"group-actions\"><a class=\"row-actions\" href=\"?page=ps_groups_edit&groupid={$_GET['groupid']}&action=rmvusr&usrid={$member->ID}&relid={$member->rel_id}&usrname={$member->user_login}\">Remove</a></td>
-        </tr>";
+    foreach($pagelist as $page){
+        $page_title = $page->post_title;
+        $html .= sprintf('
+        <tr id="page-%1$s" %2$s>
+            <td class="post-title page-title column-title">
+                <strong><a href="%3$s">%4$s</a></strong>
+                <div class="row-actions">
+                    <span class="view"><a href="#" title="View the page">View</a> | </span>
+                    <span class="edit"><a href="post.php?post=%1$s&action=edit" title="Edit this page">Edit</a> | </span>
+                    <span class="trash"><a href="javascript:alert(\'Not implemented\')" title="Remove current group from this page\'s security">Remove</a></span>
+                </div>
+            </td>
+            <td class="protected column-protected">%5$s</td>
+            <td class="type column-type">%6$s</td>
+        </tr>',
+            /*1*/$page->sec_protect_id,
+            /*2*/$alternatecss,
+            /*3*/admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
+            /*4*/$page_title,
+            /*5*/'',
+            /*6*/$page->post_type
+        );
 
         //Alternate css style for odd-numbered rows
         $alternatecss = ($alternatecss != '') ? '' : ' class="alternate" ';
-    }*/
-    return '';
+    }
+    return $html;//'<td colspan="2">There are pages attached, but this feature is not yet working.</td>';
 }
 
 
