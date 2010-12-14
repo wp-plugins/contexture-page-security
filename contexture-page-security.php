@@ -1245,8 +1245,6 @@ function ctx_ps_display_member_list($GroupID){
 /**
  * Returns html for tbody element of group-page list.
  * 
- * TODO: Make display pages instead of users
- *
  * @param int $group_id The id of the group we need a member list for.
  * @return string Html to go inside tbody.
  */
