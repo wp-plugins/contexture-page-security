@@ -834,7 +834,7 @@ function ctx_ps_admin_head_js(){
         }
 
         //Removes a group from a user
-        function ctx_ps_remove_group_from_user(igroupid,iuserid,me){
+        function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
             jQuery.get('admin-ajax.php',
                 {
                     action:'ctx_ps_removefromuser',
