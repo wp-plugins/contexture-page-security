@@ -939,6 +939,31 @@ function ctx_ps_admin_head_js(){
                 );
             }
         }
+        
+        //Removes a page from a group via the group screen
+        function ctx_ps_remove_page_from_group(ipostid,me){
+            if(confirm('<?php _e('Are you sure you want to remove this group from ') ?>"'+me.parents('td:first').children('strong:first').text()+'"?')){
+                //Get the id of the current group
+                var igroupid = parseInt(jQuery('#groupid').val());
+                
+                jQuery.get('admin-ajax.php',
+                    {
+                        action:'ctx_ps_removefrompage',
+                        groupid:igroupid,
+                        postid:ipostid
+                    },
+                    function(data){
+                        data = jQuery(data);
+                        if(data.find('code').text() == '1'){
+                            
+                            me.parents('tr:first').fadeOut(500,function(){jQuery(this).remove();});
+
+                            //ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
+                        }
+                    },'xml'
+                );
+            }
+        }
     </script>
     <?php
 }
@@ -1270,7 +1295,7 @@ function ctx_ps_display_page_list($group_id){
                 <div class="row-actions">
                     <span class="view"><a href="%7$s" title="View the page">View</a> | </span>
                     <span class="edit"><a href="post.php?post=%1$s&action=edit" title="Edit this page">Edit</a> | </span>
-                    <span class="trash"><a href="javascript:alert(\'Not implemented\')" title="Remove current group from this page\'s security">Remove</a></span>
+                    <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">Remove</a></span>
                 </div>
             </td>
             <td class="protected column-protected">%5$s</td>

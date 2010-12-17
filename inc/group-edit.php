@@ -157,7 +157,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                     <th class="type">Type</th>
                 </tr>
             </tfoot>
-            <tbody id="users" class="list:user user-list">
+            <tbody id="users" class="list:content content-list">
                 <?php
                     if(ctx_ps_count_protected_pages($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No pages are attached to this group.').'</td>';
