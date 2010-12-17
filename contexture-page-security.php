@@ -715,6 +715,11 @@ function ctx_ps_append_contextual_help(){
 function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
+        var msgNoUnprotect = <?php _e('\'You cannot unprotect this page. It is protected by a parent or ancestor.\'') ?>;
+        var msgEraseSec = <?php _e('\'This will completely erase this page\\\'s security settings and make it accessible to the public. Continue?\'') ?>;
+        var msgRemoveGroup = <?php _e('\'Are you sure you want to remove group "%s" from this page?\'') ?>;
+        var msgRemovePage = <?php _e('\'Are you sure you want to remove this group from %s ?\'') ?>;
+        
         //When DOM Ready...
         jQuery(function(){
             jQuery('#groups-available') //On restrict-access sidebar AND edit-users page
@@ -726,7 +731,7 @@ function ctx_ps_admin_head_js(){
             jQuery('label[for="ctx_ps_protectmy"]').click(function(){
                 //If the checkbox is disabled, it's because an ancestor is protected - let the user know
                 if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
-                    alert('You cannot unprotect this page. It is protected by a parent or ancestor.');
+                    alert(msgNoUnprotect);
                 }
             });
             jQuery('#btn-add-grp-2-user').click(function(){ctx_ps_add_group_to_user()});
@@ -767,7 +772,7 @@ function ctx_ps_admin_head_js(){
                     },'xml'
                 );
             }else{
-                if(confirm('This will completely erase this page\'s security settings and make it accessible to the public. Continue?')){
+                if(confirm(msgEraseSec)){
                     //Turn security OFF for this group
                     jQuery.get('admin-ajax.php',
                         {
@@ -909,7 +914,7 @@ function ctx_ps_admin_head_js(){
 
         //Removes a group from a page with security
         function ctx_ps_remove_group_from_page(igroupid,me){
-            if(confirm('Are you sure you want to remove group "'+me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()+'" from this page?')){
+            if(confirm(msgRemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
                 var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
                 //alert("The group you want to add is: "+$groupid);
                 jQuery.get('admin-ajax.php',
@@ -942,7 +947,7 @@ function ctx_ps_admin_head_js(){
         
         //Removes a page from a group via the group screen
         function ctx_ps_remove_page_from_group(ipostid,me){
-            if(confirm('<?php _e('Are you sure you want to remove this group from ') ?>"'+me.parents('td:first').children('strong:first').text()+'"?')){
+            if(confirm( varMsgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
                 //Get the id of the current group
                 var igroupid = parseInt(jQuery('#groupid').val());
                 
