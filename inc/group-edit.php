@@ -3,9 +3,12 @@
 if ( ! current_user_can( 'manage_options' ) )
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
+
+//Get info about the current group
 $sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $actionmessage = '';
 
+//If we're submitting a change to the group...
 if(!empty($_GET['action'])){
     switch($_GET['action']){
         case 'updtgrp':
@@ -50,13 +53,25 @@ if(!empty($_GET['action'])){
 
 $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
 
+
+    if($_GET['page']==='ps_groups_edit')
 ?>
+    <script type="text/javascript" src="<?php echo plugins_url('/inc/js/inline-edit-membership.js',dirname(__FILE__)) ?>"></script>
     <style type="text/css">
         .group-actions { text-align:right; }
         .group-actions a { color:red; font-weight:bold; }
-        #grouptable tbody tr:hover td { background:#fffce0; }
+        #grouptable tbody tr:hover td,
+        #pagetable tbody tr:hover td { background:#fffce0; }
+        #grouptable th.username { width:300px; }
+        #grouptable th.name { width:300px; }
+        #grouptable th.expires { width:100px; }
         #pagetable th.protected { width:50px; }
         #pagetable th.type { width:60px; }
+        .inline-membership-row label { clear:left; }
+        .inline-membership-row label,
+        .inline-membership-save a,
+        .inline-membership-date{ margin:0.2em 0; }
+        .inline-membership-row label .title { width:100px !important; }
     </style>
 
     <div class="wrap">
@@ -119,7 +134,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         <th class="username">Username</th>
                         <th class="name">Name</th>
                         <th class="email">Email</th>
-                        <th></th>
+                        <th class="expires">Until</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -127,7 +142,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         <th class="username">Username</th>
                         <th class="name">Name</th>
                         <th class="email">E-mail</th>
-                        <th></th>
+                        <th class="expires">Until</th>
                     </tr>
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
@@ -135,7 +150,51 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         if(ctx_ps_count_members($_GET['groupid']) < 1){
                             echo '<td colspan="4">'.__('No users have been added to this group.').'</td>';
                         } else {
-                            echo ctx_ps_display_member_list($_GET['groupid']);
+                           echo '<tr id="inline-membership" class="inline-membership-row inline-options-row-page inline-membership-page quick-edit-row quick-edit-row-page inline-membership-page" style="display: none"><td colspan="4">
+                                <fieldset class="inline-membership-col-left">
+                                    <h4>MEMBERSHIP DETAILS</h4>
+                                    <label>
+                                        <span class="title">'.__('User').'</span>
+                                        <span class="input-text-wrap username" style="color:silver;">
+                                            username
+                                        </span>
+                                    </label>
+                                    <label>
+                                        <span class="title">'.__('Expires').'</span>
+                                        <span class="input-text-wrap">
+                                            <input type="checkbox" value="" name="membership_permanent"/>
+                                        </span>
+                                    </label>
+                                    <label>
+                                        <span class="title">'.__('End Date').'</span>
+                                    </label>
+                                    <div class="inline-membership-date">
+                                        <div class="timestamp-wrap">
+                                            <select tabindex="4" name="mm" disabled="disabled">
+                                                <option value="01">Jan</option>
+                                                <option value="02">Feb</option>
+                                                <option value="03">Mar</option>
+                                                <option value="04">Apr</option>
+                                                <option value="05">May</option>
+                                                <option value="06">Jun</option>
+                                                <option value="07">Jul</option>
+                                                <option value="08">Aug</option>
+                                                <option value="09">Sep</option>
+                                                <option value="10">Oct</option>
+                                                <option value="11">Nov</option>
+                                                <option value="12">Dec</option>
+                                            </select>
+                                            <input type="text" autocomplete="off" tabindex="4" maxlength="2" size="2" value="" name="jj" disabled="disabled">, 
+                                            <input type="text" autocomplete="off" tabindex="4" maxlength="4" size="4" value="" name="aa" disabled="disabled">
+                                        </div>
+                                    </div>
+                                </fieldset>
+                                <p class="submit inline-membership-save">
+                                    <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel').'</a>
+                                    <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update').'</a>
+                                </p>
+                                </td></tr>';
+                                echo ctx_ps_display_member_list($_GET['groupid']);
                         }
                     ?>
                 </tbody>
@@ -162,8 +221,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                     if(ctx_ps_count_protected_pages($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No pages are attached to this group.').'</td>';
                     } else {
-                        echo '<tr id="inline-edit" class="inline-edit-row inline-edit-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="3">HELLO WORLD</td></tr>',
-                            ctx_ps_display_page_list($_GET['groupid']);
+                        echo ctx_ps_display_page_list($_GET['groupid']);
                     }
                 ?>
             </tbody>
