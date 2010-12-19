@@ -162,7 +162,8 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                     if(ctx_ps_count_protected_pages($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No pages are attached to this group.').'</td>';
                     } else {
-                        echo ctx_ps_display_page_list($_GET['groupid']);
+                        echo '<tr id="inline-edit" class="inline-edit-row inline-edit-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="3">HELLO WORLD</td></tr>',
+                            ctx_ps_display_page_list($_GET['groupid']);
                     }
                 ?>
             </tbody>

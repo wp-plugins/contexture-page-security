@@ -1150,7 +1150,7 @@ function ctx_ps_determine_access($UserGroupsArray,$PageSecurityArray){
 function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=true){
     global $wpdb;
     
-    $linkBack = admin_url();
+    $linkBack = admin_url('users.php');
 
     if($memberid==''){
         $groups = $wpdb->get_results("
@@ -1257,14 +1257,31 @@ function ctx_ps_display_member_list($GroupID){
     foreach($members as $member){
         $fname = get_user_meta($member->ID, 'first_name', true);
         $lname = get_user_meta($member->ID, 'last_name', true);
-        $html .= "
-        <tr id=\"user-{$member->ID}\" {$alternatecss}>
-            <td class=\"username column-username\"><a href=\"user-edit.php?user_id={$member->ID}&wp_httpd_referer=\"><strong>{$member->user_login}</strong></a></td>
-            <td class=\"name column-name\">{$fname} {$lname}</td>
-            <td class=\"email column-email\"><a href=\"mailto:{$member->user_email}\">{$member->user_email}</a></td>
-            <td class=\"group-actions\"><a class=\"row-actions\" href=\"?page=ps_groups_edit&groupid={$_GET['groupid']}&action=rmvusr&usrid={$member->ID}&relid={$member->rel_id}&usrname={$member->user_login}\">Remove</a></td>
-        </tr>";
-
+        $html .= sprintf('
+        <tr id="user-%1$s" %2$s>
+            <td class="username column-username">
+                <a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s"><strong>%3$s</strong></a>
+                <div class="row-actions">
+                    <span class="editinline"><a href="#" title="Change membership options">'.__('Options').'</a> | </span>
+                    <span class="trash"><a class="row-actions" href="%8$s?page=ps_groups_edit&groupid=%6$s&action=rmvusr&usrid=%1$s&relid=%7$s&usrname=%3$s">'.__('Unenroll').'</a> | </span>
+                    <span class="view"><a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s" title="View User">'.__('View').'</a></span>
+                </div>
+            </td>
+            <td class="name column-name">%4$s</td>
+            <td class="email column-email"><a href="mailto:%5$s">%5$s</a></td>
+            <td class="group-actions"></td>
+        </tr>',
+            /*1*/$member->ID,
+            /*2*/$alternatecss,
+            /*3*/$member->user_login,
+            /*4*/$fname.' '.$lname,
+            /*5*/$member->user_email,
+            /*6*/$_GET['groupid'],
+            /*7*/$member->rel_id,
+            /*8*/admin_url(),
+            /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid'])
+            );
+           
         //Alternate css style for odd-numbered rows
         $alternatecss = ($alternatecss != '') ? '' : ' class="alternate" ';
     }
@@ -1298,9 +1315,9 @@ function ctx_ps_display_page_list($group_id){
             <td class="post-title page-title column-title">
                 <strong><a href="%3$s">%4$s</a></strong>
                 <div class="row-actions">
-                    <span class="view"><a href="%7$s" title="View the page">View</a> | </span>
-                    <span class="edit"><a href="post.php?post=%1$s&action=edit" title="Edit this page">Edit</a> | </span>
-                    <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">Remove</a></span>
+                    <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit').'</a> | </span>
+                    <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove').'</a> | </span>
+                    <span class="view"><a href="%7$s" title="View the page">'.__('View').'</a> | </span>
                 </div>
             </td>
             <td class="protected column-protected">%5$s</td>
@@ -1312,7 +1329,8 @@ function ctx_ps_display_page_list($group_id){
             /*4*/$page_title,
             /*5*/'',
             /*6*/$page->post_type,
-            /*7*/get_permalink($page->sec_protect_id)
+            /*7*/get_permalink($page->sec_protect_id),
+            /*8*/admin_url()
         );
 
         //Alternate css style for odd-numbered rows
