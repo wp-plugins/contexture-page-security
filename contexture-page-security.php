@@ -318,14 +318,14 @@ function ctx_ps_ajax_update_membership(){
     }
     
     //Determine null or value
-    $db_expires = ($_POST['expires']=='1') ? '\''.$_POST['date'].'\'' : 'NULL';
+    $db_expires = ($_POST['expires']=='1') ? "'".$_POST['date']."'" : 'NULL';
 
     //Build query
     $sqlUpdateMember = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=%s WHERE ID=\'%s\';',$wpdb->prefix,$db_expires,$_POST['grel']);
     
     //Determine response
     if($wpdb->query($sqlUpdateMember) === false){
-        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed! ').$sqlUpdateMember) );
+        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed!')) );
     } else {
         ctx_ps_ajax_response( array('code'=>'1','message'=>__('User membership updated')) );
     }
@@ -1056,7 +1056,7 @@ function ctx_ps_display_member_list($GroupID){
             <td class="username column-username">
                 <a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s"><strong>%3$s</strong></a>
                 <div class="row-actions">
-                    <span class="membership"><a href="#" class="editmembership" title="Change membership options">'.__('Options').'</a> | </span>
+                    <span class="membership"><a href="#" class="editmembership" title="Change membership options">'.__('Membership').'</a> | </span>
                     <span class="trash"><a class="row-actions" href="%8$s?page=ps_groups_edit&groupid=%6$s&action=rmvusr&usrid=%1$s&relid=%7$s&usrname=%3$s">'.__('Unenroll').'</a> | </span>
                     <span class="view"><a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s" title="View User">'.__('View').'</a></span>
                 </div>
@@ -1081,7 +1081,7 @@ function ctx_ps_display_member_list($GroupID){
             /*7*/$member->grel_id,
             /*8*/admin_url(),
             /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid']),
-            /*10*/(empty($rawdate) ? 'Never' : sprintf('%s-%s-%s',$aa,$mm,$jj)),
+            /*10*/(empty($rawdate) ? 'Never' : sprintf('%s-%s-%s',$mm,$jj,$aa)),
             /*11*/$jj,
             /*12*/$mm,
             /*13*/$aa

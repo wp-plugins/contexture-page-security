@@ -24,9 +24,7 @@ function psc_add_user_to_group($user_id,$group_id,$expires=null){
     
     //Make sure user exists in db
     $UserInfo = (int)$wpdb->get_var(
-        $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '%s'",
-            $user_id
-        )
+        $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = %s",$user_id)
     );
 
     //If this user doesn't exist
@@ -34,9 +32,10 @@ function psc_add_user_to_group($user_id,$group_id,$expires=null){
         return false;
     } else {
         //Add user to group
-        $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
+        $sqlUpdateGroup = sprintf("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id, grel_expires) VALUES ('%s','%s',%s);",
             $group_id,
-            $user_id
+            $user_id,
+            (empty($expires) || strtolower($expires)==='null') ? 'NULL' : "'".$expires."'"
         );
         if($wpdb->query($sqlUpdateGroup) === false){
             return false;
@@ -48,19 +47,25 @@ function psc_add_user_to_group($user_id,$group_id,$expires=null){
 }
 }
 
-if(!function_exists('psc_update_user_expires')){
+if(!function_exists('psc_update_user_membership')){
 /**
  * INCOMPLETE: Updates expiration date for a user's group membership.
  * 
  * @param datetime $expires Set datetime to include expiration dat. If null, no expiration.
  * @return bool Returns true if record was updated. False if query fails.
  */
-function psc_update_user_expires($user_id,$group_id,$expires=null){
+function psc_update_user_membership($user_id,$group_id,$expires=null){
     global $wpdb;
     
-    $query = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=\'%s\' WHERE `grel_group_id`=\'%s\' AND `grel_user_id`=\'%s\'',$wpdb->prefix,$expires,$group_id,$user_id);
+    //Check if expires date is null
+    $expires = (empty($expires) || strtolower($expires)==='null') ? 'NULL' : "'".$expires."'";
     
-    return false;
+    $query = sprintf('UPDATE `%1$sps_group_relationships` SET grel_expires=%2$s WHERE `grel_group_id`=\'%3$s\' AND `grel_user_id`=\'%4$s\'',
+            /*1*/$wpdb->prefix,
+            /*2*/$expires,
+            /*3*/$group_id,
+            /*4*/$user_id);
+    return $wpdb->query($query);
 }
 }
 
