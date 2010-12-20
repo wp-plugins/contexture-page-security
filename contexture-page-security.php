@@ -51,6 +51,7 @@ add_action('wp_ajax_ctx_ps_security_update','ctx_ps_ajax_security_update');
 //Handle Ajax for Edit User page
 add_action('wp_ajax_ctx_ps_add2user','ctx_ps_ajax_add_group_to_user');
 add_action('wp_ajax_ctx_ps_removefromuser','ctx_ps_ajax_remove_group_from_user');
+add_action('wp_ajax_ctx_ps_updatemember','ctx_ps_ajax_update_membership');
 
 //Add basic security to all public "static" pages and posts
 add_action('wp','ctx_ps_security_action');
@@ -282,22 +283,51 @@ function ctx_ps_ajax_add_group_to_user(){
     if($UserInfo === 0){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
     } else {
-        //Make sure user isnt already in group
+        
+        //Make sure user isnt already in the group
         $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->get_var($sqlUpdateGroup)>0){
-            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Alreadt in group')) );
+            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Already in group')) );
         }
+        
         //Add user to group
         $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->query($sqlUpdateGroup) === false){
-            ctx_ps_ajax_response(array('code'=>'0','message'=>'Query failed'));
+            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed')) );
         } else {
-            ctx_ps_ajax_response(array('code'=>'1','message'=>__('User enrolled in group'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>'));
+            ctx_ps_ajax_response( array('code'=>'1','message'=>__('User enrolled in group'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
         }
+    }
+
+}
+
+/**
+ * Handles ajax requests to update a users membership info
+ */
+function ctx_ps_ajax_update_membership(){
+    global $wpdb;
+
+    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+    if(!current_user_can('manage_options')){
+        //If user isn't authorized
+        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Admin user is unauthorized.')) );
+    }
+    
+    //Determine null or value
+    $db_expires = ($_POST['expires']=='1') ? '\''.$_POST['date'].'\'' : 'NULL';
+
+    //Build query
+    $sqlUpdateMember = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=%s WHERE ID=\'%s\';',$wpdb->prefix,$db_expires,$_POST['grel']);
+    
+    //Determine response
+    if($wpdb->query($sqlUpdateMember) === false){
+        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed! ').$sqlUpdateMember) );
+    } else {
+        ctx_ps_ajax_response( array('code'=>'1','message'=>__('User membership updated')) );
     }
 
 }
@@ -722,10 +752,11 @@ function ctx_ps_append_contextual_help(){
 function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
-        var msgNoUnprotect = <?php _e('\'You cannot unprotect this page. It is protected by a parent or ancestor.\'') ?>;
-        var msgEraseSec = <?php _e('\'This will completely erase this page\\\'s security settings and make it accessible to the public. Continue?\'') ?>;
-        var msgRemoveGroup = <?php _e('\'Are you sure you want to remove group "%s" from this page?\'') ?>;
-        var msgRemovePage = <?php _e('\'Are you sure you want to remove this group from %s ?\'') ?>;
+        var msgNoUnprotect = '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.') ?>';
+        var msgEraseSec = '<?php _e('This will completely erase this page\'s security settings and make it accessible to the public. Continue?') ?>';
+        var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?') ?>';
+        var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?') ?>';
+        var msgRemoveUser = '<?php _e('Remove this user from the group?') ?>';
     </script>
     <script type="text/javascript" src="<?php echo plugins_url('/inc/js/core-ajax.js',__FILE__) ?>"></script>
     <?php
@@ -1016,9 +1047,10 @@ function ctx_ps_display_member_list($GroupID){
     foreach($members as $member){
         $fname = get_user_meta($member->ID, 'first_name', true);
         $lname = get_user_meta($member->ID, 'last_name', true);
-        $jj = ''; //Day
-        $mm = ''; //Month
-        $aa = ''; //Year
+        $rawdate = strtotime($member->grel_expires);
+        $jj = (!empty($rawdate)) ? date('j',$rawdate) : ''; //Day
+        $mm = (!empty($rawdate)) ? date('m',$rawdate) : ''; //Month
+        $aa = (!empty($rawdate)) ? date('Y',$rawdate) : ''; //Year
         $html .= sprintf('
         <tr id="user-%1$s" %2$s>
             <td class="username column-username">
@@ -1033,6 +1065,7 @@ function ctx_ps_display_member_list($GroupID){
                     <div class="jj">%11$s</div>
                     <div class="mm">%12$s</div>
                     <div class="aa">%13$s</div>
+                    <div class="grel">%7$s</div>
                 </div>
             </td>
             <td class="name column-name">%4$s</td>
@@ -1048,7 +1081,7 @@ function ctx_ps_display_member_list($GroupID){
             /*7*/$member->grel_id,
             /*8*/admin_url(),
             /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid']),
-            /*10*/(empty($member->grel_expires) ? 'Never' : $member->grel_expires),
+            /*10*/(empty($rawdate) ? 'Never' : sprintf('%s-%s-%s',$aa,$mm,$jj)),
             /*11*/$jj,
             /*12*/$mm,
             /*13*/$aa
@@ -1122,11 +1155,13 @@ function ctx_ps_display_page_list($group_id){
 function ctx_ps_get_usergroups($userid){
     global $wpdb, $current_user;
     $array = array();
+    $today = date('Y-m-d');
     $groups = $wpdb->get_results("
         SELECT * FROM `{$wpdb->prefix}ps_group_relationships`
         JOIN `{$wpdb->prefix}ps_groups`
             ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
         WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$userid}'
+        AND grel_expires IS NULL OR grel_expires = '{$today}'
     ");
 
     //We only need an ID and a name as a key/value...

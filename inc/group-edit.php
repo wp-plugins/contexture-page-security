@@ -30,12 +30,24 @@ if(!empty($_GET['action'])){
             if($UserInfo == 0){
                 $actionmessage = sprintf('<div class="error below-h2"><p>'.__('User &quot;%s&quot; does not exist.').'</p></div>',$_GET['add-username']);
             } else {
-                //Add user to group
-                $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",$_GET['groupid'],$wpdb->get_var($sqlCheckUserExists,0,0));
-                if($wpdb->query($sqlUpdateGroup) === false){
-                    $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. User could not be added to the group.').'</p></div>';
-                } else {
-                    $actionmessage = sprintf('<div id="message" class="updated below-h2"><p>'.__('User &quot;%s&quot; has been added to the group.').'</p></div>',$_GET['add-username']);
+                
+                //Make sure user isnt already in the group
+                $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',
+                        $_GET['groupid'],
+                        $wpdb->get_var($sqlCheckUserExists,0,0));
+                
+                //wp_die($UserInGroup.' <br/><br/> '.$wpdb->get_var($UserInGroup));
+                
+                if($wpdb->get_var($UserInGroup)>0){
+                    $actionmessage = '<div class="error below-h2"><p>'.__('User is already in this group.').'</p></div>';
+                }else{
+                    //Add user to group
+                    $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",$_GET['groupid'],$wpdb->get_var($sqlCheckUserExists,0,0));
+                    if($wpdb->query($sqlUpdateGroup) === false){
+                        $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. User could not be added to the group.').'</p></div>';
+                    } else {
+                        $actionmessage = sprintf('<div id="message" class="updated below-h2"><p>'.__('User &quot;%s&quot; has been added to the group.').'</p></div>',$_GET['add-username']);
+                    }
                 }
             }
             break;
@@ -199,6 +211,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                                 <p class="submit inline-edit-save">
                                     <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel').'</a>
                                     <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update').'</a>
+                                    <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display: none;" class="waiting">
                                 </p>
                                 </td></tr>';
                                 echo ctx_ps_display_member_list($_GET['groupid']);

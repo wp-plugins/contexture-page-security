@@ -6,10 +6,16 @@
             
             //Edit window cancel
             $('.submit a.cancel').live('click',function(){
-                var myRow = $(this).parents('tr:first');
-                var myId = inlineEditMembership.getId(myRow[0]);
+                var myRow = $(this).parents('tr:first'),
+                    myId = inlineEditMembership.getId(myRow[0]);
                 myRow.remove();
                 $('#user-'+myId).css('display','table-row');
+            });
+            
+            //Edit window save
+            $('.submit a.save').live('click',function(){ 
+                var myRow = $(this).parents('tr:first');
+                inlineEditMembership.save(myRow[0]);
             });
             
             //Toggle editor window date enabled
@@ -21,9 +27,14 @@
                 }
             });
             
+            //Confirm before removing a user
+            $('.row-actions .trash').click(function(){
+                return confirm(msgRemoveUser);
+            });
+            
         },
         edit : function(memberid){
-            var rowData, editForm;
+            var rowData, editForm, expires=false;
             
             //Close other open edit windows
             inlineEditMembership.revert();
@@ -37,19 +48,74 @@
             //Update username
             $('.username',editForm).text($('.username',rowData).text());
             //Update expires checkbox
-            if($('.jj',rowData).text().length!=0){ $('input[name="membership_permanent"]',editForm).attr('checked','checked'); }
-            //Update dates
-            
+            if($('.jj',rowData).text().length!=0){ $('input[name="membership_permanent"]',editForm).attr('checked','checked'); expires=true; }
+            //Set dates (if appropriate)
+            if(expires){
+                editForm.find('.inline-edit-date').find('input, select').removeAttr('disabled')
+                    .filter('[name="mm"]').val($('.mm',rowData).text()).end()
+                    .filter('[name="aa"]').val($('.aa',rowData).text()).end()
+                    .filter('[name="jj"]').val($('.jj',rowData).text()).end();
+            }
             //Hide original tr
             $('#user-'+memberid).hide();
             
         },
-        save : function(){
+        save : function(myId){
+            var myId, myEdit, rowData, newData, newDate='', hasExpire=0;
+            
+            //Show waiting anigif
+            $('.inline-edit-save .waiting').show();
+            
+            //Set memberid to the memberid int, if its an object
+            myId = inlineEditMembership.getId(myId);
+            //Get data
+            rowData = $('#inline_'+myId);
+            //Get editor object
+            myEdit = $('#edit-'+myId);
+            newData = {
+                grel:rowData.find('.grel').text(),
+                mon:myEdit.find('select[name="mm"]').val(),
+                day:myEdit.find('input[name="jj"]').val(),
+                yr:myEdit.find('input[name="aa"]').val()
+            };
+            
+            //Check if we're sending expires or not
+            if(myEdit.find('[name="membership_permanent"]:checked').length!=0){
+                //Build new date
+                hasExpire = 1;
+                newDate = newData.yr+'-'+newData.mon+'-'+newData.day;
+            }else{
+                newData.mon='';
+                newData.day='';
+                newData.yr='';
+            }
+            
             //Submit ajax data to server
-            //If successful, update tr data
-            //Hide editor
-            //Show tr
-            //Flash tr green
+            $.post('admin-ajax.php',
+            {
+                action:'ctx_ps_updatemember',
+                grel:newData.grel,
+                expires:hasExpire,
+                date:newDate
+            },
+            function(response){ response = $(response);
+                //If 1, update original tr, then revert
+                if(response.find('code').text() == '1'){
+                    $('#user-'+myId).find('.column-expires').text((hasExpire==1)?newDate:'Never');
+                    rowData.find('.jj').text(newData.day);
+                    rowData.find('.mm').text(newData.mon);
+                    rowData.find('.aa').text(newData.yr);
+                    inlineEditMembership.revert();
+                    $('#user-'+myId).animate({'background-color':'#e0ffe3'},250,function(){
+                        $(this).animate({'background-color':'#ffffff'},1000);
+                    });
+                }else{
+                    //Hide waiting anigif
+                    $('.inline-edit-save .waiting').hide();
+                    //Show error
+                    alert(response.find('message').text());
+                }
+            },'xml');
         },
         revert : function(){
             //Close any open edit and restore original row
@@ -58,9 +124,6 @@
                 $(this).remove();
                 $('#user-'+myId).css('display','table-row');
             });
-            //Clear out edit data
-            //Hide edit tr
-            //Restore original tr
         },
         getId : function(obj){
             var id = (obj.tagName == 'TR') ? obj.id : $(obj).parents('tr:first').attr('id'), 
