@@ -25,6 +25,9 @@
         edit : function(memberid){
             var rowData, editForm;
             
+            //Close other open edit windows
+            inlineEditMembership.revert();
+            
             //Set memberid to the memberid int, if its an object
             if (typeof memberid=='object') memberid = inlineEditMembership.getId(memberid);
             //Get data
@@ -49,6 +52,12 @@
             //Flash tr green
         },
         revert : function(){
+            //Close any open edit and restore original row
+            $('tr.inline-edit-row:visible').each(function(){
+                var myId = inlineEditMembership.getId( $(this)[0] );
+                $(this).remove();
+                $('#user-'+myId).css('display','table-row');
+            });
             //Clear out edit data
             //Hide edit tr
             //Restore original tr

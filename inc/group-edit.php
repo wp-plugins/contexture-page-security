@@ -138,7 +138,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         <th class="username">Username</th>
                         <th class="name">Name</th>
                         <th class="email">Email</th>
-                        <th class="expires">Until</th>
+                        <th class="expires">Expires</th>
                     </tr>
                 </thead>
                 <tfoot>
@@ -146,7 +146,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         <th class="username">Username</th>
                         <th class="name">Name</th>
                         <th class="email">E-mail</th>
-                        <th class="expires">Until</th>
+                        <th class="expires">Expires</th>
                     </tr>
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
