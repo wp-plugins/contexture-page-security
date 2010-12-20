@@ -67,11 +67,15 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         #grouptable th.expires { width:100px; }
         #pagetable th.protected { width:50px; }
         #pagetable th.type { width:60px; }
-        .inline-membership-row label { clear:left; }
-        .inline-membership-row label,
-        .inline-membership-save a,
-        .inline-membership-date{ margin:0.2em 0; }
-        .inline-membership-row label .title { width:100px !important; }
+        .inline-edit-row label { clear:left; }
+        .inline-edit-row label,
+        .inline-edit-save a,
+        .inline-edit-date{ margin:0.2em 0; }
+        .inline-edit-row label .title { width:100px !important; }
+        .inline-edit-save { height:25px; }
+        .inline-edit-col-left { width:30% !important; border-right:1px solid #DDDDDD;  }
+        
+        .inline-edit-col-right label { padding-left:10px !important; }
     </style>
 
     <div class="wrap">
@@ -150,15 +154,18 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                         if(ctx_ps_count_members($_GET['groupid']) < 1){
                             echo '<td colspan="4">'.__('No users have been added to this group.').'</td>';
                         } else {
-                           echo '<tr id="inline-membership" class="inline-membership-row inline-options-row-page inline-membership-page quick-edit-row quick-edit-row-page inline-membership-page" style="display: none"><td colspan="4">
-                                <fieldset class="inline-membership-col-left">
-                                    <h4>MEMBERSHIP DETAILS</h4>
+                           echo '<tr id="inline-edit" class="inline-edit-row inline-options-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="4">
+                                <h4>MEMBERSHIP DETAILS</h4>
+                                <fieldset class="inline-edit-col-left">
                                     <label>
                                         <span class="title">'.__('User').'</span>
                                         <span class="input-text-wrap username" style="color:silver;">
                                             username
                                         </span>
                                     </label>
+                                    <label>&nbsp;</label>
+                                </fieldset>
+                                <fieldset class="inline-edit-col-right">
                                     <label>
                                         <span class="title">'.__('Expires').'</span>
                                         <span class="input-text-wrap">
@@ -168,7 +175,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                                     <label>
                                         <span class="title">'.__('End Date').'</span>
                                     </label>
-                                    <div class="inline-membership-date">
+                                    <div class="inline-edit-date">
                                         <div class="timestamp-wrap">
                                             <select tabindex="4" name="mm" disabled="disabled">
                                                 <option value="01">Jan</option>
@@ -189,7 +196,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                                         </div>
                                     </div>
                                 </fieldset>
-                                <p class="submit inline-membership-save">
+                                <p class="submit inline-edit-save">
                                     <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel').'</a>
                                     <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update').'</a>
                                 </p>

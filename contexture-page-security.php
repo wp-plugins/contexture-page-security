@@ -282,6 +282,13 @@ function ctx_ps_ajax_add_group_to_user(){
     if($UserInfo === 0){
         ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
     } else {
+        //Make sure user isnt already in group
+        $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',
+                $_GET['groupid'],
+                $_GET['user_id']);
+        if($wpdb->get_var($sqlUpdateGroup)>0){
+            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Alreadt in group')) );
+        }
         //Add user to group
         $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
                 $_GET['groupid'],
@@ -1009,6 +1016,9 @@ function ctx_ps_display_member_list($GroupID){
     foreach($members as $member){
         $fname = get_user_meta($member->ID, 'first_name', true);
         $lname = get_user_meta($member->ID, 'last_name', true);
+        $jj = ''; //Day
+        $mm = ''; //Month
+        $aa = ''; //Year
         $html .= sprintf('
         <tr id="user-%1$s" %2$s>
             <td class="username column-username">
@@ -1019,12 +1029,15 @@ function ctx_ps_display_member_list($GroupID){
                     <span class="view"><a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s" title="View User">'.__('View').'</a></span>
                 </div>
                 <div id="inline_%1$s" class="hidden">
-                    <div class="membership_expiration">%10$s</div>
+                    <div class="username">%3$s</div>
+                    <div class="jj">%11$s</div>
+                    <div class="mm">%12$s</div>
+                    <div class="aa">%13$s</div>
                 </div>
             </td>
             <td class="name column-name">%4$s</td>
             <td class="email column-email"><a href="mailto:%5$s">%5$s</a></td>
-            <td class="expires column-expires">%11$s</td>
+            <td class="expires column-expires">%10$s</td>
         </tr>',
             /*1*/$member->ID,
             /*2*/$alternatecss,
@@ -1035,8 +1048,10 @@ function ctx_ps_display_member_list($GroupID){
             /*7*/$member->grel_id,
             /*8*/admin_url(),
             /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid']),
-            /*10*/$member->grel_expires,
-            /*11*/(empty($member->grel_expires) ? 'Never' : $member->grel_expires)
+            /*10*/(empty($member->grel_expires) ? 'Never' : $member->grel_expires),
+            /*11*/$jj,
+            /*12*/$mm,
+            /*13*/$aa
             );
            
         //Alternate css style for odd-numbered rows
