@@ -72,6 +72,10 @@ Absolutely! PO files are now included with each PSC download. You can use a Word
 
 Yes! This is particularly handy if you're working on a new section of your website but you aren't quite ready to share it with the world. From the page's edit screen, simply find the "Restrict Access" sidebar and check "Protect this page and it's descendants". That's it! Even if you don't assign any groups, anyone who's logged in as an admin will still have full access to that page.
 
+= I found a bug or need a feature, what do I do? =
+
+Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad to help you out.
+
 == Theme Functions ==
 
 Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's inc/theme-functions.php file)).
