@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.3.0
+Version: 1.3.1
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -474,7 +474,7 @@ function ctx_ps_security_action(){
     global $current_user;
     $secureallowed = true;
 
-    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404()) {
+    if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
         /**Groups that this user is a member of*/
         $useraccess = ctx_ps_get_usergroups($current_user->ID);
         /**Groups required to access this page*/
@@ -558,7 +558,7 @@ function ctx_ps_security_filter_blog($content){
         return $content;
     }else{
         //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-        if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() )  && !is_admin()) {
+        if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() || is_search() )  && !is_admin()) {
             foreach($content as $post->key => $post->value){
                 //Fun with manipulating the array
                 //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
@@ -738,8 +738,12 @@ function ctx_ps_append_contextual_help(){
         //Add our contextual help
         add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>').$supporturl );
         add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>').$supporturl );
-        add_contextual_help( 'dashboard_page_ps_groups_edit', __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages/posts this group is attached to. Click a page name to edit that page.</p><p><strong>For more information:</strong></p>').$supporturl );
-        add_contextual_help( 'dashboard_page_ps_groups_delete', __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>').$supporturl );
+        $ps_groups_edit = __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages and posts this group is attached to.</p><p><strong>For more information:</strong></p>').$supporturl;
+        add_contextual_help( 'dashboard_page_ps_groups_edit', $ps_groups_edit );
+        add_contextual_help( 'users_page_ps_groups_edit', $ps_groups_edit );
+        $ps_groups_delete = __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>').$supporturl;
+        add_contextual_help( 'dashboard_page_ps_groups_delete', $ps_groups_delete );
+        add_contextual_help( 'users_page_ps_groups_delete', $ps_groups_delete );
         add_contextual_help( 'settings_page_ps_manage_opts', __('<p>This screen contains general settings for Page Security.</p><p><strong>For more information:</strong></p>').$supporturl );
         //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>') );
         

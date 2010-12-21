@@ -97,6 +97,9 @@ This function can be used to determine if a specific page or post is protected (
 
 == Changelog ==
 
+= 1.3.1 =
+* Fixed a bug that could cause search results to return an AD in certain conditions.
+
 = 1.3.0 =
 * Merry Christmas! Lots of new features.
 * New feature: Subscription support! You can now assign expiration dates to group memberships!
