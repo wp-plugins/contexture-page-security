@@ -1128,7 +1128,7 @@ function ctx_ps_display_page_list($group_id){
                 <div class="row-actions">
                     <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit').'</a> | </span>
                     <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove').'</a> | </span>
-                    <span class="view"><a href="%7$s" title="View the page">'.__('View').'</a> | </span>
+                    <span class="view"><a href="%7$s" title="View the page">'.__('View').'</a></span>
                 </div>
             </td>
             <td class="protected column-protected">%5$s</td>

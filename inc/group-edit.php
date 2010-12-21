@@ -146,18 +146,18 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             <table id="grouptable" class="widefat fixed" cellspacing="0">
                 <thead>
                     <tr class="thead">
-                        <th class="username">Username</th>
-                        <th class="name">Name</th>
-                        <th class="email">Email</th>
-                        <th class="expires">Expires</th>
+                        <th class="username"><?php _e('Username') ?></th>
+                        <th class="name"><?php _e('Name') ?></th>
+                        <th class="email"><?php _e('Email') ?></th>
+                        <th class="expires"><?php _e('Expires') ?></th>
                     </tr>
                 </thead>
                 <tfoot>
                     <tr class="thead">
-                        <th class="username">Username</th>
-                        <th class="name">Name</th>
-                        <th class="email">E-mail</th>
-                        <th class="expires">Expires</th>
+                        <th class="username"><?php _e('Username') ?></th>
+                        <th class="name"><?php _e('Name') ?></th>
+                        <th class="email"><?php _e('Email') ?></th>
+                        <th class="expires"><?php _e('Expires') ?></th>
                     </tr>
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
@@ -223,16 +223,16 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         <table id="pagetable" class="widefat fixed" cellspacing="0">
             <thead>
                 <tr class="thead">
-                    <th class="title">Title</th>
-                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
-                    <th class="type">Type</th>
+                    <th class="title"><?php _e('Title') ?></th>
+                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="type"><?php _e('Type') ?></th>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="thead">
-                    <th class="title">Title</th>
-                    <th class="protected"><?php echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
-                    <th class="type">Type</th>
+                    <th class="title"><?php _e('Title') ?></th>
+                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="type"><?php _e('Type') ?></th>
                 </tr>
             </tfoot>
             <tbody id="users" class="list:content content-list">
