@@ -10,11 +10,13 @@ Allows admins to create user groups and set access restrictions for any post, pa
 
 == Description ==
 
-Page Security by Contexture International adds some much-needed user groups and permissions to WordPress! Now you can easily limit access to posts, pages, or 
-entire sections of your website. Create an intranet or a members-only area with just a few clicks. You can even create sub-sections with multiple levels of 
-security. Page Security by Contexture (PSC) lets YOU decide which users can access which content.
+Page Security by Contexture International (PSC) lets YOU decide which users can access which content. PSC adds much-needed user groups and permissions features to WordPress!
 
-PSC is designed to integrate seamlessly and intuitively with WordPress.
+Create groups to organize your users how YOU see fit. Use groups to easily limit access to posts, pages, or entire sections of your website. Create an intranet or a members-only 
+area with just a few clicks - or build a subscription based system with automatically expiring memberships. You can even create multiple levels of security for granualar protection 
+of any sub-section on your site.
+
+PSC is created to be simple, yet powerful - and is designed to integrate seamlessly and intuitively with WordPress. If you know how to use WordPress, you know how to use PSC.
 
 Features:
 
@@ -30,6 +32,13 @@ Notice:
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
 
 == Installation ==
+
+= Via WordPress Admin =
+
+1. From your sites admin, go to Plugins > Add New
+1. Search for '
+
+= Manual Install =
 
 1. Upload `contexture-page-security` folder to your `/wp-content/plugins/` directory
 1. Activate the plugin through the 'Plugins' menu in WordPress
@@ -63,28 +72,33 @@ Yes! This is particularly handy if you're working on a new section of your websi
 
 == Theme Functions ==
 
-Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help.
+Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's inc/theme-functions.php file)).
 
 = psc_add_user_to_group($user_id, $group_id, $expires) =
 
-This can be called from within a theme file to add a specific user to a specific group. It requires two parameters, a user id and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id. $expires is optional, but takes either a date string (formatted YYYY-MM-DD) or NULL. If left empty, users membership will never expire.
+This can be used to add a specified user to a specified group. It requires two parameters, a user id and a group id (The current users id can be acquired by declaring the $current_user global, then $current_user->ID). You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id. $expires is optional, but takes either a date string (formatted YYYY-MM-DD) or NULL. If left empty, users membership will never expire.
+
+= psc_update_user_membership($user_id,$group_id,$expires) =
+
+This function can be used to update a users membership details (usually expiration date). $expires is optional and can be either NULL or a string-formatted date (YYYY-MM-DD).
 
 = psc_remove_user_from_group($user_id, $group_id) =
 
-This can be called from within a theme file to remove a user from a group. Like psc_add_user_to_group(), it requires two parameters, a user id and a group id.
+Use this function to remove a user from a group. Both parameters are required.
 
 = psc_get_groups($user_id) =
 
-This function can be used to generate an associative array of groups. If you specify a user id, only groups that a user is a member of will be returned. If no parameter is provided, it will return all groups.
+This function can be used to generate an associative array of groups (group id=>name). If you specify a user id, only groups that a user is a member of will be returned. If no parameter is provided, it will return all groups.
 
 = psc_has_protection($post_id) =
 
-This function can be used to determine if a specific page or post is protected. This includes any inherited restrictions. It requires one parameter, the id of the page or post to check.
+This function can be used to determine if a specific page or post is protected (including any inherited restrictions). $post_id is optional - if left blank, the function will try to automatically use the post id from the current loop, if available. This function returns true if protected, false if not.
 
 
 == Changelog ==
 
 = 1.3.0 =
+* Merry Christmas! Lots of new features.
 * New feature: Subscription support! You can now assign expiration dates to group memberships!
 * New feature: New theme-friendly functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
 * New feature: Group screens now show which pages they are assigned to!
