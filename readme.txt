@@ -36,7 +36,9 @@ While we believe this plugin is secure, we make no warranty about it's effective
 = Via WordPress Admin =
 
 1. From your sites admin, go to Plugins > Add New
-1. Search for '
+1. In the search box, type 'Page Security by Contexture' and press enter
+1. Locate the entry for 'Page Security by Contexture' (there should be only one) and click the 'Install' link
+1. When installation is finished, click the 'Activate' link
 
 = Manual Install =
 
