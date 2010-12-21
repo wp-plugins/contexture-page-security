@@ -211,7 +211,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                                 <p class="submit inline-edit-save">
                                     <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel').'</a>
                                     <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update').'</a>
-                                    <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display: none;" class="waiting">
+                                    <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display:none;" class="waiting"/>
                                 </p>
                                 </td></tr>';
                                 echo ctx_ps_display_member_list($_GET['groupid']);

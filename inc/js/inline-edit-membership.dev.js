@@ -124,6 +124,7 @@
                 $(this).remove();
                 $('#user-'+myId).css('display','table-row');
             });
+            $('.inline-edit-save .waiting').hide();
         },
         getId : function(obj){
             var id = (obj.tagName == 'TR') ? obj.id : $(obj).parents('tr:first').attr('id'), 

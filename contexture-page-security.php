@@ -1161,7 +1161,7 @@ function ctx_ps_get_usergroups($userid){
         JOIN `{$wpdb->prefix}ps_groups`
             ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
         WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$userid}'
-        AND grel_expires IS NULL OR grel_expires = '{$today}'
+        AND grel_expires IS NULL OR grel_expires > '{$today}'
     ");
 
     //We only need an ID and a name as a key/value...
@@ -1479,11 +1479,11 @@ function ctx_ps_sidebar_security(){
                 foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
                     if($securityArray->pageid == $_GET['post']){
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
+                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
                         }
                     }else{
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >'.__('ancestor').'</a></div>';
+                            echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$securityArray->pageid.'&action=edit').'" >'.__('ancestor').'</a></div>';
                         }
                     }
                 }
