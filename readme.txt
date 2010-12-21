@@ -11,13 +11,15 @@ Allows admins to create user groups and set access restrictions for any post, pa
 == Description ==
 
 Page Security by Contexture International adds some much-needed user groups and permissions to WordPress! Now you can easily limit access to posts, pages, or 
-entire sections of your website. Create an intranet or a members-only area with just a few clicks. You can even create tiered sections with multiple levels of 
+entire sections of your website. Create an intranet or a members-only area with just a few clicks. You can even create sub-sections with multiple levels of 
 security. Page Security by Contexture (PSC) lets YOU decide which users can access which content.
 
-PSC is designed to integrate seamlessly and intuitively with WordPress. 
+PSC is designed to integrate seamlessly and intuitively with WordPress.
 
 Features:
 
+1. Subscription support! Assign an expiration date to any membership!
+1. Custom "Access Denied" pages!
 1. Fully AJAX-loaded! Any changes you make to security are saved immediately!
 1. Use the "Registered Users" smart group to create special "registered users only" sections!
 1. Contextual help is available for every PSC feature (via WordPress's 'Help' tab)!
@@ -63,9 +65,9 @@ Yes! This is particularly handy if you're working on a new section of your websi
 
 Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help.
 
-= psc_add_user_to_group($user_id, $group_id) =
+= psc_add_user_to_group($user_id, $group_id, $expires) =
 
-This can be called from within a theme file to add a specific user to a specific group. It requires two parameters, a user id and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id.
+This can be called from within a theme file to add a specific user to a specific group. It requires two parameters, a user id and a group id. The current users id can be acquired by declaring the $current_user global, then $current_user->ID. You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id. $expires is optional, but takes either a date string (formatted YYYY-MM-DD) or NULL. If left empty, users membership will never expire.
 
 = psc_remove_user_from_group($user_id, $group_id) =
 
@@ -83,10 +85,10 @@ This function can be used to determine if a specific page or post is protected. 
 == Changelog ==
 
 = 1.3.0 =
+* New feature: Subscription support! You can now assign expiration dates to group memberships!
 * New feature: New theme-friendly functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
 * New feature: Group screens now show which pages they are assigned to!
 * New feature: The contextual help tab now includes documentation for all PSC features!
-* New feature: Subscriptions! You can now create time-limited/expiring group memberships!
 
 = 1.2.4 =
 * Fixed a redirect bug reported by the community.

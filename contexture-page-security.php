@@ -1048,9 +1048,15 @@ function ctx_ps_display_member_list($GroupID){
         $fname = get_user_meta($member->ID, 'first_name', true);
         $lname = get_user_meta($member->ID, 'last_name', true);
         $rawdate = strtotime($member->grel_expires);
-        $jj = (!empty($rawdate)) ? date('j',$rawdate) : ''; //Day
+        $jj = (!empty($rawdate)) ? date('d',$rawdate) : ''; //Day
         $mm = (!empty($rawdate)) ? date('m',$rawdate) : ''; //Month
         $aa = (!empty($rawdate)) ? date('Y',$rawdate) : ''; //Year
+        if(!empty($rawdate) && $rawdate < time()){
+            $displaydate = 'Expired';
+        }else{
+            $displaydate = (empty($rawdate) ? 'Never' : sprintf('%s-%s-%s',$mm,$jj,$aa));
+        }
+        
         $html .= sprintf('
         <tr id="user-%1$s" %2$s>
             <td class="username column-username">
@@ -1081,7 +1087,7 @@ function ctx_ps_display_member_list($GroupID){
             /*7*/$member->grel_id,
             /*8*/admin_url(),
             /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid']),
-            /*10*/(empty($rawdate) ? 'Never' : sprintf('%s-%s-%s',$mm,$jj,$aa)),
+            /*10*/$displaydate,
             /*11*/$jj,
             /*12*/$mm,
             /*13*/$aa

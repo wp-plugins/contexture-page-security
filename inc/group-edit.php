@@ -3,7 +3,6 @@
 if ( ! current_user_can( 'manage_options' ) )
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
-
 //Get info about the current group
 $sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $actionmessage = '';
