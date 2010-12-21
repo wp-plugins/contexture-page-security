@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.3.1
+Version: 1.3.2
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -53,16 +53,16 @@ add_action('wp_ajax_ctx_ps_add2user','ctx_ps_ajax_add_group_to_user');
 add_action('wp_ajax_ctx_ps_removefromuser','ctx_ps_ajax_remove_group_from_user');
 add_action('wp_ajax_ctx_ps_updatemember','ctx_ps_ajax_update_membership');
 
-//Add basic security to all public "static" pages and posts
-add_action('wp','ctx_ps_security_action');
+//Add basic security to all public "static" pages and posts [highest priority]
+add_action('wp','ctx_ps_security_action',1);
 
-//Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home)
-add_filter( "the_posts","ctx_ps_security_filter_blog");
+//Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home) [highest priority]
+add_filter( "the_posts","ctx_ps_security_filter_blog",1);
 
-//Ensure that menus do not display protected pages (when using default menus only)
-add_filter('get_pages','ctx_ps_security_filter_menu');
-//Ensure that menus do not display protected pages (when using WP3 custom menus only)
-add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom');
+//Ensure that menus do not display protected pages (when using default menus only) [highest priority]
+add_filter('get_pages','ctx_ps_security_filter_menu',1);
+//Ensure that menus do not display protected pages (when using WP3 custom menus only) [highest priority]
+add_filter('wp_get_nav_menu_items','ctx_ps_security_filter_menu_custom',1);
 
 //Add shortcodes!
 add_shortcode('groups_attached', 'ctx_ps_tag_groups_attached'); //Current page permissions only
