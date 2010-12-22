@@ -1,6 +1,6 @@
 <?php
     if ( ! current_user_can( 'manage_options' ) )
-	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+	wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
 ?>
     <div class="wrap">
         <div class="icon32" id="icon-users"><br/></div>
@@ -12,7 +12,7 @@
                 <tr class="form-field form-required">
                     <th scope="row">
                         <label for="group_name">
-                            <?php _e('Group Name <span class="description">(required)</span>'); ?>
+                            <?php _e('Group Name <span class="description">(required)</span>','contexture-page-security'); ?>
                         </label>
                     </th>
                     <td>
@@ -22,7 +22,7 @@
                 <tr class="form-field">
                     <th scope="row">
                         <label for="group_description">
-                            <?php _e('Description'); ?>
+                            <?php _e('Description','contexture-page-security'); ?>
                         </label>
                     </th>
                     <td>

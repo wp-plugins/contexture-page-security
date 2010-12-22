@@ -64,17 +64,17 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
             <thead>
                 <tr class="thead">
                     <th class="id">id</th>
-                    <th class="name"><?php _e('Name') ?></th>
-                    <th class="description"><?php _e('Description') ?></th>
-                    <th class="user-count"><?php _e('Users') ?></th>
+                    <th class="name"><?php _e('Name','contexture-page-security') ?></th>
+                    <th class="description"><?php _e('Description','contexture-page-security') ?></th>
+                    <th class="user-count"><?php _e('Users','contexture-page-security') ?></th>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="thead">
                     <th class="id">id</th>
-                    <th class="name"><?php _e('Name') ?></th>
-                    <th class="description"><?php _e('Description') ?></th>
-                    <th class="user-count"><?php _e('Users') ?></th>
+                    <th class="name"><?php _e('Name','contexture-page-security') ?></th>
+                    <th class="description"><?php _e('Description','contexture-page-security') ?></th>
+                    <th class="user-count"><?php _e('Users','contexture-page-security') ?></th>
                 </tr>
             </tfoot>
             <tbody>
@@ -82,14 +82,14 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                     if ( IS_PROFILE_PAGE ) {
                         //IF THIS IS A PROFILE PAGE (non-admin)
                         if(ctx_ps_count_groups($current_user->ID) == '0'){
-                            _e('<td colspan="4">You are not currently a member of any groups.</td>');
+                            _e('<td colspan="4">You are not currently a member of any groups.</td>','contexture-page-security');
                         } else {
                             echo ctx_ps_display_group_list($current_user->ID,'users',false);
                         }
                     }else{
                         //IF THIS IS A USER-EDIT PAGE (admin version)
                         if(ctx_ps_count_groups($_GET['user_id']) == '0'){
-                            echo '<td colspan="4">'.sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.'),admin_url('users.php?page=ps_groups')).'</td>';
+                            echo '<td colspan="4">'.sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'),admin_url('users.php?page=ps_groups')).'</td>';
                         } else {
                             echo ctx_ps_display_group_list($_GET['user_id'],'users',true);
                         }

@@ -3,7 +3,7 @@
 global $wpdb;
 
 if ( !current_user_can('manage_options') )
-	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+	wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
 
 $updatesettingsMessage = "";
 
@@ -27,7 +27,7 @@ if(empty($_POST['action'])){
         }else{
             //User didn't select both AD pages, disable usepages
             $newopts['ad_msg_usepages'] = 'false';
-            $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.').'</strong></p></div>';
+            $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.','contexture-page-security').'</strong></p></div>';
         }
 
         //Set new AD page ids
@@ -53,7 +53,7 @@ if(empty($_POST['action'])){
 
     //If save was successful, show the message
     if(isset($saveStatus)){
-        $updatesettingsMessage = '<div id="message" class="updated below-h2 fade"><p><strong>'.__('Page Security settings saved.').'</strong></p></div>';
+        $updatesettingsMessage = '<div id="message" class="updated below-h2 fade"><p><strong>'.__('Page Security settings saved.','contexture-page-security').'</strong></p></div>';
     }
 }
 
@@ -62,8 +62,8 @@ $ADMsg = get_option('contexture_ps_options');
 $ProtPages = ctx_ps_get_protected_pages('string');
 
 //Generate ddls with page heirarchy
-$pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0, 'exclude'=>$ProtPages));
-$pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_none' => __('-- Choose AD Message Page --'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_anon_id'], 'echo' => 0, 'exclude'=>$ProtPages));
+$pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --','contexture-page-security'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0, 'exclude'=>$ProtPages));
+$pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_none' => __('-- Choose AD Message Page --','contexture-page-security'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_anon_id'], 'echo' => 0, 'exclude'=>$ProtPages));
 
 ?>
     <style type="text/css">
@@ -119,85 +119,85 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
                 <p></p>
                 <form method="post" action="">
                     <input type="hidden" name="action" id="action" value="updateopts" />
-                    <h3 class="title"><?php _e('Access Denied Messages') ?></h3>
-                    <p><?php _e('Use these settings to determine what your users will see when accessing content they are not allowed to view.') ?></p>
+                    <h3 class="title"><?php _e('Access Denied Messages','contexture-page-security') ?></h3>
+                    <p><?php _e('Use these settings to determine what your users will see when accessing content they are not allowed to view.','contexture-page-security') ?></p>
                     <table class="form-table">
                         <tr valign="top" class="toggle-opts-ad">
                             <th scope="row">
-                                <label for="ad-msg-enable"> <?php _e('Use Custom Pages:') ?></label>
+                                <label for="ad-msg-enable"> <?php _e('Use Custom Pages:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens') ?>
+                                    <input type="checkbox" name="ad-msg-enable" id="ad-msg-enable" <?php echo ($ADMsg['ad_msg_usepages']=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Use <strong>pages</strong> for default access denied screens','contexture-page-security') ?>
                                 </label>
                             </td>
                         </tr>
                         <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
-                                <label for="ad-page-auth"><?php _e('Authenticated Users:') ?></label>
+                                <label for="ad-page-auth"><?php _e('Authenticated Users:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <!-- NOTE: Should show only pages marked as "Use as Access Denied" -->
                                 <?php echo $pageDDLAuth; ?> <?php echo '<a href="'.admin_url("post.php?post={$ADMsg['ad_page_auth_id']}&action=edit").'">Edit Page</a>' ?><br/>
-                                <div class="ctx-footnote"><?php _e('The "access denied" page to show users who <strong><em>are logged in</em></strong>.') ?></div>
+                                <div class="ctx-footnote"><?php _e('The "access denied" page to show users who <strong><em>are logged in</em></strong>.','contexture-page-security') ?></div>
                             </td>
                         </tr>
                         <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
-                                <label for="ad-page-anon"><?php _e('Anonymous Users:') ?></label>
+                                <label for="ad-page-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <!-- NOTE: Should show only pages marked as "Use as Access Denied" -->
                                 <?php echo $pageDDLAnon; ?> <?php echo '<a href="'.admin_url("post.php?post={$ADMsg['ad_page_anon_id']}&action=edit").'">Edit Page</a>' ?><br/>
-                                <div class="ctx-footnote"><?php _e('The "access denied" page to show users who are <strong><em>not</em></strong> logged in.') ?></div>
+                                <div class="ctx-footnote"><?php _e('The "access denied" page to show users who are <strong><em>not</em></strong> logged in.','contexture-page-security') ?></div>
                             </td>
                         </tr>
                         <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
-                                <label for="ad-msg-auth"><?php _e('Authenticated Users:') ?></label>
+                                <label for="ad-msg-auth"><?php _e('Authenticated Users:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <input type="text" name="ad-msg-auth" id="ad-msg-auth" value="<?php echo esc_attr($ADMsg['ad_msg_auth']); ?>" /><br/>
-                                <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are logged in (HTML OK).') ?></div>
+                                <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are logged in (HTML OK).','contexture-page-security') ?></div>
                             </td>
                         </tr>
                         <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
-                                <label for="ad-msg-anon"><?php _e('Anonymous Users:') ?></label>
+                                <label for="ad-msg-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="<?php echo esc_attr($ADMsg['ad_msg_anon']); ?>" /><br/>
-                                <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are <strong><em>not</em></strong> logged in (HTML OK).') ?></div>
+                                <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are <strong><em>not</em></strong> logged in (HTML OK).','contexture-page-security') ?></div>
                             </td>
                         </tr>
                     </table>
-                    <h3 class="title"><?php _e('Global Security Features') ?></h3>
-                    <p><?php _e('These options selectively enable/disable Page Security features.') ?></p>
+                    <h3 class="title"><?php _e('Global Security Features','contexture-page-security') ?></h3>
+                    <p><?php _e('These options selectively enable/disable Page Security features.','contexture-page-security') ?></p>
                     <table class="form-table">
                         <tr valign="top">
                             <th scope="row">
-                                <label for="filter-menu"><?php _e('Enable Menu Filtering:') ?></label>
+                                <label for="filter-menu"><?php _e('Enable Menu Filtering:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_usefilter_menus']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter menu items*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Restricted content will be removed from menus unless user is authenticated') ?></div>
+                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_usefilter_menus']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter menu items*','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*Restricted content will be removed from menus unless user is authenticated','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>
                         <tr valign="top">
                             <th scope="row">
-                                <label for="filter-rss"><?php _e('Enable RSS Filtering:') ?></label>
+                                <label for="filter-rss"><?php _e('Enable RSS Filtering:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content*') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from most RSS readers.') ?></div>
+                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content*','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from most RSS readers.','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>
                     </table>
-                    <input type="submit" name="Submit" class="button-primary" value="<?php _e('Save Changes') ?>" />
+                    <input type="submit" name="Submit" class="button-primary" value="<?php _e('Save Changes','contexture-page-security') ?>" />
                 </form>
             </div>
         </td>

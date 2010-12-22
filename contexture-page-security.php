@@ -91,9 +91,9 @@ function ctx_ps_activate(){
     if (version_compare(PHP_VERSION, '5', '<')) {
         deactivate_plugins(__FILE__);
         wp_die(
-            "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:')."</span> "
-            .sprintf(__("Page Security requires PHP5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP5 support."),PHP_VERSION)
-            ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page')." &gt;&gt;</a>"
+            "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:','contexture-page-security')."</span> "
+            .sprintf(__('Page Security requires PHP5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP5 support.','contexture-page-security'),PHP_VERSION)
+            ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page','contexture-page-security')." &gt;&gt;</a>"
         );
     }
 
@@ -164,7 +164,7 @@ function ctx_ps_activate(){
     $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `{$table_groups}` WHERE `group_system_id` = 'CPS01' LIMIT 1");
     if(!$CntRegSmrtGrp){
         //Adds the Registered Users system group (if it doesnt exist)
-        $wpdb->query("INSERT INTO `{$table_groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users')."','".__('This group automatically applies to all authenticated users.')."','0','CPS01')");
+        $wpdb->query("INSERT INTO `{$table_groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users','contexture-page-security')."','".__('This group automatically applies to all authenticated users.','contexture-page-security')."','0','CPS01')");
     }
 }
 
@@ -178,7 +178,7 @@ function ctx_ps_ajax_add_group_to_page(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized, stop and return error
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     //Add new security to the database
@@ -218,7 +218,7 @@ function ctx_ps_ajax_add_group_to_page(){
         //Show groups that are already added to this page
         if($groupcount===0){
             //Display this if we have no groups (inherited or otherwise)
-            $OutputHTML = '<div><em>'.__('No groups have been added yet.').'</em></div>';
+            $OutputHTML = '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
         }else{
             //Loop through each PAGE (starting with this one and working our way up)
             foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
@@ -226,12 +226,12 @@ function ctx_ps_ajax_add_group_to_page(){
                 if($securityArray->pageid == $_GET['postid']){
                     //Loop through all groups for the CURRENT page
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
+                        $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                     }
                 }else{
                     //Loop through all groups for the ANCESTOR page
                     foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                        $OutputHTML .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >'.__('ancestor').'</a></div>';
+                        $OutputHTML .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><a class="viewgrp" target="_blank" href="'.admin_url().'post.php?post='.$securityArray->pageid.'&action=edit" >'.__('ancestor','contexture-page-security').'</a></div>';
                     }
                 }
             }
@@ -251,13 +251,13 @@ function ctx_ps_ajax_remove_group_from_page(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
-        ctx_ps_ajax_response(array('code'=>'1','message'=>__('Group removed')));
+        ctx_ps_ajax_response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
     }else{
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Query failed')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
     }
     ctx_ps_ajax_response($response);
 }
@@ -271,7 +271,7 @@ function ctx_ps_ajax_add_group_to_user(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     //Make sure user exists in db
@@ -289,7 +289,7 @@ function ctx_ps_ajax_add_group_to_user(){
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->get_var($sqlUpdateGroup)>0){
-            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Already in group')) );
+            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Already in group','contexture-page-security')) );
         }
         
         //Add user to group
@@ -297,9 +297,9 @@ function ctx_ps_ajax_add_group_to_user(){
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->query($sqlUpdateGroup) === false){
-            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed')) );
+            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
         } else {
-            ctx_ps_ajax_response( array('code'=>'1','message'=>__('User enrolled in group'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
+            ctx_ps_ajax_response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
         }
     }
 
@@ -314,7 +314,7 @@ function ctx_ps_ajax_update_membership(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Admin user is unauthorized.')) );
+        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
     }
     
     //Determine null or value
@@ -325,9 +325,9 @@ function ctx_ps_ajax_update_membership(){
     
     //Determine response
     if($wpdb->query($sqlUpdateMember) === false){
-        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed!')) );
+        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
     } else {
-        ctx_ps_ajax_response( array('code'=>'1','message'=>__('User membership updated')) );
+        ctx_ps_ajax_response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
     }
 
 }
@@ -341,20 +341,20 @@ function ctx_ps_ajax_remove_group_from_user(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
             $_GET['groupid'],
             $_GET['user_id']);
     if($wpdb->query($sqlRemoveUserRel) == 0){
-        ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
     } else {
         $html = ctx_ps_display_group_list($_GET['user_id'],'users');
         if(empty($html)){
-            $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>');
+            $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>','contexture-page-security');
         }
-        ctx_ps_ajax_response(array('code'=>'1','message'=>__('User unenrolled from group'),'html'=>'<![CDATA['.$html.']]>'));
+        ctx_ps_ajax_response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
     }
 }
 
@@ -386,7 +386,7 @@ function ctx_ps_ajax_security_update(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
 
@@ -425,8 +425,8 @@ function ctx_ps_set_options($arrayOverrides=false){
     //Set defaults
     $defaultOpts = array(
         "ad_msg_usepages"=>"false",
-        "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.'),wp_login_url( get_permalink() )),
-        "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.'),
+        "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
+        "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
         "ad_page_anon_id"=>"",
         "ad_page_auth_id"=>"",
         "ad_msg_usefilter_menus"=>"true",
@@ -504,15 +504,15 @@ function ctx_ps_security_action(){
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
                             $redir_anon_link = get_permalink($dbOpt['ad_page_anon_id']);
                             wp_safe_redirect($redir_anon_link);
-                            die(sprintf(__('Access Denied. Redirecting to %s'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
+                            die(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
-                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
+                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                         }
                     }else{
                         //If user is anonymous, show this message
                         $blogurl = get_bloginfo('url');
-                        wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
+                        wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                     }
                 }else{
                     //Check options to determine if we're using a PAGE or a MESSAGE
@@ -521,14 +521,14 @@ function ctx_ps_security_action(){
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
                             $redir_auth_link = get_permalink($dbOpt['ad_page_auth_id']);
                             wp_safe_redirect($redir_auth_link);
-                            die(sprintf(__('Access Denied. Redirecting to %s'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
+                            die(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
-                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
+                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                         }
                     }else{
                         //If user is authenticated, show this message
-                        wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page').'</a>');
+                        wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                     }
                 }
             }
@@ -719,33 +719,33 @@ function ctx_ps_append_contextual_help(){
     //We bring in the global help array so we can modify it
     global $_wp_contextual_help;
     
-    $supporturl = /*'<p><strong>'.__('For more information:').'</strong></p>'.*/'<p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">'.__('Official Page Security Support').'</a></p>';
+    $supporturl = /*'<p><strong>'.__('For more information:','contexture-page-security').'</strong></p>'.*/'<p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">'.__('Official Page Security Support','contexture-page-security').'</a></p>';
 
     //Append additional help to users page (use preg_replace to add it seamlessly before "Fore more information")
     if(isset($_wp_contextual_help['users']))
-        $_wp_contextual_help['users'] .= '<div style="border-top:1px solid silver;"></div>'.__('<h4><strong>Page Security:</strong></h4><p>To add a user to a group, check the users to add, and select a group from the "Add to group..." drop down. Click "Add" to save the changes.</p>');
+        $_wp_contextual_help['users'] .= '<div style="border-top:1px solid silver;"></div>'.__('<h4><strong>Page Security:</strong></h4><p>To add a user to a group, check the users to add, and select a group from the "Add to group..." drop down. Click "Add" to save the changes.</p>','contexture-page-security');
     if(isset($_wp_contextual_help['page']))
-        $_wp_contextual_help['page'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this page, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a page is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the page. To give users access to the page, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+        $_wp_contextual_help['page'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this page, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a page is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the page. To give users access to the page, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>','contexture-page-security').$supporturl,admin_url('users.php?page=ps_groups_add'));
     if(isset($_wp_contextual_help['post']))
-        $_wp_contextual_help['post'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this post, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a post is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the post. To give users access to the post, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+        $_wp_contextual_help['post'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>To restrict access to this post, find the "Restrict Access" sidebar and check the box next to "Protect this page and it\'s decendants. This will reveal some additional options.</p><p>If a post is protected, but you don\'t have any groups assigned to it, only admins will be able to see or access the post. To give users access to the post, select a group from the "Available Groups" drop-down and click "Add". You may need to <a href="%s">create a group</a>, if you haven\'t already.</p><p>To remove a group, either uncheck the "Protect this page..." box (all permissions will be removed), or find the group in the "Allowed Groups" list and click "Remove".</p><p>All changes are saved immediately. There is no need to click "Update" in order to save your security settings.</p>','contexture-page-security').$supporturl,admin_url('users.php?page=ps_groups_add'));
     if(isset($_wp_contextual_help['edit-page']))
-        $_wp_contextual_help['edit-page'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>The lock icon shows which pages currently have restrictions. The lighter icons show which pages are simply inheriting their parent\'s restrictions, while dark icons appear only on pages that have their own restrictions.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+        $_wp_contextual_help['edit-page'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>The lock icon shows which pages currently have restrictions. The lighter icons show which pages are simply inheriting their parent\'s restrictions, while dark icons appear only on pages that have their own restrictions.</p>','contexture-page-security').$supporturl,admin_url('users.php?page=ps_groups_add'));
     if(isset($_wp_contextual_help['edit-post']))
-        $_wp_contextual_help['edit-post'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>The lock icon shows which posts currently have restrictions.</p>').$supporturl,admin_url('users.php?page=ps_groups_add'));
+        $_wp_contextual_help['edit-post'] .= '<div style="border-top:1px solid silver;"></div>'.sprintf(__('<h4><strong>Page Security:</strong></h4><p>The lock icon shows which posts currently have restrictions.</p>','contexture-page-security').$supporturl,admin_url('users.php?page=ps_groups_add'));
     
     
     if ( function_exists('add_contextual_help') ){
         //Add our contextual help
-        add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>').$supporturl );
-        add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>').$supporturl );
-        $ps_groups_edit = __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages and posts this group is attached to.</p><p><strong>For more information:</strong></p>').$supporturl;
+        add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl );
+        add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl );
+        $ps_groups_edit = __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages and posts this group is attached to.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl;
         add_contextual_help( 'dashboard_page_ps_groups_edit', $ps_groups_edit );
         add_contextual_help( 'users_page_ps_groups_edit', $ps_groups_edit );
-        $ps_groups_delete = __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>').$supporturl;
+        $ps_groups_delete = __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl;
         add_contextual_help( 'dashboard_page_ps_groups_delete', $ps_groups_delete );
         add_contextual_help( 'users_page_ps_groups_delete', $ps_groups_delete );
-        add_contextual_help( 'settings_page_ps_manage_opts', __('<p>This screen contains general settings for Page Security.</p><p><strong>For more information:</strong></p>').$supporturl );
-        //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>') );
+        add_contextual_help( 'settings_page_ps_manage_opts', __('<p>This screen contains general settings for Page Security.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl );
+        //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>','contexture-page-security') );
         
     }
 }
@@ -756,11 +756,11 @@ function ctx_ps_append_contextual_help(){
 function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
-        var msgNoUnprotect = '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.') ?>';
-        var msgEraseSec = '<?php _e('This will completely erase this page\'s security settings and make it accessible to the public. Continue?') ?>';
-        var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?') ?>';
-        var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?') ?>';
-        var msgRemoveUser = '<?php _e('Remove this user from the group?') ?>';
+        var msgNoUnprotect = '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.','contexture-page-security') ?>';
+        var msgEraseSec = '<?php _e('This will completely erase this page\'s security settings and make it accessible to the public. Continue?','contexture-page-security') ?>';
+        var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>';
+        var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
+        var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
     </script>
     <script type="text/javascript" src="<?php echo plugins_url('/inc/js/core-ajax.js',__FILE__) ?>"></script>
     <?php
@@ -878,8 +878,8 @@ function ctx_ps_create_group($name, $description){
  */
 function ctx_ps_create_menus(){
     //Add Groups option to the WP admin menu under Users (these also return hook names, which are needed for contextual help)
-    add_submenu_page('users.php', __('Group Management'), __('Groups'), 'manage_options', 'ps_groups', 'ctx_ps_page_groups_view');
-    add_submenu_page('users.php', __('Add a Group'), __('Add Group'), 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
+    add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', 'ctx_ps_page_groups_view');
+    add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
     add_submenu_page('', 'Edit Group', 'Edit Group', 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
     add_submenu_page('', 'Delete Group', 'Delete Group', 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
 
@@ -1066,9 +1066,9 @@ function ctx_ps_display_member_list($GroupID){
             <td class="username column-username">
                 <a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s"><strong>%3$s</strong></a>
                 <div class="row-actions">
-                    <span class="membership"><a href="#" class="editmembership" title="Change membership options">'.__('Membership').'</a> | </span>
-                    <span class="trash"><a class="row-actions" href="%8$s?page=ps_groups_edit&groupid=%6$s&action=rmvusr&usrid=%1$s&relid=%7$s&usrname=%3$s">'.__('Unenroll').'</a> | </span>
-                    <span class="view"><a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s" title="View User">'.__('View').'</a></span>
+                    <span class="membership"><a href="#" class="editmembership" title="Change membership options">'.__('Membership','contexture-page-security').'</a> | </span>
+                    <span class="trash"><a class="row-actions" href="%8$s?page=ps_groups_edit&groupid=%6$s&action=rmvusr&usrid=%1$s&relid=%7$s&usrname=%3$s">'.__('Unenroll','contexture-page-security').'</a> | </span>
+                    <span class="view"><a href="%8$suser-edit.php?user_id=%1$s&wp_httpd_referer=%9$s" title="View User">'.__('View','contexture-page-security').'</a></span>
                 </div>
                 <div id="inline_%1$s" class="hidden">
                     <div class="username">%3$s</div>
@@ -1130,9 +1130,9 @@ function ctx_ps_display_page_list($group_id){
             <td class="post-title page-title column-title">
                 <strong><a href="%3$s">%4$s</a></strong>
                 <div class="row-actions">
-                    <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit').'</a> | </span>
-                    <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove').'</a> | </span>
-                    <span class="view"><a href="%7$s" title="View the page">'.__('View').'</a></span>
+                    <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
+                    <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove','contexture-page-security').'</a> | </span>
+                    <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
                 </div>
             </td>
             <td class="protected column-protected">%5$s</td>
@@ -1451,30 +1451,30 @@ function ctx_ps_sidebar_security(){
                 echo ' disabled="disabled" ';
             }
             echo '/>';
-            echo __(' Protect this page and it\'s descendants');
+            echo __(' Protect this page and it\'s descendants','contexture-page-security');
             echo '  </label>';
             /** TODO: Add "Use as Access Denied page" option */
 
             //If the checkbox is disabled, give admin the option to go straight to the parent
             if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
-                echo '<a href="'.admin_url().'post.php?post='.$post->post_parent.'&action=edit" style="display:block;font-size:0.75em;text-align:left;padding-left:20px;">',__('Edit Parent'),'</a>';
+                echo '<a href="'.admin_url().'post.php?post='.$post->post_parent.'&action=edit" style="display:block;font-size:0.75em;text-align:left;padding-left:20px;">',__('Edit Parent','contexture-page-security'),'</a>';
             }
             //Start on "Available Groups" select box
             echo '  <div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;';
             if ( !!$securityStatus )
                 echo ' display:block ';
             echo '">';
-            echo    sprintf('<h5>%s <a href="%s" title="%s" style="text-decoration:none;">+</a></h5>',__('Available Groups'),__('New Group'),admin_url('users.php?page=ps_groups_add'));
+            echo    sprintf('<h5>%s <a href="%s" title="%s" style="text-decoration:none;">+</a></h5>',__('Available Groups','contexture-page-security'),__('New Group','contexture-page-security'),admin_url('users.php?page=ps_groups_add'));
             echo '      <select id="groups-available" name="groups-available">';
-            echo '<option value="0">-- '.__('Select').' -- </option>';
+            echo '<option value="0">-- '.__('Select','contexture-page-security').' -- </option>';
             //Loop through all groups in the db to populate the drop-down list
             foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
                 //Generate the option HTML, hiding it if it's already in our $currentGroups array
                 echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
             }
             echo       '</select>';
-            echo       '<input type="button" id="add_group_page" class="button-secondary action" value="',__('Add'),'" />';
-            echo       sprintf('<h5>%s</h5>',__('Allowed Groups'));
+            echo       '<input type="button" id="add_group_page" class="button-secondary action" value="',__('Add','contexture-page-security'),'" />';
+            echo       sprintf('<h5>%s</h5>',__('Allowed Groups','contexture-page-security'));
             echo       '<div id="ctx-ps-page-group-list">';
             //Set this to 0, we are going to count the number of groups attached to this page next...
             $groupcount = 0;
@@ -1484,16 +1484,16 @@ function ctx_ps_sidebar_security(){
             //Show groups that are already added to this page
             if($groupcount===0){
                 //Display this if we have no groups (inherited or otherwise)
-                echo '<div><em>'.__('No groups have been added yet.').'</em></div>';
+                echo '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
             }else{
                 foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
                     if($securityArray->pageid == $_GET['post']){
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove').'</span></div>';
+                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$securityArray->pageid.'&action=edit').'" >'.__('ancestor').'</a></div>';
+                            echo '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$securityArray->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
                         }
                     }
                 }
@@ -1501,13 +1501,13 @@ function ctx_ps_sidebar_security(){
             echo '      </div>';
             echo '  </div>';
         }else{
-            echo sprintf(__('<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a href="%s">View Security Settings</a></p>'),admin_url('options-general.php?page=ps_manage_opts'));
+            echo sprintf(__('<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a href="%s">View Security Settings</a></p>','contexture-page-security'),admin_url('options-general.php?page=ps_manage_opts'));
         }
         echo '</div>';
         /***END BUILDING HTML****************************/
     }else{
         echo '<div class="new-admin-wp25">';
-        echo __('<p>You need to publish before you can update security settings.</p>');
+        echo __('<p>You need to publish before you can update security settings.</p>','contexture-page-security');
         echo '</div>';
     }
 }
@@ -1524,7 +1524,7 @@ function ctx_ps_tag_groups_attached($atts){
     $output = shortcode_atts(
     array(
         'public' => 'false',
-        'label' => __('Groups attached to this page:'),
+        'label' => __('Groups attached to this page:','contexture-page-security'),
     ), $atts);
 
     //Create an array of groups that are already attached to the page
@@ -1532,7 +1532,7 @@ function ctx_ps_tag_groups_attached($atts){
     foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$post->ID}'") as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
-    $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.').'</em></li>' : $currentGroups;
+    $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.','contexture-page-security').'</em></li>' : $currentGroups;
     $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><ol>{$currentGroups}</ol></div>";
     if($output['public']==='true'){
         return $return;
@@ -1553,8 +1553,8 @@ function ctx_ps_tag_groups_required($atts){
     $output = shortcode_atts(
     array(
         'public' => 'false',
-        'label' => __('Groups Required:'),
-        'description' => __('To access this page, users must be a member of at least one group from each set of groups.'),
+        'label' => __('Groups Required:','contexture-page-security'),
+        'description' => __('To access this page, users must be a member of at least one group from each set of groups.','contexture-page-security'),
         'showempty' => 'true',
     ), $atts);
 
@@ -1577,7 +1577,7 @@ function ctx_ps_tag_groups_required($atts){
 
         //If there were no groups attached, show that there's no access at that level
         if(empty($groupcount) && $output['showempty']==='true'){
-            $return .= "<li><em>".__("No groups attached")."</em></li>";
+            $return .= "<li><em>".__('No groups attached','contexture-page-security')."</em></li>";
         }
 
         //Reset groupcount

@@ -40,7 +40,7 @@ if(!empty($_POST['action'])){
     </script>
     <div class="wrap">
         <div class="icon32" id="icon-users"><br/></div>
-        <h2><?php _e('Groups'); ?> <?php if (current_user_can('create_users')){ ?><a href="<?php echo admin_url(); ?>users.php?page=ps_groups_add" class="button add-new-h2"><?php _e('Add New'); ?></a><?php } ?></h2>
+        <h2><?php _e('Groups','contexture-page-security'); ?> <?php if (current_user_can('create_users')){ ?><a href="<?php echo admin_url(); ?>users.php?page=ps_groups_add" class="button add-new-h2"><?php _e('Add New'); ?></a><?php } ?></h2>
         <?php echo $creategroup_message; ?>
         <p></p>
         <table id="grouptable" class="widefat fixed" cellspacing="0">
@@ -64,7 +64,7 @@ if(!empty($_POST['action'])){
                 <?php
                     if(ctx_ps_count_groups() == 0){
                         echo ctx_ps_display_group_list();
-                        echo sprintf('<td colspan="4">'.__('You have not created any groups. Please <a href="%s">add a group</a>.').'</td>'),admin_url('users.php?page=ps_groups_add');
+                        echo sprintf('<td colspan="4">'.__('You have not created any groups. Please <a href="%s">add a group</a>.','contexture-page-security').'</td>'),admin_url('users.php?page=ps_groups_add');
                     } else {
                         echo ctx_ps_display_group_list();
                 }

@@ -1,7 +1,7 @@
 <?php
 
 if ( ! current_user_can( 'manage_options' ) )
-    wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
+    wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
 
 $sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $sqlGetGroupPageCount = $wpdb->prepare("SELECT COUNT(*) FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '%s' AND `sec_access_type` = 'group'",$_GET['groupid']);
@@ -23,9 +23,9 @@ if(!empty($_GET['action']) && !empty($_GET['submit']) && $_GET['action'] == "del
     $sqlstatus3 = $wpdb->query($sqlDeleteGroup);
 
     if(!$sqlstatus3){
-        $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. The group was not fully deleted.').'</p></div>';
+        $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. The group was not fully deleted.','contexture-page-security').'</p></div>';
     } else {
-        $actionmessage2 = '<div id="message" class="update below-h2"><p><strong>1</strong> '.__('group was deleted.').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups').' &gt;&gt;</a></p></div>';
+        $actionmessage2 = '<div id="message" class="update below-h2"><p><strong>1</strong> '.__('group was deleted.','contexture-page-security').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups','contexture-page-security').' &gt;&gt;</a></p></div>';
     }
 }
 ?>
@@ -37,9 +37,9 @@ if(!empty($_GET['action']) && !empty($_GET['submit']) && $_GET['action'] == "del
         <?php if(!empty($actionmessage2)){ echo $actionmessage2; }else{ ?>
         <?php 
             if (empty($groupInfo->group_title)){ //Group doesnt exist error
-                echo '<div id="message" class="error below-h2"><p>'.__('A group with that id does not exist.').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups').' &gt;&gt;</a></p></div>';
+                echo '<div id="message" class="error below-h2"><p>'.__('A group with that id does not exist.','contexture-page-security').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups','contexture-page-security').' &gt;&gt;</a></p></div>';
             }else if(isset($groupInfo->group_system_id)){ //Group is a system group error (cannot edit)
-                echo '<div id="message" class="error below-h2"><p>'.__('System groups cannot be deleted.').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups').' &gt;&gt;</a></p></div>';
+                echo '<div id="message" class="error below-h2"><p>'.__('System groups cannot be deleted.','contexture-page-security').' <a href="'.admin_url().'users.php?page=ps_groups">'.__('View all groups','contexture-page-security').' &gt;&gt;</a></p></div>';
             }else{ 
         ?>
         <form id="deletegroup" name="deletegroup" method="get" action="">
@@ -50,7 +50,7 @@ if(!empty($_GET['action']) && !empty($_GET['submit']) && $_GET['action'] == "del
             <p>Deleting this group will affect <strong><?php echo ctx_ps_count_members($groupInfo->ID); ?></strong> users and <strong><?php echo $groupPageCount; ?></strong> pages/posts. Are you sure you want to continue?</p>
             <?php wp_nonce_field('delete-group'); ?>
             <p class="submit">
-                <input class="button-secondary" type="submit" value="<?php _e('Confirm Deletion'); ?>" name="submit"/>
+                <input class="button-secondary" type="submit" value="<?php _e('Confirm Deletion','contexture-page-security'); ?>" name="submit"/>
             </p>
         </form>
         <?php
