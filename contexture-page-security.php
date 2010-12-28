@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.3.2
+Version: 1.3.3
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -757,7 +757,7 @@ function ctx_ps_admin_head_js(){
     ?>
     <script type="text/javascript">
         var msgNoUnprotect = '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.','contexture-page-security') ?>';
-        var msgEraseSec = '<?php _e('This will completely erase this page\'s security settings and make it accessible to the public. Continue?','contexture-page-security') ?>';
+        var msgEraseSec = "<?php _e("This will completely erase this page's security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>";
         var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>';
         var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
         var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
