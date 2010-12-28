@@ -3,8 +3,8 @@ Contributors: Contexture International, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
-Tested up to: 3.0.3
-Stable tag: 1.3.1
+Tested up to: 3.1
+Stable tag: 1.3.2
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -103,8 +103,9 @@ This function can be used to determine if a specific page or post is protected (
 
 == Changelog ==
 
-= 1.4.0 =
-* Mostly fixed an issue where slower sites would "blink" during an Access Denied page redirect
+= 1.3.2 =
+* Somewhat remedied an issue that could cause slower sites to "blink" during AD page redirects
+* Other minor bug fixes
 
 = 1.3.1 =
 * Fixed a bug that could cause search results to return an AD in certain conditions.
