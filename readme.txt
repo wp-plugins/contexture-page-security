@@ -103,6 +103,9 @@ This function can be used to determine if a specific page or post is protected (
 
 == Changelog ==
 
+= 1.3.3 =
+* Bug fixes (thanks, Alex)
+
 = 1.3.2 =
 * Somewhat remedied an issue that could cause slower sites to "blink" during AD page redirects
 * Other minor bug fixes
