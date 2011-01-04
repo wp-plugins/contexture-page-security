@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Page Security by Contexture package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Page Security by Contexture 1.3.0\n"
+"Project-Id-Version: Page Security by Contexture 1.3.3\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/contexture-page-security\n"
-"POT-Creation-Date: 2010-12-21 16:55:15+00:00\n"
+"POT-Creation-Date: 2011-01-04 19:07:42+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -148,8 +148,8 @@ msgstr ""
 msgid "Group Name <span class=\"description\">(required)</span>"
 msgstr ""
 
-#: inc/group-new.php:25 inc/group-edit.php:124 inc/user-edit-groups.php:68
-#: inc/user-edit-groups.php:76
+#: inc/group-new.php:25 inc/group-edit.php:124 inc/user-edit-groups.php:69
+#: inc/user-edit-groups.php:77
 msgid "Description"
 msgstr ""
 
@@ -209,8 +209,8 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: inc/group-edit.php:150 inc/group-edit.php:158 inc/user-edit-groups.php:67
-#: inc/user-edit-groups.php:75
+#: inc/group-edit.php:150 inc/group-edit.php:158 inc/user-edit-groups.php:68
+#: inc/user-edit-groups.php:76
 msgid "Name"
 msgstr ""
 
@@ -258,21 +258,21 @@ msgstr ""
 msgid "No pages are attached to this group."
 msgstr ""
 
-#: inc/user-edit-groups.php:69 inc/user-edit-groups.php:77
+#: inc/user-edit-groups.php:70 inc/user-edit-groups.php:78
 msgid "Users"
 msgstr ""
 
-#: inc/user-edit-groups.php:85
-msgid "<td colspan=\"4\">You are not currently a member of any groups.</td>"
+#: inc/user-edit-groups.php:86
+msgid "You are not currently a member of any groups."
 msgstr ""
 
-#: inc/user-edit-groups.php:92
+#: inc/user-edit-groups.php:93
 msgid ""
 "This user has not been added to any custom groups. Select a group above or "
 "visit any <a href=\"%s\">group detail page</a>."
 msgstr ""
 
-#: inc/groups.php:43 contexture-page-security.php:877
+#: inc/groups.php:43 contexture-page-security.php:890
 msgid "Groups"
 msgstr ""
 
@@ -307,20 +307,20 @@ msgid "This group automatically applies to all authenticated users."
 msgstr ""
 
 #: contexture-page-security.php:181 contexture-page-security.php:254
-#: contexture-page-security.php:274 contexture-page-security.php:317
-#: contexture-page-security.php:344 contexture-page-security.php:389
+#: contexture-page-security.php:282 contexture-page-security.php:327
+#: contexture-page-security.php:356 contexture-page-security.php:403
 msgid "Admin user is unauthorized."
 msgstr ""
 
-#: contexture-page-security.php:221 contexture-page-security.php:1483
+#: contexture-page-security.php:221 contexture-page-security.php:1524
 msgid "No groups have been added yet."
 msgstr ""
 
-#: contexture-page-security.php:229 contexture-page-security.php:1488
+#: contexture-page-security.php:229 contexture-page-security.php:1529
 msgid "remove"
 msgstr ""
 
-#: contexture-page-security.php:234 contexture-page-security.php:1492
+#: contexture-page-security.php:234 contexture-page-security.php:1533
 msgid "ancestor"
 msgstr ""
 
@@ -328,71 +328,75 @@ msgstr ""
 msgid "Group removed"
 msgstr ""
 
-#: contexture-page-security.php:260 contexture-page-security.php:300
+#: contexture-page-security.php:260 contexture-page-security.php:308
 msgid "Query failed"
 msgstr ""
 
-#: contexture-page-security.php:292
+#: contexture-page-security.php:300
 msgid "Already in group"
 msgstr ""
 
-#: contexture-page-security.php:302
+#: contexture-page-security.php:310
 msgid "User enrolled in group"
 msgstr ""
 
-#: contexture-page-security.php:328
+#: contexture-page-security.php:338
 msgid "Query failed!"
 msgstr ""
 
-#: contexture-page-security.php:330
+#: contexture-page-security.php:340
 msgid "User membership updated"
 msgstr ""
 
-#: contexture-page-security.php:355
+#: contexture-page-security.php:363
+msgid "User not found"
+msgstr ""
+
+#: contexture-page-security.php:367
 msgid ""
 "This user has not been added to any static groups. Select a group above or "
 "visit any <a href=\"users.php?page=ps_groups\">group detail page</a>.</td>"
 msgstr ""
 
-#: contexture-page-security.php:357
+#: contexture-page-security.php:369
 msgid "User unenrolled from group"
 msgstr ""
 
-#: contexture-page-security.php:428
+#: contexture-page-security.php:442
 msgid ""
 "You do not have the appropriate group permissions to access this page. "
 "Please try <a href=\"%s\">logging in</a> or contact an administrator for "
 "assistance."
 msgstr ""
 
-#: contexture-page-security.php:429
+#: contexture-page-security.php:443
 msgid ""
 "You do not have the appropriate group permissions to access this page. If "
 "you believe you <em>should</em> have access to this page, please contact an "
 "administrator for assistance."
 msgstr ""
 
-#: contexture-page-security.php:507 contexture-page-security.php:524
+#: contexture-page-security.php:518 contexture-page-security.php:535
 msgid "Access Denied. Redirecting to %s"
 msgstr ""
 
-#: contexture-page-security.php:510 contexture-page-security.php:515
-#: contexture-page-security.php:527 contexture-page-security.php:531
+#: contexture-page-security.php:521 contexture-page-security.php:526
+#: contexture-page-security.php:538 contexture-page-security.php:542
 msgid "Go to home page"
 msgstr ""
 
-#: contexture-page-security.php:722
+#: contexture-page-security.php:724
 msgid "Official Page Security Support"
 msgstr ""
 
-#: contexture-page-security.php:726
+#: contexture-page-security.php:728
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To add a user to a group, check "
 "the users to add, and select a group from the \"Add to group...\" drop down. "
 "Click \"Add\" to save the changes.</p>"
 msgstr ""
 
-#: contexture-page-security.php:728
+#: contexture-page-security.php:730
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To restrict access to this page, "
 "find the \"Restrict Access\" sidebar and check the box next to \"Protect "
@@ -408,7 +412,7 @@ msgid ""
 "</p>"
 msgstr ""
 
-#: contexture-page-security.php:730
+#: contexture-page-security.php:732
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To restrict access to this post, "
 "find the \"Restrict Access\" sidebar and check the box next to \"Protect "
@@ -424,7 +428,7 @@ msgid ""
 "</p>"
 msgstr ""
 
-#: contexture-page-security.php:732
+#: contexture-page-security.php:734
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>The lock icon shows which pages "
 "currently have restrictions. The lighter icons show which pages are simply "
@@ -432,13 +436,13 @@ msgid ""
 "pages that have their own restrictions.</p>"
 msgstr ""
 
-#: contexture-page-security.php:734
+#: contexture-page-security.php:736
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>The lock icon shows which posts "
 "currently have restrictions.</p>"
 msgstr ""
 
-#: contexture-page-security.php:739
+#: contexture-page-security.php:741
 msgid ""
 "<p>This screen shows a list of all the groups currently available. Groups "
 "are used to arbitrarily \"group\" users together for permissions purposes. "
@@ -450,14 +454,14 @@ msgid ""
 "automatically.</p><p><strong>For more information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:740
+#: contexture-page-security.php:742
 msgid ""
 "<p>This screen allows you to add a new group. Simply enter a new, unique "
 "name for your group, and an optional description.</p><p><strong>For more "
 "information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:741
+#: contexture-page-security.php:743
 msgid ""
 "<p>This screen shows you all the details about the current group, and allows "
 "you to edit some of those details.</p><p><strong>Group Details</strong> - "
@@ -465,11 +469,11 @@ msgid ""
 "- A list of users currently attached to the group. You also add users to a "
 "group if you know their username (users can also be added to groups from "
 "their profile pages).</p><p><strong>Associated Content</strong> - A list of "
-"all the pages/posts this group is attached to. Click a page name to edit "
-"that page.</p><p><strong>For more information:</strong></p>"
+"all the pages and posts this group is attached to.</p><p><strong>For more "
+"information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:742
+#: contexture-page-security.php:746
 msgid ""
 "<p>This screen allows you to delete the selected group. Once you click "
 "\"Confirm Deletion\", the group will be permanently deleted, and all users "
@@ -479,124 +483,124 @@ msgid ""
 "</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:743
+#: contexture-page-security.php:749
 msgid ""
 "<p>This screen contains general settings for Page Security.</"
 "p><p><strong>For more information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:755
+#: contexture-page-security.php:761
 msgid ""
 "You cannot unprotect this page. It is protected by a parent or ancestor."
 msgstr ""
 
-#: contexture-page-security.php:756
+#: contexture-page-security.php:762
 msgid ""
 "This will completely erase this page's security settings and make it "
 "accessible to the public. Continue?"
 msgstr ""
 
-#: contexture-page-security.php:757
+#: contexture-page-security.php:763
 msgid "Are you sure you want to remove group \"%s\" from this page?"
 msgstr ""
 
-#: contexture-page-security.php:758
+#: contexture-page-security.php:764
 msgid "Are you sure you want to remove this group from %s ?"
 msgstr ""
 
-#: contexture-page-security.php:759
+#: contexture-page-security.php:765
 msgid "Remove this user from the group?"
 msgstr ""
 
-#: contexture-page-security.php:877
+#: contexture-page-security.php:890
 msgid "Group Management"
 msgstr ""
 
-#: contexture-page-security.php:878
+#: contexture-page-security.php:891
 msgid "Add a Group"
 msgstr ""
 
-#: contexture-page-security.php:878
+#: contexture-page-security.php:891
 msgid "Add Group"
 msgstr ""
 
-#: contexture-page-security.php:1065
+#: contexture-page-security.php:1082
 msgid "Membership"
 msgstr ""
 
-#: contexture-page-security.php:1066
+#: contexture-page-security.php:1083
 msgid "Unenroll"
 msgstr ""
 
-#: contexture-page-security.php:1067 contexture-page-security.php:1131
+#: contexture-page-security.php:1084 contexture-page-security.php:1150
 msgid "View"
 msgstr ""
 
-#: contexture-page-security.php:1129
+#: contexture-page-security.php:1148
 msgid "Edit"
 msgstr ""
 
-#: contexture-page-security.php:1130
+#: contexture-page-security.php:1149
 msgid "Remove"
 msgstr ""
 
-#: contexture-page-security.php:1450
+#: contexture-page-security.php:1491
 msgid " Protect this page and it's descendants"
 msgstr ""
 
-#: contexture-page-security.php:1456
+#: contexture-page-security.php:1497
 msgid "Edit Parent"
 msgstr ""
 
-#: contexture-page-security.php:1463
+#: contexture-page-security.php:1504
 msgid "Available Groups"
 msgstr ""
 
-#: contexture-page-security.php:1463
+#: contexture-page-security.php:1504
 msgid "New Group"
 msgstr ""
 
-#: contexture-page-security.php:1465
+#: contexture-page-security.php:1506
 msgid "Select"
 msgstr ""
 
-#: contexture-page-security.php:1472
+#: contexture-page-security.php:1513
 msgid "Add"
 msgstr ""
 
-#: contexture-page-security.php:1473
+#: contexture-page-security.php:1514
 msgid "Allowed Groups"
 msgstr ""
 
-#: contexture-page-security.php:1500
+#: contexture-page-security.php:1541
 msgid ""
 "<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a "
 "href=\"%s\">View Security Settings</a></p>"
 msgstr ""
 
-#: contexture-page-security.php:1506
+#: contexture-page-security.php:1547
 msgid "<p>You need to publish before you can update security settings.</p>"
 msgstr ""
 
-#: contexture-page-security.php:1523
+#: contexture-page-security.php:1567
 msgid "Groups attached to this page:"
 msgstr ""
 
-#: contexture-page-security.php:1531
+#: contexture-page-security.php:1575
 msgid "No groups attached."
 msgstr ""
 
-#: contexture-page-security.php:1552
+#: contexture-page-security.php:1599
 msgid "Groups Required:"
 msgstr ""
 
-#: contexture-page-security.php:1553
+#: contexture-page-security.php:1600
 msgid ""
 "To access this page, users must be a member of at least one group from each "
 "set of groups."
 msgstr ""
 
-#: contexture-page-security.php:1576
+#: contexture-page-security.php:1623
 msgid "No groups attached"
 msgstr ""
 
