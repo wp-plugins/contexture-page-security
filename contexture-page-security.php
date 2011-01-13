@@ -1611,7 +1611,7 @@ function ctx_ps_tag_groups_required($atts){
     foreach($requiredGroups as $pageGroup->ID => $pageGroups->groups){
 
         //List the page title
-        $return .= "<li><strong>".get_the_title($pageGroup->ID)." (id:{$pageGroup->ID})</strong></li><ul>";
+        $return .= "<li><strong>".get_the_title($pageGroup->ID)." (id:{$pageGroup->ID})</strong><ul>";
 
         foreach($pageGroups->groups as $curGrp->ID => $curGrp->title){
             ++$groupcount;
@@ -1626,7 +1626,7 @@ function ctx_ps_tag_groups_required($atts){
         //Reset groupcount
         $groupcount = 0;
 
-        $return .= '</ul>';
+        $return .= '</ul></li>';
     }
 
     $return .= '</ul></div>';
