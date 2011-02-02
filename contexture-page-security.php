@@ -24,13 +24,19 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/** TODO: See basecamp todo lists **/
+define('CTXPSCDIR', dirname(__FILE__));
+
+require_once 'core/model.php';
+require_once 'core/model_queries.php';
+require_once 'controllers/ajax.php';
 
 /************************* HOOKS *********************************/
 // Install new tables (on activate)
-register_activation_hook(__FILE__,'ctx_ps_activate');
+register_activation_hook(__FILE__,'CTXPSC_Queries::plugin_install');
 // Remove tables from db (on delete)
-register_uninstall_hook(__FILE__,'ctx_ps_uninstall');
+register_uninstall_hook(__FILE__,'CTXPSC_Queries::plugin_delete');
+
+
 // Add "Groups" option to "Users" in admin
 add_action('admin_menu', 'ctx_ps_create_menus');
 // Add a "Groups" view to a user's user-edit.php page
@@ -79,125 +85,25 @@ add_action('admin_head', 'ctx_ps_append_contextual_help');
 
 /*********************** FUNCTIONS **********************************/
 
-/**
- * Adds the important tables to the wordpress database
- */
-function ctx_ps_activate(){
-    global $wpdb;
 
-    $linkBack = admin_url();
-
-    //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
-    if (version_compare(PHP_VERSION, '5', '<')) {
-        deactivate_plugins(__FILE__);
-        wp_die(
-            "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:','contexture-page-security')."</span> "
-            .sprintf(__('Page Security requires PHP5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP5 support.','contexture-page-security'),PHP_VERSION)
-            ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page','contexture-page-security')." &gt;&gt;</a>"
-        );
-    }
-
-    //Name our tables
-    $table_groups = $wpdb->prefix . "ps_groups";
-    $table_group_relationships = $wpdb->prefix . "ps_group_relationships";
-    $table_security = $wpdb->prefix . "ps_security";
-
-    //Build our SQL scripts to create the new db tables
-    $sql_create_groups = "CREATE TABLE IF NOT EXISTS `{$table_groups}` (
-        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
-        `group_description` text COMMENT 'A description of or notes about the group',
-        `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
-        `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
-        `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
-        PRIMARY KEY (`ID`)
-    )";
-
-    $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `{$table_group_relationships}` (
-        `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
-        `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
-        `grel_user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The user id to attach to the group',
-        `grel_expires` datetime COMMENT 'If set, user cannot access content after this date',
-        PRIMARY KEY (`ID`)
-    )";
-
-    $sql_create_security = "CREATE TABLE IF NOT EXISTS `{$table_security}` (
-        `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
-        `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
-        `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
-        `sec_access_type` varchar(10) NOT NULL default 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
-        `sec_access_id` bigint(20) NOT NULL COMMENT 'The id of the user, group, or role this pertains to.',
-        `sec_setting` varchar(10) NOT NULL default 'allow' COMMENT 'Set to either allow or restrict',
-        `sec_cascades` tinyint(1) NOT NULL default '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
-        PRIMARY KEY (`ID`)
-    )";
-
-    //Create the tables
-    $wpdb->show_errors();
-    $wpdb->query($sql_create_groups);
-    $wpdb->query($sql_create_group_relationships);
-    $wpdb->query($sql_create_security);
-
-    //Record what version of the db we're using (only works if option not already set)
-    add_option("contexture_ps_db_version", "1.2");
-
-    //Set plugin options (not db version)
-    ctx_ps_set_options();
-
-    /********* START UPGRADE PATH < 1.1 ***********/
-    $dbver = get_option("contexture_ps_db_version");
-    if($dbver == "" || (float)$dbver < 1.1){
-        $wpdb->query("ALTER TABLE `{$table_groups}` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
-        update_option("contexture_ps_db_version", "1.1");
-    }
-    /******** END UPGRADE PATH < 1.1 **************/
-
-    /********* START UPGRADE PATH < 1.2 ***********/
-    $dbver = get_option("contexture_ps_db_version");
-    if($dbver == "" || (float)$dbver < 1.2){
-        $wpdb->query("ALTER TABLE `{$table_group_relationships}` ADD COLUMN `grel_expires` datetime COMMENT 'If set, user cannot access content after this date' AFTER `grel_user_id`");
-        update_option("contexture_ps_db_version", "1.2");
-    }
-    /******** END UPGRADE PATH < 1.2 **************/
-
-    //Check if our "Registered Users" group already exists
-    $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `{$table_groups}` WHERE `group_system_id` = 'CPS01' LIMIT 1");
-    if(!$CntRegSmrtGrp){
-        //Adds the Registered Users system group (if it doesnt exist)
-        $wpdb->query("INSERT INTO `{$table_groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users','contexture-page-security')."','".__('This group automatically applies to all authenticated users.','contexture-page-security')."','0','CPS01')");
-    }
-}
 
 /**
  * Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
  * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
+ * @global wpdb $wpdb
+ * @global CTXPSC_Tables $ctxpscdb
  */
 function ctx_ps_ajax_add_group_to_page(){
-    global $wpdb;
+    global $wpdb, $ctxpscdb;
 
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(!current_user_can('manage_options')){
+    if(!current_user_can('edit_pages')){
         //If user isn't authorized, stop and return error
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        ctx_ps_ajax_response(array('code'=>'0','message'=>__('User is unauthorized to make this change.','contexture-page-security')));
     }
 
-    //Add new security to the database
-    $qryAddSec = $wpdb->prepare(
-        "INSERT INTO `{$wpdb->prefix}ps_security` (
-        sec_protect_type,
-        sec_protect_id,
-        sec_access_type,
-        sec_access_id)
-        VALUES (
-        'page',
-        '%s',
-        'group',
-        '%s'
-        )",
-        $_GET['postid'],
-        $_GET['groupid']
-    );
-    $result = $wpdb->query($qryAddSec);
+    //Run the query
+    $result = CTXPSC_Queries::add_security($_GET['postid'],$_GET['groupid']);
 
     if(!!$result){
         //Start with blank HTML output
@@ -764,7 +670,7 @@ function ctx_ps_admin_head_js(){
         var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
         var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
     </script>
-    <script type="text/javascript" src="<?php echo plugins_url('/inc/js/core-ajax.js',__FILE__) ?>"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('/views/js/core-ajax.js',__FILE__) ?>"></script>
     <?php
 }
 
@@ -1027,7 +933,7 @@ function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=t
  * Adds the "Group Management" feature to Edit User pages
  */
 function ctx_ps_generate_usergroupslist(){
-    require_once("inc/user-edit-groups.php");
+    require_once 'views/user-edit-groups.php';
 }
 
 
@@ -1352,7 +1258,7 @@ function ctx_ps_menu_filter_custom($array){
  */
 function ctx_ps_page_groups_add(){
     global $wpdb;
-    require_once 'inc/group-new.php';
+    require_once 'views/group-new.php';
 }
 
 
@@ -1363,7 +1269,7 @@ function ctx_ps_page_groups_add(){
  */
 function ctx_ps_page_groups_delete(){
     global $wpdb;
-    require_once 'inc/group-delete.php';
+    require_once 'views/group-delete.php';
 }
 
 
@@ -1374,7 +1280,7 @@ function ctx_ps_page_groups_delete(){
  */
 function ctx_ps_page_groups_edit(){
     global $wpdb;
-    require_once 'inc/group-edit.php';
+    require_once 'views/group-edit.php';
 }
 
 
@@ -1385,7 +1291,7 @@ function ctx_ps_page_groups_edit(){
  */
 function ctx_ps_page_groups_view(){
     global $wpdb;
-    require_once 'inc/groups.php';
+    require_once 'views/groups.php';
 }
 
 
@@ -1395,7 +1301,7 @@ function ctx_ps_page_groups_view(){
  * @global wpdb $wpdb
  */
 function ctx_ps_page_options(){
-    require_once 'inc/options.php';
+    require_once 'views/options.php';
 }
 
 /**
@@ -1675,36 +1581,7 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
 }
 
 
- /**
- * Removes custom tables and options from the WP database.
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_uninstall(){
-    global $wpdb;
-
-    //Name our tables
-    $table_groups = $wpdb->prefix . "ps_groups";
-    $table_group_relationships = $wpdb->prefix . "ps_group_relationships";
-    $table_security = $wpdb->prefix . "ps_security";
-
-    //Build our SQL scripts to delete the old db tables
-    $sql_drop_groups = "DROP TABLE IF EXISTS `" . $table_groups . "`";
-    $sql_drop_group_relationships = "DROP TABLE IF EXISTS `" . $table_group_relationships . "`";
-    $sql_drop_security = "DROP TABLE IF EXISTS `" . $table_security . "`";
-
-    //Run our cleanup queries
-    $wpdb->show_errors();
-    $wpdb->query($sql_drop_groups);
-    $wpdb->query($sql_drop_group_relationships);
-    $wpdb->query($sql_drop_security);
-
-    //Remove our db version reference from options
-    delete_option("contexture_ps_db_version");
-    delete_option("contexture_ps_options");
-}
-
 //Load theme functions
-require_once 'inc/theme-functions.php';
+require_once 'views/theme-functions.php';
 
 ?>

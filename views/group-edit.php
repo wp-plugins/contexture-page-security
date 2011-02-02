@@ -67,7 +67,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
 
     if($_GET['page']==='ps_groups_edit')
 ?>
-    <script type="text/javascript" src="<?php echo plugins_url('/inc/js/inline-edit-membership.js',dirname(__FILE__)) ?>"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('/views/js/inline-edit-membership.js',dirname(__FILE__)) ?>"></script>
     <style type="text/css">
         .group-actions { text-align:right; }
         .group-actions a { color:red; font-weight:bold; }
@@ -238,7 +238,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             <tbody id="users" class="list:content content-list">
                 <?php
                     if(ctx_ps_count_protected_pages($_GET['groupid']) < 1){
-                        echo '<td colspan="3">'.__('No pages are attached to this group.','contexture-page-security').'</td>';
+                        echo '<td colspan="3">'.__('No content is attached to this group.','contexture-page-security').'</td>';
                     } else {
                         echo ctx_ps_display_page_list($_GET['groupid']);
                     }

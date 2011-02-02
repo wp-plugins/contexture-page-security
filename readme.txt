@@ -78,7 +78,7 @@ Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad t
 
 == Theme Functions ==
 
-Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's inc/theme-functions.php file)).
+Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's views/theme-functions.php file)).
 
 = psc_add_user_to_group($user_id, $group_id, $expires) =
 
