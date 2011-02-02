@@ -29,14 +29,14 @@ if(!empty($_GET['action'])){
             if($UserInfo == 0){
                 $actionmessage = sprintf('<div class="error below-h2"><p>'.__('User &quot;%s&quot; does not exist.','contexture-page-security').'</p></div>',$_GET['add-username']);
             } else {
-                
+
                 //Make sure user isnt already in the group
                 $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',
                         $_GET['groupid'],
                         $wpdb->get_var($sqlCheckUserExists,0,0));
-                
+
                 //wp_die($UserInGroup.' <br/><br/> '.$wpdb->get_var($UserInGroup));
-                
+
                 if($wpdb->get_var($UserInGroup)>0){
                     $actionmessage = '<div class="error below-h2"><p>'.__('User is already in this group.','contexture-page-security').'</p></div>';
                 }else{
@@ -85,7 +85,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         .inline-edit-row label .title { width:100px !important; }
         .inline-edit-save { height:25px; }
         .inline-edit-col-left { width:30% !important; border-right:1px solid #DDDDDD;  }
-        
+
         .inline-edit-col-right label { padding-left:10px !important; }
     </style>
 
@@ -93,12 +93,12 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
         <div class="icon32" id="icon-users"><br/></div>
         <h2>Editing a Group</h2>
         <?php echo $actionmessage; ?>
-        <?php 
+        <?php
             if (empty($groupInfo->group_title)){ //Group doesnt exist error
                 echo '<div id="message" class="error below-h2"><p>',__('A group with that id does not exist.','contexture-page-security'),' <a href="'.admin_url().'users.php?page=ps_groups">',__('View all groups','contexture-page-security'),' &gt;&gt;</a></p></div>';
             }else if(isset($groupInfo->group_system_id)){ //Group is a system group error (cannot edit)
                 echo '<div id="message" class="error below-h2"><p>',__('System groups cannot be edited.','contexture-page-security'),' <a href="'.admin_url().'users.php?page=ps_groups">',__('View all groups','contexture-page-security'),' &gt;&gt;</a></p></div>';
-            }else{ 
+            }else{
         ?>
 
         <form id="editgroup" name="editgroup" class="validate" method="get" action="">
@@ -141,7 +141,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 <input id="action" name="action" type="hidden" value="addusr" />
                 <input id="groupid" name="groupid" type="hidden" value="<?php echo $_GET['groupid']; ?>" />
                 <input id="add-username" name="add-username" class="regular-text" type="text" value="username" onclick="if(jQuery(this).val()=='username'){jQuery(this).val('')}" onblur="if(jQuery(this).val().replace(' ','')==''){jQuery(this).val('username')}" /> <input type="submit" class="button-secondary action" value="<?php _e('Add User','contexture-page-security'); ?>" onclick="if(jQuery('#add-username').val().replace(' ','') != '' && jQuery('#add-username').val().replace(' ','') != 'username'){return true;}else{ jQuery('#add-username').css({'border-color':'#CC0000','background-color':'pink'});return false; }" />
-                <?php wp_nonce_field('ps-add-user'); ?>
+                <?php wp_nonce_field('ps-add-user','',false); ?>
             </div>
             <table id="grouptable" class="widefat fixed" cellspacing="0">
                 <thead>
@@ -202,7 +202,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                                                 <option value="11">Nov</option>
                                                 <option value="12">Dec</option>
                                             </select>
-                                            <input type="text" autocomplete="off" tabindex="4" maxlength="2" size="2" value="" name="jj" disabled="disabled">, 
+                                            <input type="text" autocomplete="off" tabindex="4" maxlength="2" size="2" value="" name="jj" disabled="disabled">,
                                             <input type="text" autocomplete="off" tabindex="4" maxlength="4" size="4" value="" name="aa" disabled="disabled">
                                         </div>
                                     </div>
