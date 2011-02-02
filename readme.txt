@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.1
-Stable tag: 1.3.3
+Stable tag: 1.3.4
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -12,8 +12,8 @@ Allows admins to create user groups and set access restrictions for any post, pa
 
 Page Security by Contexture International (PSC) lets YOU decide which users can access which content. PSC adds much-needed user groups and permissions features to WordPress!
 
-Create groups to organize your users how YOU see fit. Use groups to easily limit access to posts, pages, or entire sections of your website. Create an intranet or a members-only 
-area with just a few clicks - or build a subscription based system with automatically expiring memberships. You can even create multiple levels of security for granualar protection 
+Create groups to organize your users how YOU see fit. Use groups to easily limit access to posts, pages, or entire sections of your website. Create an intranet or a members-only
+area with just a few clicks - or build a subscription based system with automatically expiring memberships. You can even create multiple levels of security for granualar protection
 of any sub-section on your site.
 
 PSC is created to be simple, yet powerful - and is designed to integrate seamlessly and intuitively with WordPress. If you know how to use WordPress, you know how to use PSC.
@@ -102,6 +102,9 @@ This function can be used to determine if a specific page or post is protected (
 
 
 == Changelog ==
+
+= 1.3.4 =
+* Fixed a bug that could cause query strings to become too long when adding users from the Group Edit screen
 
 = 1.3.3 =
 * Bug fixes (thanks, Alex)
