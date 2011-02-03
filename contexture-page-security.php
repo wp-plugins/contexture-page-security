@@ -99,13 +99,13 @@ function ctx_ps_ajax_add_group_to_page(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('edit_pages')){
         //If user isn't authorized, stop and return error
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('User is unauthorized to make this change.','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('User is unauthorized to make this change.','contexture-page-security')));
     }
 
     //Run the query
     $result = CTXPSC_Queries::add_security($_GET['postid'],$_GET['groupid']);
 
-    if(!!$result){
+    if($result!==false){
         //Start with blank HTML output
         $OutputHTML = '';
 
@@ -143,7 +143,7 @@ function ctx_ps_ajax_add_group_to_page(){
             }
         }
 
-        ctx_ps_ajax_response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
+        CTXAjax::response(array('code'=>0,'html'=>'<![CDATA['.$OutputHTML.']]>'));
     }
 }
 
@@ -157,15 +157,15 @@ function ctx_ps_ajax_remove_group_from_page(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
-    if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']} AND sec_access_id = {$_GET['groupid']}") !== false){
-        ctx_ps_ajax_response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
+    if(CTXPSC_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
+        CTXAjax::response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
     }else{
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
     }
-    ctx_ps_ajax_response($response);
+    CTXAjax::response($response);
 }
 
 /**
@@ -185,7 +185,7 @@ function ctx_ps_ajax_add_group_to_user(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     //Make sure user exists in db
@@ -195,7 +195,7 @@ function ctx_ps_ajax_add_group_to_user(){
 
     //If this user doesn't exist
     if($UserInfo === 0){
-        ctx_ps_ajax_response(array('code'=>'0','message'=>'User not found'));
+        CTXAjax::response(array('code'=>'0','message'=>'User not found'));
     } else {
 
         //Make sure user isnt already in the group
@@ -203,7 +203,7 @@ function ctx_ps_ajax_add_group_to_user(){
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->get_var($UserInGroup)>0){
-            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Already in group','contexture-page-security')) );
+            CTXAjax::response( array('code'=>'0','message'=>__('Already in group','contexture-page-security')) );
         }
 
         //Add user to group
@@ -211,9 +211,9 @@ function ctx_ps_ajax_add_group_to_user(){
                 $_GET['groupid'],
                 $_GET['user_id']);
         if($wpdb->query($sqlUpdateGroup) === false){
-            ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
+            CTXAjax::response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
         } else {
-            ctx_ps_ajax_response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
+            CTXAjax::response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
         }
     }
 
@@ -230,7 +230,7 @@ function ctx_ps_ajax_update_membership(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
+        CTXAjax::response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
     }
 
     //Determine null or value
@@ -241,9 +241,9 @@ function ctx_ps_ajax_update_membership(){
 
     //Determine response
     if($wpdb->query($sqlUpdateMember) === false){
-        ctx_ps_ajax_response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
+        CTXAjax::response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
     } else {
-        ctx_ps_ajax_response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
+        CTXAjax::response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
     }
 
 }
@@ -259,40 +259,21 @@ function ctx_ps_ajax_remove_group_from_user(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
     $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
             $_GET['groupid'],
             $_GET['user_id']);
     if($wpdb->query($sqlRemoveUserRel) == 0){
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
     } else {
         $html = ctx_ps_display_group_list($_GET['user_id'],'users');
         if(empty($html)){
             $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>','contexture-page-security');
         }
-        ctx_ps_ajax_response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
+        CTXAjax::response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
     }
-}
-
-/**
- * Takes an associative array and outputs xml
- */
-function ctx_ps_ajax_response($AssocArray=''){
-    if(!isset($AssocArray['code'])){
-        $AssocArray['code'] = 0;
-    }
-
-    @header('Content-Type: text/xml; charset=' . get_option('blog_charset'));
-    $response = "<?xml version='1.0' standalone='yes'?><ajax>";
-    foreach($AssocArray as $element=>$value){
-        $element = strtolower($element);
-        $element = sanitize_title_with_dashes($element);
-        $response .= "<{$element}>{$value}</{$element}>";
-    }
-    $response .= "</ajax>";
-    die($response);
 }
 
 /**
@@ -306,7 +287,7 @@ function ctx_ps_ajax_security_update(){
     //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
     if(!current_user_can('manage_options')){
         //If user isn't authorized
-        ctx_ps_ajax_response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
     }
 
 
@@ -330,7 +311,7 @@ function ctx_ps_ajax_security_update(){
             $response['message'] = 'Data does not validate';
             break;
     }
-    ctx_ps_ajax_response($response);
+    CTXAjax::response($response);
 }
 
 

@@ -9,7 +9,7 @@ class CTXPSC_Queries{
      * @global wpdb $wpdb
      * @global CTXPSC_Props $ctxpscdb
      */
-    public function plugin_install(){
+    public static function plugin_install(){
         global $wpdb, $ctxpscdb;
 
         $linkBack = admin_url();
@@ -97,7 +97,7 @@ class CTXPSC_Queries{
      * @global wpdb $wpdb
      * @global CTXPSC_Props $ctxpscdb
      */
-    public function plugin_delete(){
+    public static function plugin_delete(){
         global $wpdb, $ctxpscdb;
 
         //Build our SQL scripts to delete the old db tables
@@ -121,32 +121,53 @@ class CTXPSC_Queries{
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Props $ctxpscdb
-     * @param string $content_id The id of the page or post to protect
-     * @param string $group_id The id of the group to use for protection
-     * @param string $content_type Unused. Will tell PSC what type of content to protect.
+     * @param string $content_id The id of the page/post/etc to be protected
+     * @param string $protection_id The id of the group/user/etc being given access
+     * @param string $content_type The type of content being protected (page/post/category/etc)
+     * @param string $protection_type The type of protection being applied (group/user/role/etc)
+     * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
      */
-    public function add_security($content_id,$group_id,$content_type='post'){
+    public static function add_security($content_id,$protection_id,$content_type='page',$protection_type='group'){
         global $wpdb, $ctxpscdb;
 
-            return $wpdb->query($wpdb->prepare(
-                "INSERT INTO `{$ctxpscdb->security}` (
-                sec_protect_type,
-                sec_protect_id,
-                sec_access_type,
-                sec_access_id)
-                VALUES (
-                'page',
-                '%s',
-                'group',
-                '%s'
-                )",
-                    $content_id,
-                    $group_id
-                )
-            );
+        return $wpdb->insert($ctxpscdb->security,
+                array(
+                    'sec_protect_type'  =>$content_type,
+                    'sec_protect_id'    =>$content_id,
+                    'sec_access_type'   =>$protection_type,
+                    'sec_access_id'     =>$protection_id
+                    )
+                );
+
     }
 
+    /**
+     * Deletes a security record from the db
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Props $ctxpscdb
+     * @param string $content_id The id of the page or post to protect
+     * @param string $protection_id The id of the group to use for protection
+     * @param string $content_type Unused. Will tell PSC what type of content to protect.
+     * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
+     */
+    public static function delete_security($content_id,$protection_id,$content_type='page',$protection_type='group'){
+        global $wpdb, $ctxpscdb;
 
+        $sql = $wpdb->prepare('
+        DELETE FROM `'.$ctxpscdb->security.'`
+        WHERE   sec_protect_id      = %s
+        AND     sec_protect_type    = %s
+        AND     sec_access_id       = %s
+        AND     sec_access_type     = %s',
+            /*1*/$content_id,
+            /*2*/$content_type,
+            /*3*/$protection_id,
+            /*4*/$protection_type
+        );
+
+        return $wpdb->query($sql);
+    }
 
 
 }

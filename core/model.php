@@ -13,6 +13,7 @@ class CTXPSC_Tables{
     public $pluginbase;
 
     public function __construct() {
+        global $wpdb;
         //Initialize properties
         $this->groups =     $wpdb->prefix.$this->prefix.'groups';
         $this->group_rels = $wpdb->prefix.$this->prefix.'group_relationships';
