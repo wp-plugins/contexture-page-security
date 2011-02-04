@@ -90,7 +90,6 @@ add_action('admin_head', 'ctx_ps_append_contextual_help');
 /*********************** FUNCTIONS **********************************/
 
 
-
 /**
  * Handles creating or updating the options array
  *
