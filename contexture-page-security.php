@@ -24,13 +24,17 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-define('CTXPSCDIR', dirname(__FILE__));
+//Get our globals out of the way
+define('CTXPSCDIR',basename(dirname(__FILE__)));
+global $wpdb, $ctxpscdb;
 
+
+/**************************** LOAD CORE FILES *********************************/
 require_once 'core/model.php';
 require_once 'core/model_queries.php';
 require_once 'controllers/ajax.php';
 
-/************************* HOOKS *********************************/
+/******************************** HOOKS ***************************************/
 // Install new tables (on activate)
 register_activation_hook(__FILE__,'CTXPSC_Queries::plugin_install');
 // Remove tables from db (on delete)
@@ -57,7 +61,7 @@ add_action('wp_ajax_ctx_ps_security_update','ctx_ps_ajax_security_update');
 //Handle Ajax for Edit User page
 add_action('wp_ajax_ctx_ps_add2user','CTXPSAjax::add_group_to_user');
 add_action('wp_ajax_ctx_ps_removefromuser','ctx_ps_ajax_remove_group_from_user');
-add_action('wp_ajax_ctx_ps_updatemember','ctx_ps_ajax_update_membership');
+add_action('wp_ajax_ctx_ps_updatemember','CTXPSAjax::update_membership');
 
 //Add basic security to all public "static" pages and posts [highest priority]
 add_action('wp','ctx_ps_security_action',1);
@@ -86,40 +90,6 @@ add_action('admin_head', 'ctx_ps_append_contextual_help');
 /*********************** FUNCTIONS **********************************/
 
 
-
-
-
-
-
-
-/**
- * Handles ajax requests to update a users membership info
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_ajax_update_membership(){
-    global $wpdb;
-
-    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(!current_user_can('manage_options')){
-        //If user isn't authorized
-        CTXAjax::response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
-    }
-
-    //Determine null or value
-    $db_expires = ($_POST['expires']=='1') ? "'".$_POST['date']."'" : 'NULL';
-
-    //Build query
-    $sqlUpdateMember = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=%s WHERE ID=\'%s\';',$wpdb->prefix,$db_expires,$_POST['grel']);
-
-    //Determine response
-    if($wpdb->query($sqlUpdateMember) === false){
-        CTXAjax::response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
-    } else {
-        CTXAjax::response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
-    }
-
-}
 
 /**
  * Handles ajax requests to remove a group from a users account

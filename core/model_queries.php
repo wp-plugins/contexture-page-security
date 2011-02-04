@@ -7,7 +7,7 @@ class CTXPSC_Queries{
     /**
      * Adds the important tables to the wordpress database
      * @global wpdb $wpdb
-     * @global CTXPSC_Props $ctxpscdb
+     * @global CTXPSC_Tables $ctxpscdb
      */
     public static function plugin_install(){
         global $wpdb, $ctxpscdb;
@@ -25,7 +25,7 @@ class CTXPSC_Queries{
         }
 
         //Build our SQL scripts to create the new db tables
-        $sql_create_groups = "CREATE TABLE IF NOT EXISTS `{$ctxpscdb->groups}` (
+        $sql_create_groups = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
             `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
             `group_description` text COMMENT 'A description of or notes about the group',
@@ -33,17 +33,17 @@ class CTXPSC_Queries{
             `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
             `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
             PRIMARY KEY (`ID`)
-        )";
+        )",$ctxpscdb->groups);
 
-        $sql_create_group_relationships = "CREATE TABLE IF NOT EXISTS `{$ctxpscdb->group_rels}` (
+        $sql_create_group_relationships = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
             `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `grel_group_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The group id that the user is attached to',
             `grel_user_id` bigint(20) UNSIGNED NOT NULL COMMENT 'The user id to attach to the group',
             `grel_expires` datetime COMMENT 'If set, user cannot access content after this date',
             PRIMARY KEY (`ID`)
-        )";
+        )",$ctxpscdb->group_rels);
 
-        $sql_create_security = "CREATE TABLE IF NOT EXISTS `{$ctxpscdb->security}` (
+        $sql_create_security = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
             `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
             `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
             `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
@@ -52,7 +52,11 @@ class CTXPSC_Queries{
             `sec_setting` varchar(10) NOT NULL default 'allow' COMMENT 'Set to either allow or restrict',
             `sec_cascades` tinyint(1) NOT NULL default '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
             PRIMARY KEY (`ID`)
-        )";
+        )",$ctxpscdb->security);
+
+        //deactivate_plugins($ctxpscdb->pluginbase);
+        //wp_die('<pre>'.print_r($ctxpscdb,true).'</pre>');
+        //wp_die($ctxpscdb->security);
 
         //Create the tables
         $wpdb->show_errors();
@@ -69,7 +73,7 @@ class CTXPSC_Queries{
         /********* START UPGRADE PATH < 1.1 ***********/
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.1){
-            $wpdb->query("ALTER TABLE `{$ctxpscdb->groups}` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
+            $wpdb->query("ALTER TABLE `".$ctxpscdb->groups."` ADD COLUMN `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups' AFTER `group_date`");
             update_option("contexture_ps_db_version", "1.1");
         }
         /******** END UPGRADE PATH < 1.1 **************/
@@ -77,16 +81,21 @@ class CTXPSC_Queries{
         /********* START UPGRADE PATH < 1.2 ***********/
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.2){
-            $wpdb->query("ALTER TABLE `{$ctxpscdb->group_rels}` ADD COLUMN `grel_expires` datetime COMMENT 'If set, user cannot access content after this date' AFTER `grel_user_id`");
+            $wpdb->query("ALTER TABLE `".$ctxpscdb->group_rels."` ADD COLUMN `grel_expires` datetime COMMENT 'If set, user cannot access content after this date' AFTER `grel_user_id`");
             update_option("contexture_ps_db_version", "1.2");
         }
         /******** END UPGRADE PATH < 1.2 **************/
 
         //Check if our "Registered Users" group already exists
-        $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `{$ctxpscdb->groups}` WHERE `group_system_id` = 'CPS01' LIMIT 1");
+        $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `".$ctxpscdb->groups."` WHERE `group_system_id` = 'CPS01' LIMIT 1");
         if(!$CntRegSmrtGrp){
             //Adds the Registered Users system group (if it doesnt exist)
-            $wpdb->query("INSERT INTO `{$ctxpscdb->groups}` (`group_title`,`group_description`,`group_creator`,`group_system_id`) VALUES ('".__('Registered Users','contexture-page-security')."','".__('This group automatically applies to all authenticated users.','contexture-page-security')."','0','CPS01')");
+            $wpdb->insert($ctxpscdb->groups, array(
+                    'group_title'=>__('Registered Users','contexture-page-security'),
+                    'group_description'=>__('This group automatically applies to all authenticated users.','contexture-page-security'),
+                    'group_creator'=>'0',
+                    'group_system_id'=>'CPS01'
+            ));
         }
     }
 
@@ -95,7 +104,7 @@ class CTXPSC_Queries{
      * Removes custom tables and options from the WP database.
      *
      * @global wpdb $wpdb
-     * @global CTXPSC_Props $ctxpscdb
+     * @global CTXPSC_Tables $ctxpscdb
      */
     public static function plugin_delete(){
         global $wpdb, $ctxpscdb;
@@ -120,7 +129,7 @@ class CTXPSC_Queries{
      * Inserts a new security setting into the db.
      *
      * @global wpdb $wpdb
-     * @global CTXPSC_Props $ctxpscdb
+     * @global CTXPSC_Tables $ctxpscdb
      * @param string $content_id The id of the page/post/etc to be protected
      * @param string $protection_id The id of the group/user/etc being given access
      * @param string $content_type The type of content being protected (page/post/category/etc)

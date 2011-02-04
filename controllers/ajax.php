@@ -106,7 +106,7 @@ class CTXPSAjax extends CTXAjax {
         }
         CTXAjax::response($response);
     }
-    
+
     /**
      * Handles ajax requests to add a user to a group
      *
@@ -154,6 +154,36 @@ class CTXPSAjax extends CTXAjax {
             } else {
                 CTXAjax::response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
             }
+        }
+
+    }
+
+
+    /**
+     * Handles ajax requests to update a users membership info
+     *
+     * @global wpdb $wpdb
+     */
+    function update_membership(){
+        global $wpdb;
+
+        //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+        if(!current_user_can('manage_options')){
+            //If user isn't authorized
+            CTXAjax::response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
+        }
+
+        //Determine null or value
+        $db_expires = ($_POST['expires']=='1') ? "'".$_POST['date']."'" : 'NULL';
+
+        //Build query
+        $sqlUpdateMember = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=%s WHERE ID=\'%s\';',$wpdb->prefix,$db_expires,$_POST['grel']);
+
+        //Determine response
+        if($wpdb->query($sqlUpdateMember) === false){
+            CTXAjax::response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
+        } else {
+            CTXAjax::response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
         }
 
     }
