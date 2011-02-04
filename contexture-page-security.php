@@ -56,11 +56,11 @@ add_action('init','ctx_ps_localization');
 //Handle Ajax for Edit Page/Post page
 add_action('wp_ajax_ctx_ps_add2page','CTXPSAjax::add_group_to_page');
 add_action('wp_ajax_ctx_ps_removefrompage','CTXPSAjax::remove_group_from_page');
-add_action('wp_ajax_ctx_ps_security_update','ctx_ps_ajax_security_update');
+add_action('wp_ajax_ctx_ps_security_update','CTXPSAjax::update_security');
 
 //Handle Ajax for Edit User page
 add_action('wp_ajax_ctx_ps_add2user','CTXPSAjax::add_group_to_user');
-add_action('wp_ajax_ctx_ps_removefromuser','ctx_ps_ajax_remove_group_from_user');
+add_action('wp_ajax_ctx_ps_removefromuser','CTXPSAjax::remove_group_from_user');
 add_action('wp_ajax_ctx_ps_updatemember','CTXPSAjax::update_membership');
 
 //Add basic security to all public "static" pages and posts [highest priority]
@@ -89,73 +89,6 @@ add_action('admin_head', 'ctx_ps_append_contextual_help');
 
 /*********************** FUNCTIONS **********************************/
 
-
-
-/**
- * Handles ajax requests to remove a group from a users account
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_ajax_remove_group_from_user(){
-    global $wpdb;
-
-    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(!current_user_can('manage_options')){
-        //If user isn't authorized
-        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
-    }
-
-    $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
-            $_GET['groupid'],
-            $_GET['user_id']);
-    if($wpdb->query($sqlRemoveUserRel) == 0){
-        CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
-    } else {
-        $html = ctx_ps_display_group_list($_GET['user_id'],'users');
-        if(empty($html)){
-            $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>','contexture-page-security');
-        }
-        CTXAjax::response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
-    }
-}
-
-/**
- * Toggles page security on or off - removes all groups from page if toggled off
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_ajax_security_update(){
-    global $wpdb;
-
-    //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-    if(!current_user_can('manage_options')){
-        //If user isn't authorized
-        CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
-    }
-
-
-    $response = array();
-    switch($_GET['setting']){
-        case 'on':
-            $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
-            $response['message'] = 'Security enabled';
-            break;
-        case 'off':
-            if($wpdb->query("DELETE FROM {$wpdb->prefix}ps_security WHERE sec_protect_id = {$_GET['postid']}") !== false){
-                $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
-                $response['message'] = 'Security disabled';
-            }else{
-                $response['code'] = '0';
-                $response['message'] = 'Query failed';
-            }
-            break;
-        default:
-            $response['code'] = '0';
-            $response['message'] = 'Data does not validate';
-            break;
-    }
-    CTXAjax::response($response);
-}
 
 
 /**

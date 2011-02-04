@@ -151,29 +151,42 @@ class CTXPSC_Queries{
     }
 
     /**
-     * Deletes a security record from the db
+     * Deletes one or more security records from the db.
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Props $ctxpscdb
      * @param string $content_id The id of the page or post to protect
-     * @param string $protection_id The id of the group to use for protection
+     * @param string $protection_id The id of the protector to be revoked. If empty, ALL groups will be removed from the content.
      * @param string $content_type Unused. Will tell PSC what type of content to protect.
      * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
      */
-    public static function delete_security($content_id,$protection_id,$content_type='page',$protection_type='group'){
+    public static function delete_security($content_id,$protection_id='',$content_type='page',$protection_type='group'){
         global $wpdb, $ctxpscdb;
+        $sql=false;
 
-        $sql = $wpdb->prepare('
-        DELETE FROM `'.$ctxpscdb->security.'`
-        WHERE   sec_protect_id      = %s
-        AND     sec_protect_type    = %s
-        AND     sec_access_id       = %s
-        AND     sec_access_type     = %s',
-            /*1*/$content_id,
-            /*2*/$content_type,
-            /*3*/$protection_id,
-            /*4*/$protection_type
-        );
+        if(!empty($protection_id)){
+            //To be used for removing specific access from content
+            $sql = $wpdb->prepare('
+            DELETE FROM `'.$ctxpscdb->security.'`
+            WHERE   sec_protect_id      = %s
+            AND     sec_protect_type    = %s
+            AND     sec_access_id       = %s
+            AND     sec_access_type     = %s',
+                /*1*/$content_id,
+                /*2*/$content_type,
+                /*3*/$protection_id,
+                /*4*/$protection_type
+            );
+        }else{
+            //To be used for removing ALL access from content
+            $sql = $wpdb->prepare('
+            DELETE FROM `'.$ctxpscdb->security.'`
+            WHERE   sec_protect_id      = %s
+            AND     sec_protect_type    = %s',
+                /*1*/$content_id,
+                /*2*/$content_type
+            );
+        }
 
         return $wpdb->query($sql);
     }

@@ -90,7 +90,7 @@ class CTXPSAjax extends CTXAjax {
     /**
      * Handles ajax requests to remove a group from a specified page
      */
-    function remove_group_from_page(){
+    public static function remove_group_from_page(){
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
@@ -112,7 +112,7 @@ class CTXPSAjax extends CTXAjax {
      *
      * @global wpdb $wpdb
      */
-    function add_group_to_user(){
+    public static function add_group_to_user(){
         global $wpdb;
         /** Determines if user exists*/
         $UserInfo = 0;
@@ -164,7 +164,7 @@ class CTXPSAjax extends CTXAjax {
      *
      * @global wpdb $wpdb
      */
-    function update_membership(){
+    public static function update_membership(){
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
@@ -188,5 +188,70 @@ class CTXPSAjax extends CTXAjax {
 
     }
 
+    /**
+     * Handles ajax requests to remove a group from a users account
+     *
+     * @global wpdb $wpdb
+     */
+    public static function remove_group_from_user(){
+        global $wpdb;
+
+        //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+        if(!current_user_can('manage_options')){
+            //If user isn't authorized
+            CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        }
+
+        $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
+                $_GET['groupid'],
+                $_GET['user_id']);
+        if($wpdb->query($sqlRemoveUserRel) == 0){
+            CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
+        } else {
+            $html = ctx_ps_display_group_list($_GET['user_id'],'users');
+            if(empty($html)){
+                $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>','contexture-page-security');
+            }
+            CTXAjax::response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
+        }
+    }
+
+    /**
+     * Toggles page security on or off - removes all groups from page if toggled off
+     *
+     * @global wpdb $wpdb
+     */
+    public static function update_security(){
+        global $wpdb;
+
+        //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+        if(!current_user_can('manage_options')){
+            //If user isn't authorized
+            CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+        }
+
+
+        $response = array();
+        switch($_GET['setting']){
+            case 'on':
+                $response['code'] = add_post_meta($_GET['postid'],'ctx_ps_security','1');
+                $response['message'] = 'Security enabled';
+                break;
+            case 'off':
+                if(CTXPSC_Queries::delete_security($_GET['postid']) !== false){
+                    $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
+                    $response['message'] = 'Security disabled';
+                }else{
+                    $response['code'] = '0';
+                    $response['message'] = 'Query failed';
+                }
+                break;
+            default:
+                $response['code'] = '0';
+                $response['message'] = 'Data does not validate';
+                break;
+        }
+        CTXAjax::response($response);
+    }
 }
 ?>
