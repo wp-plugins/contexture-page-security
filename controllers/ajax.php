@@ -127,13 +127,8 @@ class CTXPSAjax extends CTXAjax {
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
 
-        //Make sure user exists in db
-        $UserInfo = (int)$wpdb->get_var(
-                $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = '%s'",
-                        $_GET['user_id']));
-
         //If this user doesn't exist
-        if($UserInfo === 0){
+        if(CTXPSC_Queries::wp_check_user($_GET['user_id'])){
             CTXAjax::response(array('code'=>'0','message'=>'User not found'));
         } else {
 

@@ -191,6 +191,22 @@ class CTXPSC_Queries{
         return $wpdb->query($sql);
     }
 
+    /**
+     * Checks if user exists in WP db. Returns true if user exists, false if not.
+     * 
+     * @global wpdb $wpdb
+     * @param integer $user_id
+     * @return boolean True if user exists in db. False if not.
+     */
+    public static function wp_check_user($user_id){
+        global $wpdb;
+        $check = (integer)$wpdb->get_var($wpdb->prepare(
+            'SELECT COUNT(*) FROM '.$wpdb->users.' WHERE '.$wpdb->users.'.ID = \'%s\'',
+                $user_id
+            )
+        );
+        return ($check>0);
+    }
 
 }
 }
