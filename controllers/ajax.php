@@ -37,7 +37,7 @@ class CTXPSAjax extends CTXAjax {
         global $wpdb, $ctxpscdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_pages')){
+        if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
             //If user isn't authorized, stop and return error
             CTXAjax::response(array('code'=>'0','message'=>__('User is unauthorized to make this change.','contexture-page-security')));
         }
@@ -94,7 +94,7 @@ class CTXPSAjax extends CTXAjax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('manage_options')){
+        if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
             //If user isn't authorized
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
@@ -114,37 +114,25 @@ class CTXPSAjax extends CTXAjax {
      */
     public static function add_group_to_user(){
         global $wpdb;
-        /** Determines if user exists*/
-        $UserInfo = 0;
-        /** Determines if user is already in the group */
-        $UserInGroup = 0;
-        /** SQL for updating the group */
-        $sqlUpdateGroup = 0;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('manage_options')){
+        if(!current_user_can('edit_users')){
             //If user isn't authorized
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
 
         //If this user doesn't exist
-        if(CTXPSC_Queries::wp_check_user($_GET['user_id'])){
+        if(CTXPSC_Queries::check_user_exists($_GET['user_id'])){
             CTXAjax::response(array('code'=>'0','message'=>'User not found'));
         } else {
 
             //Make sure user isnt already in the group
-            $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',
-                    $_GET['groupid'],
-                    $_GET['user_id']);
-            if($wpdb->get_var($UserInGroup)>0){
+            if(CTXPSC_Queries::check_membership($_GET['user_id'], $_GET['groupid'])){
                 CTXAjax::response( array('code'=>'0','message'=>__('Already in group','contexture-page-security')) );
             }
 
-            //Add user to group
-            $sqlUpdateGroup = $wpdb->prepare("INSERT INTO `{$wpdb->prefix}ps_group_relationships` (grel_group_id, grel_user_id) VALUES ('%s','%s');",
-                    $_GET['groupid'],
-                    $_GET['user_id']);
-            if($wpdb->query($sqlUpdateGroup) === false){
+            //Add the user to the group
+            if(CTXPSC_Queries::enroll($_GET['user_id'], $_GET['groupid']) === false){
                 CTXAjax::response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
             } else {
                 CTXAjax::response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
@@ -163,19 +151,16 @@ class CTXPSAjax extends CTXAjax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('manage_options')){
+        if(!current_user_can('edit_users')){
             //If user isn't authorized
             CTXAjax::response( array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')) );
         }
 
-        //Determine null or value
-        $db_expires = ($_POST['expires']=='1') ? "'".$_POST['date']."'" : 'NULL';
-
-        //Build query
-        $sqlUpdateMember = sprintf('UPDATE `%sps_group_relationships` SET grel_expires=%s WHERE ID=\'%s\';',$wpdb->prefix,$db_expires,$_POST['grel']);
+        //Determine if we need to pass NULL or a DateTime value...
+        $db_expires = ($_POST['expires']=='1') ? $_POST['date'] : 'NULL';
 
         //Determine response
-        if($wpdb->query($sqlUpdateMember) === false){
+        if(CTXPSC_Queries::grel_enrollment_update($_POST['grel'], $db_expires) === false){
             CTXAjax::response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
         } else {
             CTXAjax::response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
@@ -192,15 +177,13 @@ class CTXPSAjax extends CTXAjax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('manage_options')){
+        if(!current_user_can('edit_users')){
             //If user isn't authorized
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
 
-        $sqlRemoveUserRel = $wpdb->prepare("DELETE FROM `{$wpdb->prefix}ps_group_relationships` WHERE grel_group_id = '%s' AND grel_user_id = '%s';",
-                $_GET['groupid'],
-                $_GET['user_id']);
-        if($wpdb->query($sqlRemoveUserRel) == 0){
+
+        if(CTXPSC_Queries::unenroll($_GET['user_id'], $_GET['groupid'])){
             CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
         } else {
             $html = ctx_ps_display_group_list($_GET['user_id'],'users');
@@ -220,12 +203,11 @@ class CTXPSAjax extends CTXAjax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('manage_options')){
+        if(!current_user_can('edit_pages')){
             //If user isn't authorized
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
-
-
+    
         $response = array();
         switch($_GET['setting']){
             case 'on':

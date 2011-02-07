@@ -3,7 +3,7 @@
         init : function(){
             //Open membership expiration editor
             $('a.editmembership').live('click',function(){ inlineEditMembership.edit(this); return false; });
-            
+
             //Edit window cancel
             $('.submit a.cancel').live('click',function(){
                 var myRow = $(this).parents('tr:first'),
@@ -11,13 +11,13 @@
                 myRow.remove();
                 $('#user-'+myId).css('display','table-row');
             });
-            
+
             //Edit window save
-            $('.submit a.save').live('click',function(){ 
+            $('.submit a.save').live('click',function(){
                 var myRow = $(this).parents('tr:first');
                 inlineEditMembership.save(myRow[0]);
             });
-            
+
             //Toggle editor window date enabled
             $('input[name="membership_permanent"]').live('click',function(){
                 if( $(this).filter(':checked').length>0 ){
@@ -26,19 +26,19 @@
                     $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').attr('disabled','disabled');
                 }
             });
-            
+
             //Confirm before removing a user
             $('.row-actions .trash').click(function(){
                 return confirm(msgRemoveUser);
             });
-            
+
         },
         edit : function(memberid){
             var rowData, editForm, expires=false;
-            
+
             //Close other open edit windows
             inlineEditMembership.revert();
-            
+
             //Set memberid to the memberid int, if its an object
             if (typeof memberid=='object') memberid = inlineEditMembership.getId(memberid);
             //Get data
@@ -58,14 +58,14 @@
             }
             //Hide original tr
             $('#user-'+memberid).hide();
-            
+
         },
         save : function(myId){
             var myId, myEdit, rowData, newData, newDate='', hasExpire=0;
-            
+
             //Show waiting anigif
             $('.inline-edit-save .waiting').show();
-            
+
             //Set memberid to the memberid int, if its an object
             myId = inlineEditMembership.getId(myId);
             //Get data
@@ -78,18 +78,22 @@
                 day:myEdit.find('input[name="jj"]').val(),
                 yr:myEdit.find('input[name="aa"]').val()
             };
-            
+
             //Check if we're sending expires or not
             if(myEdit.find('[name="membership_permanent"]:checked').length!=0){
-                //Build new date
+                //Set expiration flag
                 hasExpire = 1;
+                //Validate day and year data (if empty, adjust or error
+                if(newData.day==''){ newData.day=1 }
+                if(newData.yr==''){ $('.inline-edit-save .waiting').hide();alert(msgYearRequired);return false; }
+                //Build new date string
                 newDate = newData.yr+'-'+newData.mon+'-'+newData.day;
             }else{
                 newData.mon='';
                 newData.day='';
                 newData.yr='';
             }
-            
+
             //Submit ajax data to server
             $.post('admin-ajax.php',
             {
@@ -127,7 +131,7 @@
             $('.inline-edit-save .waiting').hide();
         },
         getId : function(obj){
-            var id = (obj.tagName == 'TR') ? obj.id : $(obj).parents('tr:first').attr('id'), 
+            var id = (obj.tagName == 'TR') ? obj.id : $(obj).parents('tr:first').attr('id'),
                 parts = id.split('-');
             return parts[parts.length-1];
         }

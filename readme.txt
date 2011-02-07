@@ -103,6 +103,15 @@ This function can be used to determine if a specific page or post is protected (
 
 == Changelog ==
 
+= 1.4.0 =
+* COMPLETE CODE REWRITE! Code base is now now MUCH more flexible and updates should come much more quickly.
+* New feature: Bulk actions are now available from Users and Groups pages!
+* New feature: Admins can now enable no-redirect access denied pages (content-replacement).
+* New feature: You can now protect custom post types!
+* New feature: Create page/section-specific access denied pages!
+* Updated permissions for all actions to be more "common sense".
+* WAY MORE FEATURES COMING SOON.
+
 = 1.3.4 =
 * Fixed a bug that could cause query strings to become too long when adding users from the Group Edit screen
 

@@ -67,7 +67,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
 
     if($_GET['page']==='ps_groups_edit')
 ?>
-    <script type="text/javascript" src="<?php echo plugins_url('/views/js/inline-edit-membership.js',dirname(__FILE__)) ?>"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('/views/js/inline-edit-membership.dev.js',dirname(__FILE__)) ?>"></script>
     <style type="text/css">
         .group-actions { text-align:right; }
         .group-actions a { color:red; font-weight:bold; }

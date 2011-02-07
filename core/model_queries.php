@@ -19,7 +19,7 @@ class CTXPSC_Queries{
             deactivate_plugins($ctxpscdb->pluginbase);
             wp_die(
                 "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:','contexture-page-security')."</span> "
-                .sprintf(__('Page Security requires PHP5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP5 support.','contexture-page-security'),PHP_VERSION)
+                .sprintf(__('Page Security requires PHP 5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP 5 support.','contexture-page-security'),PHP_VERSION)
                 ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page','contexture-page-security')." &gt;&gt;</a>"
             );
         }
@@ -192,20 +192,113 @@ class CTXPSC_Queries{
     }
 
     /**
+     * Checks if a user is enrolled in a group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $user_id
+     * @param int $group_id
+     * @return boolean Returns true if user is in group, false if not.
+     */
+    public static function check_membership($user_id,$group_id){
+        global $wpdb, $ctxpscdb;
+        $check = $wpdb->get_var($wpdb->prepare(
+            'SELECT COUNT(*) FROM `'.$ctxpscdb->group_rels.'` WHERE grel_group_id=%s AND grel_user_id=%s',
+                $group_id,
+                $user_id
+        ));
+        return ($check>0);
+    }
+
+    /**
      * Checks if user exists in WP db. Returns true if user exists, false if not.
-     * 
+     *
      * @global wpdb $wpdb
      * @param integer $user_id
      * @return boolean True if user exists in db. False if not.
      */
-    public static function wp_check_user($user_id){
+    public static function check_user_exists($user_id){
         global $wpdb;
         $check = (integer)$wpdb->get_var($wpdb->prepare(
             'SELECT COUNT(*) FROM '.$wpdb->users.' WHERE '.$wpdb->users.'.ID = \'%s\'',
                 $user_id
-            )
-        );
+        ));
         return ($check>0);
+    }
+
+    /**
+     * Add a user to a group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $user_id
+     * @param int $group_id
+     * @return bool Returns 1 if success, false if failed.
+     */
+    public static function enroll($user_id,$group_id){
+        global $wpdb,$ctxpscdb;
+        return $wpdb->insert($ctxpscdb->group_rels,
+                array(
+                    'grel_group_id'=>$group_id,
+                    'grel_user_id'=>$user_id
+                )
+        );
+
+    }
+
+    /**
+     * Updates a user's enrollment information, by grel_id. Use get_grel(), if needed,
+     * to find the grel_id.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $grel_id
+     * @param string $expiration_date A MySQL-friendly, string-formatted DateTime. yyyy-mm-dd hh:mm:ss
+     * @return type
+     */
+    public static function grel_enrollment_update($grel_id,$expiration_date){
+        global $wpdb,$ctxpscdb;
+
+        //Return false if this is empty
+        if(empty($expiration_date)){
+            return false;
+        }
+
+        //If we need to set this to null...
+        if(trim(strtolower($expiration_date))==='null'){
+            return $wpdb->query($wpdb->prepare('UPDATE `'.$ctxpscdb->group_rels.'` SET grel_expires=NULL WHERE id=%s',$grel_id));
+        }
+
+        if(preg_match('/^\d{4}-\d{1,2}-\d{1,2}/', trim($expiration_date))>=1){
+            //Try to format the date (extra layer of validation)
+            $expiration_date = strtotime((string)$expiration_date);
+            //Let's convert our unix timestamp back to a MySQL-friendly date
+            $expiration_date = date('Y-m-d H:i:s');
+        }else{
+            return false;
+        }
+
+        //Run the query and return
+        return $wpdb->update($ctxpscdb->group_rels, array('grel_expires'=>$expiration_date), array('ID'=>$grel_id));;
+    }
+
+    /**
+     * Removes a user from a group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $user_id
+     * @param int $group_id
+     * @return boolean Returns true if delete was successful, false if it failed for any reason.
+     */
+    public static function unenroll($user_id,$group_id){
+        global $wpdb,$ctxpscdb;
+
+        $count = $wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpscdb->group_rels.'` WHERE grel_group_id = %s AND grel_user_id = %s',
+                $group_id,
+                $user_id
+        ));
+        return ($count>0);
     }
 
 }

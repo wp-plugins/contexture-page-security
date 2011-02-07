@@ -176,8 +176,8 @@ function ctx_ps_security_action(){
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_anon_id'])){
                             $redir_anon_link = get_permalink($dbOpt['ad_page_anon_id']);
-                            wp_safe_redirect($redir_anon_link);
-                            die(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
+                            wp_safe_redirect($redir_anon_link,401);
+                            exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
@@ -193,8 +193,8 @@ function ctx_ps_security_action(){
                         //Send user to the new page
                         if(is_numeric($dbOpt['ad_page_auth_id'])){
                             $redir_auth_link = get_permalink($dbOpt['ad_page_auth_id']);
-                            wp_safe_redirect($redir_auth_link);
-                            die(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
+                            wp_safe_redirect($redir_auth_link,401);
+                            exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                         }else{
                             //Just in case theres a config problem...
                             wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
@@ -425,8 +425,9 @@ function ctx_ps_admin_head_js(){
         var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>';
         var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
         var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
+        var msgYearRequired = '<?php _e('You must specify an expiration year.','contexture-page-security') ?>';
     </script>
-    <script type="text/javascript" src="<?php echo plugins_url('/views/js/core-ajax.js',__FILE__) ?>"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('/views/js/core-ajax.dev.js',__FILE__) ?>"></script>
     <?php
 }
 
