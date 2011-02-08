@@ -308,7 +308,7 @@ class CTXPSC_Queries{
      * @param array $array_overrides An associative array containing key=>value pairs to override originals
      * @return string
      */
-    function set_options($arrayOverrides=false){
+    public static function set_options($arrayOverrides=false){
 
         //Set defaults
         $defaultOpts = array(
@@ -350,15 +350,51 @@ class CTXPSC_Queries{
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
+     * @param int $user_id Optional. If provided, will return the number of groups a specified user is a member of.
      * @return int The number of groups in the db
      */
-    function count_groups($user_id=null){
+    public static function count_groups($user_id=null){
         global $wpdb,$ctxpscdb;
         if(is_numeric($user_id) && !empty($user_id)){
             return $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM `'.$ctxpscdb->group_rels.'` WHERE grel_user_id = %s',$user_id));
         }
         return $wpdb->get_var('SELECT COUNT(*) FROM `'.$ctxpscdb->groups.'` WHERE group_system_id IS NULL');
     }
+
+
+    /**
+     * Count the number of pages that use this group for permissions
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $group_id The id of the group to count for pages.
+     * @return int The number of groups attached to this page.
+     */
+    public static function count_protected($group_id=null){
+        global $wpdb,$ctxpscdb;
+        if(is_numeric($group_id) && !empty($group_id)){
+            return $wpdb->get_var($wpdb->prepare('SELECT COUNT(DISTINCT(sec_protect_id)) FROM `'.$ctxpscdb->security.'` WHERE sec_access_id=%s',$group_id));
+        }
+        return $wpdb->get_var('SELECT COUNT(DISTINCT(sec_protect_id)) FROM `'.$ctxpscdb->security.'`');
+    }
+
+
+    /**
+     * Gets a count of the number of users currently in a group
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $group_id The group id to count users for
+     * @return int The number of users attached to the group
+     */
+    public static function count_members($group_id){
+        global $wpdb,$ctxpscdb;
+        if(is_numeric($group_id) && !empty($group_id)){
+            return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships WHERE grel_group_id = '{$group_id}'"));
+        }
+        return 0;
+    }
+
 
 }
 }
