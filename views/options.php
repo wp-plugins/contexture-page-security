@@ -49,7 +49,7 @@ if(empty($_POST['action'])){
     $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
 
     //Update the options array
-    $saveStatus = ctx_ps_set_options($newopts);
+    $saveStatus = CTXPSC_Queries::set_options($newopts);
 
     //If save was successful, show the message
     if(isset($saveStatus)){

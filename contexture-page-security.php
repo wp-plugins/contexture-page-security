@@ -91,50 +91,6 @@ add_action('admin_head', 'ctx_ps_append_contextual_help');
 
 
 /**
- * Handles creating or updating the options array
- *
- * @param array $array_overrides An associative array containing key=>value pairs to override originals
- * @return string
- */
-function ctx_ps_set_options($arrayOverrides=false){
-
-    //Set defaults
-    $defaultOpts = array(
-        "ad_msg_usepages"=>"false",
-        "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
-        "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
-        "ad_page_anon_id"=>"",
-        "ad_page_auth_id"=>"",
-        "ad_msg_usefilter_menus"=>"true",
-        "ad_msg_usefilter_rss"=>"true"
-    );
-
-    //Let's see if the options already exist...
-    $dbOpts = get_option('contexture_ps_options');
-
-    if(!$dbOpts){
-        //There's no options! Let's build them...
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        //Now add them to the db
-        return add_option('contexture_ps_options',$defaultOpts);
-    }else{
-        //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
-        $defaultOpts = array_merge($defaultOpts, $dbOpts);
-        //Now let's add our custom settings (if appropriate)
-        if($arrayOverrides!=false && is_array($arrayOverrides)){
-            //If we have some custom settings, use those
-            $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
-        }
-        return update_option('contexture_ps_options',$defaultOpts);
-    }
-
-}
-
-
-/**
  * Same as ctx_ps_security_filter, but modified for use as an action. Controls
  * page/post access for general users.
  *
@@ -460,55 +416,6 @@ function ctx_ps_admin_head_css(){
 }
 
 /**
- * Gets a count of the number of groups currently in the db
- *
- * @global wpdb $wpdb
- * @return int The number of groups in the db
- */
-function ctx_ps_count_groups($user_id=''){
-    global $wpdb;
-    if(is_numeric($user_id) && !empty($user_id)){
-        return $wpdb->get_var("
-            SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships
-            WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$user_id}'
-        ");
-    }
-    return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_system_id IS NULL"));
-}
-
-/**
- * Count the number of pages that use this group for permissions
- *
- * @global wpdb $wpdb
- * @param int $group_id The id of the group to count for pages.
- * @return int The number of groups attached to this page.
- */
-function ctx_ps_count_protected_pages($group_id=''){
-    global $wpdb;
-    if(is_numeric($group_id) && !empty($group_id)){
-        return $wpdb->get_var("SELECT COUNT(DISTINCT(sec_protect_id)) FROM `{$wpdb->prefix}ps_security` WHERE sec_access_id='{$group_id}'");
-    }
-    return $wpdb->get_var("SELECT COUNT(DISTINCT(sec_protect_id)) FROM `{$wpdb->prefix}ps_security`");
-}
-
-
-/**
- * Gets a count of the number of users currently in a group
- *
- * @global wpdb $wpdb
- * @param int $group_id The group id to count users for
- * @return int The number of users attached to the group
- */
-function ctx_ps_count_members($group_id){
-    global $wpdb;
-    if(is_numeric($group_id) && !empty($group_id)){
-        return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships WHERE grel_group_id = '{$group_id}'"));
-    }
-    return 0;
-}
-
-
-/**
  * Creates a new group
  *
  * @global wpdb $wpdb
@@ -641,7 +548,7 @@ function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=t
     $countusers = count_users();
 
     foreach($groups as $group){
-        $countmembers = (!isset($group->group_system_id)) ? ctx_ps_count_members($group->ID) : $countusers['total_users'];
+        $countmembers = (!isset($group->group_system_id)) ? CTXPSC_Queries::count_members($group->ID) : $countusers['total_users'];
 
         //Only create the actions if $showactions is true
         if($showactions){

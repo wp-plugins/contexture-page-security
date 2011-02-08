@@ -68,7 +68,7 @@ class CTXPSC_Queries{
         add_option("contexture_ps_db_version", "1.2");
 
         //Set plugin options (not db version)
-        ctx_ps_set_options();
+        CTXPSC_Queries::set_options();
 
         /********* START UPGRADE PATH < 1.1 ***********/
         $dbver = get_option("contexture_ps_db_version");
@@ -300,6 +300,51 @@ class CTXPSC_Queries{
         ));
         return ($count>0);
     }
+
+
+    /**
+     * Handles creating or updating the options array
+     *
+     * @param array $array_overrides An associative array containing key=>value pairs to override originals
+     * @return string
+     */
+    function set_options($arrayOverrides=false){
+
+        //Set defaults
+        $defaultOpts = array(
+            "ad_msg_usepages"=>"false",
+            "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
+            "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
+            "ad_page_anon_id"=>"",
+            "ad_page_auth_id"=>"",
+            "ad_msg_usefilter_menus"=>"true",
+            "ad_msg_usefilter_rss"=>"true"
+        );
+
+        //Let's see if the options already exist...
+        $dbOpts = get_option('contexture_ps_options');
+
+        if(!$dbOpts){
+            //There's no options! Let's build them...
+            if($arrayOverrides!=false && is_array($arrayOverrides)){
+                //If we have some custom settings, use those
+                $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+            }
+            //Now add them to the db
+            return add_option('contexture_ps_options',$defaultOpts);
+        }else{
+            //db options exist, so let's merge it with the defaults (just to be sure we have all the latest options
+            $defaultOpts = array_merge($defaultOpts, $dbOpts);
+            //Now let's add our custom settings (if appropriate)
+            if($arrayOverrides!=false && is_array($arrayOverrides)){
+                //If we have some custom settings, use those
+                $defaultOpts = array_merge($defaultOpts, $arrayOverrides);
+            }
+            return update_option('contexture_ps_options',$defaultOpts);
+        }
+
+    }
+
 
 }
 }

@@ -1,5 +1,9 @@
+/**
+ * This file handles the inline-editor behavior for user membership settings.
+ */
 (function($) {
     inlineEditMembership = {
+        //LOADS ALL INITIAL SETUP FUNCTIONALITY
         init : function(){
             //Open membership expiration editor
             $('a.editmembership').live('click',function(){ inlineEditMembership.edit(this); return false; });
@@ -33,6 +37,7 @@
             });
 
         },
+        //OPENS THE CURRENTLY CHOSEN EDITOR SCREEN
         edit : function(memberid){
             var rowData, editForm, expires=false;
 
@@ -60,6 +65,7 @@
             $('#user-'+memberid).hide();
 
         },
+        //SUBMIT MEMBERSHIP EDIT FOR SAVE
         save : function(myId){
             var myId, myEdit, rowData, newData, newDate='', hasExpire=0;
 
@@ -103,9 +109,20 @@
                 date:newDate
             },
             function(response){ response = $(response);
-                //If 1, update original tr, then revert
+                var showDate = 'Never',today = new Date();
+                //If success (code 1), update original tr, then revert
                 if(response.find('code').text() == '1'){
-                    $('#user-'+myId).find('.column-expires').text((hasExpire==1)?newData.mon+'-'+newData.day+'-'+newData.yr:'Never');
+                    //Choose what to show for expiration
+                    if(hasExpire==1){
+                        showDate = newData.mon+'-'+newData.day+'-'+newData.yr;
+                        //If the date just set is older than today, membership is expired
+                        if(new Date(showDate)<new Date()){
+                            showDate='Expired';
+                        }
+                    }
+
+                    $('#user-'+myId).find('.column-expires').text(showDate);
+                    //Load updated dates into saved row data
                     rowData.find('.jj').text(newData.day);
                     rowData.find('.mm').text(newData.mon);
                     rowData.find('.aa').text(newData.yr);
@@ -113,6 +130,7 @@
                     $('#user-'+myId).animate({'background-color':'#e0ffe3'},250,function(){
                         $(this).animate({'background-color':'#ffffff'},1000);
                     });
+                //If we get an error...
                 }else{
                     //Hide waiting anigif
                     $('.inline-edit-save .waiting').hide();
@@ -121,6 +139,7 @@
                 }
             },'xml');
         },
+        //CLOSE ALL OPEN EDITS AND REVERT/RESTORE CURRENT EDIT
         revert : function(){
             //Close any open edit and restore original row
             $('tr.inline-edit-row:visible').each(function(){
