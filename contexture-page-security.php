@@ -1024,15 +1024,7 @@ function ctx_ps_sidebar_security(){
 
         //Create an array of groups that are already attached to the page
         $currentGroups = array();
-        foreach($wpdb->get_results(
-                $wpdb->prepare(
-                    "SELECT * FROM {$wpdb->prefix}ps_security
-                        JOIN {$wpdb->prefix}ps_groups
-                            ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID
-                        WHERE sec_protect_id = '%s'",
-                        $_GET['post']
-                )
-            ) as $curGrp){
+        foreach(CTXPSC_Queries::page_groups($_GET['post']) as $curGrp){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
@@ -1246,6 +1238,6 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
 
 
 //Load theme functions
-require_once 'views/theme-functions.php';
+require_once 'controllers/theme-functions.php';
 
 ?>

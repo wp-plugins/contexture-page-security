@@ -380,21 +380,43 @@ class CTXPSC_Queries{
 
 
     /**
-     * Gets a count of the number of users currently in a group
+     * Gets a count of the number of users currently in a group, or the total number of users
+     * currently
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
      * @param int $group_id The group id to count users for
      * @return int The number of users attached to the group
      */
-    public static function count_members($group_id){
+    public static function count_members($group_id=null){
         global $wpdb,$ctxpscdb;
         if(is_numeric($group_id) && !empty($group_id)){
-            return $wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_group_relationships WHERE grel_group_id = '{$group_id}'"));
+            return $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM `'.$ctxpscdb->group_rels.'` WHERE grel_group_id = %s',$group_id));
         }
-        return 0;
+        return $wpdb->get_var('SELECT COUNT(DISTINCT(grel_user_id)) FROM `'.$ctxpscdb->group_rels.'`');
     }
 
+    /**
+     * Returns an array containing the groups attached to the specified page.
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param integer $post_id The post_id of the content to get groups for (can be any content type that uses posts table)
+     * @return integer
+     */
+    public static function page_groups($post_id){
+        global $wpdb,$ctxpscdb;
+        if(is_numeric($post_id) && !empty($post_id)){
+            return $wpdb->get_results($wpdb->prepare(
+                'SELECT * FROM `'.$ctxpscdb->security.'`
+                    JOIN `'.$ctxpscdb->groups.'`
+                        ON '.$ctxpscdb->security.'.sec_access_id = '.$ctxpscdb->groups.'.ID
+                    WHERE sec_protect_id = %s',
+                $post_id
+            ));
+        }
+        //If $post_id is improper, return false
+        return false;
+    }
 
 }
 }
