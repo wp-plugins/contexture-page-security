@@ -345,6 +345,20 @@ class CTXPSC_Queries{
 
     }
 
+    /**
+     * Gets a count of the number of groups currently in the db
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @return int The number of groups in the db
+     */
+    function count_groups($user_id=null){
+        global $wpdb,$ctxpscdb;
+        if(is_numeric($user_id) && !empty($user_id)){
+            return $wpdb->get_var($wpdb->prepare('SELECT COUNT(*) FROM `'.$ctxpscdb->group_rels.'` WHERE grel_user_id = %s',$user_id));
+        }
+        return $wpdb->get_var('SELECT COUNT(*) FROM `'.$ctxpscdb->groups.'` WHERE group_system_id IS NULL');
+    }
 
 }
 }
