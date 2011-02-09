@@ -427,7 +427,7 @@ class CTXPSC_Queries{
      * @param integer $post_id The post_id of the content to get groups for (can be any content type that uses posts table)
      * @return integer
      */
-    public static function page_groups($post_id){
+    public static function get_page_groups($post_id){
         global $wpdb,$ctxpscdb;
         if(is_numeric($post_id) && !empty($post_id)){
             return $wpdb->get_results($wpdb->prepare(
@@ -439,6 +439,29 @@ class CTXPSC_Queries{
             ));
         }
         //If $post_id is improper, return false
+        return false;
+    }
+
+    /**
+     * Returns a list of pages that are attached to the specified group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param type $group_id
+     * @return type
+     */
+    public static function get_group_pages($group_id){
+        global $wpdb,$ctxpscdb;
+        if(is_numeric($group_id) && !empty($group_id)){
+            return $wpdb->get_results($wpdb->prepare(
+                'SELECT * FROM `'.$ctxpscdb->security.'`
+                    JOIN `'.$wpdb->posts.'`
+                        ON `sec_protect_id` = `'.$wpdb->posts.'`.ID
+                    WHERE sec_access_id=%s',
+                $group_id
+            ));
+        }
+        //If $group_id is improper, return false
         return false;
     }
 
@@ -495,6 +518,107 @@ class CTXPSC_Queries{
         ));
 
         return ($check>0);
+    }
+
+    /**
+     * Finds the groups attached to the specified post/page and returns them as
+     * an array.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     */
+    public static function get_groups($post_id=null){
+        global $wpdb,$ctxpscdb;
+
+        //Return an object/array of groups attached to the current page
+        if(is_numeric($post_id) && !empty($post_id)){
+            return $wpdb->get_results($wpdb->prepare(
+                'SELECT * FROM `'.$ctxpscdb->security.'`
+                    JOIN `'.$ctxpscdb->groups.'`
+                        ON `'.$ctxpscdb->security.'`.sec_access_id = `'.$ctxpscdb->groups.'`.ID
+                    WHERE sec_protect_id = %s',
+                $post_id
+            ));
+        //Return ALL groups, orderedby system first, then title (alphabetically)
+        }else{
+            return $wpdb->get_results('SELECT * FROM `'.$ctxpscdb->groups.'` ORDER BY `group_system_id` DESC, `group_title` ASC');
+        }
+    }
+
+    /**
+     * Gets the id of the specified posts parent.
+     *
+     * @global wpdb $wpdb
+     * @param type $post_id
+     * @return integer The id of the specified post's parent
+     */
+    public static function get_parent_id($post_id){
+        global $wpdb,$ctxpscdb;
+        return $wpdb->get_var($wpdb->prepare('SELECT post_parent FROM `'.$wpdb->posts.'` WHERE `ID` = %s',$post_id));
+    }
+
+    /**
+     * Returns an array containing the ids of all explicitly protected pages
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @return array Returns an array containing post ids
+     */
+    public static function get_protected_posts(){
+        global $wpdb,$ctxpscdb;
+        return $wpdb->get_results('SELECT DISTINCT(post_id) FROM `'.$wpdb->postmeta.'` WHERE `meta_key` = "ctx_ps_security"',ARRAY_N);
+    }
+
+    /**
+     * Gets an array with all the groups that a user belongs to.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     *
+     * @param int $user_id The user id of the user to check
+     * @return array Returns an array with all the groups that the specified user belongs to.
+     */
+    public static function get_user_groups($user_id){
+        global $wpdb, $ctxpscdb;
+
+        /**Empty array to be used for building output*/
+        $array = array();
+        /**Todays date for MySQL comparison*/
+        $today = date('Y-m-d');
+        /**Assume user is multi-site user*/
+        $multisitemember = true;
+
+        $groups = $wpdb->get_results($wpdb->prepare(
+            'SELECT * FROM `'.$ctxpscdb->group_rels.'`
+            JOIN `'.$ctxpscdb->groups.'`
+                ON `'.$ctxpscdb->group_rels.'`.grel_group_id = `'.$ctxpscdb->groups.'`.ID
+            WHERE `'.$ctxpscdb->group_rels.'`.grel_user_id = %s
+            AND grel_expires IS NULL OR grel_expires > %s',
+                $user_id,
+                $today
+        ));
+
+        //We only need an ID and a name as a key/value...
+        foreach($groups as $group){
+            $array += array($group->ID => $group->group_title);
+        }
+
+
+        //If multisite is enabled we can better support it...
+        if(function_exists('is_user_member_of_blog')){
+            $multisitemember = is_user_member_of_blog($user_id);
+        }
+
+        /*** ADD SMART GROUPS (AKA SYSTEM GROUPS ***/
+        //Registered Users Smart Group
+        if($user_id != 0 && $multisitemember){
+            //Get the ID for CPS01
+            $newArray = ctx_ps_get_sysgroup('CPS01');
+            //Add CPS01 to the current users permissions array
+            $array += array($newArray->ID => $newArray->group_title);
+        }
+
+        return $array;
     }
 
 }

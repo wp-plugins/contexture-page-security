@@ -101,7 +101,7 @@ function ctx_ps_security_action(){
 
     if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
         /**Groups that this user is a member of*/
-        $useraccess = ctx_ps_get_usergroups($current_user->ID);
+        $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
         /**Groups required to access this page*/
         $pagereqs = ctx_ps_getprotection($post->ID);
 
@@ -186,7 +186,7 @@ function ctx_ps_security_filter_blog($content){
                 //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
 
                 /**Groups that this user is a member of*/
-                $useraccess = ctx_ps_get_usergroups($current_user->ID);
+                $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
                 /**Groups required to access this page*/
                 $pagereqs = ctx_ps_getprotection($post->value->ID);
 
@@ -231,7 +231,7 @@ function ctx_ps_security_filter_menu($content){
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
-            $useraccess = ctx_ps_get_usergroups($current_user->ID);
+            $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
             //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->ID);
 
@@ -285,7 +285,7 @@ function ctx_ps_security_filter_menu_custom($content){
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
-            $useraccess = ctx_ps_get_usergroups($current_user->ID);
+            $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
             //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->object_id);
 
@@ -455,7 +455,7 @@ function ctx_ps_create_menus(){
  * This function takes an array of user groups and an array of page-required groups
  * and determines if the user should be allowed to access the specified content.
  *
- * @param array $UserGroupsArray The array returned by ctx_ps_get_usergroups()
+ * @param array $UserGroupsArray The array returned by CTXPSC_Queries::get_user_groups()
  * @param array $PageSecurityArray The array returned by ctx_ps_get_protection()
  * @return bool Returns true if user has necessary permissions to access the page, false if not.
  */
@@ -733,7 +733,7 @@ function ctx_ps_display_page_list($group_id){
  * @param int $userid The user id of the user to check
  * @return array Returns an array with all the groups that the specified user belongs to.
  */
-function ctx_ps_get_usergroups($userid){
+function CTXPSC_Queries::get_user_groups($userid){
     global $wpdb, $current_user;
     $array = array();
     $today = date('Y-m-d');
@@ -1002,8 +1002,9 @@ function ctx_ps_localization(){
 function ctx_ps_sidebar_security(){
     global $wpdb, $post;
 
+    require_once 'views/sidebar-security.php';
 
-        //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
+    //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
     if(!empty($_GET['post']) && intval($_GET['post']) == $_GET['post']){
 
         //Create an array of groups that are already attached to the page
@@ -1051,7 +1052,7 @@ function ctx_ps_sidebar_security(){
             echo '      <select id="groups-available" name="groups-available">';
             echo '<option value="0">-- '.__('Select','contexture-page-security').' -- </option>';
             //Loop through all groups in the db to populate the drop-down list
-            foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_groups ORDER BY `group_system_id` DESC, `group_title` ASC") as $group){
+            foreach(CTXPSC_Queries::get_groups() as $group){
                 //Generate the option HTML, hiding it if it's already in our $currentGroups array
                 echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
             }
@@ -1100,8 +1101,6 @@ function ctx_ps_sidebar_security(){
  *
  * @global wpdb $wpdb
  * @global array $post
- * @attr public
- * @attr label
  */
 function ctx_ps_tag_groups_attached($atts){
     global $wpdb, $post;
@@ -1115,7 +1114,7 @@ function ctx_ps_tag_groups_attached($atts){
 
     //Create an array of groups that are already attached to the page
     $currentGroups = '';
-    foreach($wpdb->get_results("SELECT * FROM {$wpdb->prefix}ps_security JOIN {$wpdb->prefix}ps_groups ON {$wpdb->prefix}ps_security.sec_access_id = {$wpdb->prefix}ps_groups.ID WHERE sec_protect_id = '{$post->ID}'") as $curGrp){
+    foreach(CTXPSC_Queries::get_groups($post->ID) as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
     $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.','contexture-page-security').'</em></li>' : $currentGroups;
