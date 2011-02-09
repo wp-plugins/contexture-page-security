@@ -562,11 +562,29 @@ class CTXPSC_Queries{
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
-     * @return array Returns an array containing post ids
+     * @return mixed Returns an array containing post ids, or a CSV if $return_type is set to 'csv'
      */
-    public static function get_protected_posts(){
+    public static function get_protected_posts($return_type='array'){
         global $wpdb,$ctxpscdb;
-        return $wpdb->get_results('SELECT DISTINCT(post_id) FROM `'.$wpdb->postmeta.'` WHERE `meta_key` = "ctx_ps_security"',ARRAY_N);
+        $results =  $wpdb->get_results('SELECT DISTINCT(post_id) FROM `'.$wpdb->postmeta.'` WHERE `meta_key` = "ctx_ps_security"',ARRAY_N);
+
+        //IF WE NEED A STRING (CSV) DO THIS....
+        if($return_type==='string'){
+            $string = '';
+            foreach($results as $page){
+                $string .= $page[0].',';
+            }
+            //get rid of the last comma before returning
+            return preg_replace('/,$/','',$string);
+        //HANDLE DEFAULT (ARRAY)
+        }
+
+        //We get back an unnecessary multidimensional array, so we will collapse this into a simple array
+        $array = array();
+        foreach($results as $page){
+            $array[] = $page[0];
+        }
+        return $array;
     }
 
     /**

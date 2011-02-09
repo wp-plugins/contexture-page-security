@@ -59,7 +59,7 @@ if(empty($_POST['action'])){
 
 //Get AD messages from options
 $ADMsg = get_option('contexture_ps_options');
-$ProtPages = ctx_ps_get_protected_pages('string');
+$ProtPages = CTXPSC_Queries::get_protected_posts('string');
 
 //Generate ddls with page heirarchy
 $pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --','contexture-page-security'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0, 'exclude'=>$ProtPages));
