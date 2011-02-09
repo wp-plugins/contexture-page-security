@@ -521,29 +521,28 @@ class CTXPSC_Queries{
     }
 
     /**
-     * Finds the groups attached to the specified post/page and returns them as
-     * an array.
+     * Recursively checks security for this page/post and it's ancestors. Returns true
+     * if any of them are protected or false if none of them are protected.
      *
      * @global wpdb $wpdb
-     * @global CTXPSC_Tables $ctxpscdb
+     *
+     * @return bool If this page or it's ancestors has the "protected page" flag
      */
-    public static function get_groups($post_id=null){
-        global $wpdb,$ctxpscdb;
-
-        //Return an object/array of groups attached to the current page
-        if(is_numeric($post_id) && !empty($post_id)){
-            return $wpdb->get_results($wpdb->prepare(
-                'SELECT * FROM `'.$ctxpscdb->security.'`
-                    JOIN `'.$ctxpscdb->groups.'`
-                        ON `'.$ctxpscdb->security.'`.sec_access_id = `'.$ctxpscdb->groups.'`.ID
-                    WHERE sec_protect_id = %s',
-                $post_id
-            ));
-        //Return ALL groups, orderedby system first, then title (alphabetically)
-        }else{
-            return $wpdb->get_results('SELECT * FROM `'.$ctxpscdb->groups.'` ORDER BY `group_system_id` DESC, `group_title` ASC');
+    public static function check_section_protection($post_id){
+        global $wpdb;
+        if(get_post_meta($post_id,'ctx_ps_security')){
+            return true;
+        } else {
+            $parent_id = get_post($post_id);//$wpdb->get_var("SELECT post_parent FROM $wpdb->posts WHERE `ID` = $post_id");
+            $parent_id = $parent_id->post_parent;
+            if ($parent_id != 0)
+                return self::check_section_protection($parent_id);
+            else
+                return false;
         }
     }
+
+
 
     /**
      * Gets the id of the specified posts parent.
@@ -588,13 +587,15 @@ class CTXPSC_Queries{
     }
 
     /**
-     * Gets an array with all the groups that a user belongs to.
+     * Returns an array with all the groups for which a user has a current, active
+     * membership. This takes into account system groups and membership expiration
+     * dates.
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
      *
      * @param int $user_id The user id of the user to check
-     * @return array Returns an array with all the groups that the specified user belongs to.
+     * @return array Returns an array with all the groups that the specified user is currently a member of.
      */
     public static function get_user_groups($user_id){
         global $wpdb, $ctxpscdb;
@@ -637,6 +638,54 @@ class CTXPSC_Queries{
         }
 
         return $array;
+    }
+
+    /**
+     * 
+     * @param type $user_id
+     * @return type
+     */
+    public static function get_groups($user_id=null){
+        global $wpdb,$ctxpscdb;
+        //If $user_id is any kind of empty, get a list of ALL groups
+        if(empty($user_id)){
+            return $wpdb->get_results('SELECT * FROM `'.$ctxpscdb->groups.'` ORDER BY `group_system_id` DESC, `group_title` ASC');
+        }
+
+        //Otherwise, let's only fetch the ones relevant to the specified user
+        return $wpdb->get_results($wpdb->prepare(
+            'SELECT * FROM `'.$ctxpscdb->group_rels.'`
+            JOIN `'.$ctxpscdb->groups.'`
+                ON grel_group_id = `'.$ctxpscdb->groups.'`.ID
+            WHERE grel_user_id = %s
+            ORDER BY `group_system_id` DESC, `group_title` ASC',
+                $user_id
+        ));
+    }
+
+    /**
+     * Finds the groups attached to the specified post/page and returns them as
+     * an array.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     */
+    public static function get_post_groups($post_id=null){
+        global $wpdb,$ctxpscdb;
+
+        //Return an object/array of groups attached to the current page
+        if(is_numeric($post_id) && !empty($post_id)){
+            return $wpdb->get_results($wpdb->prepare(
+                'SELECT * FROM `'.$ctxpscdb->security.'`
+                    JOIN `'.$ctxpscdb->groups.'`
+                        ON `'.$ctxpscdb->security.'`.sec_access_id = `'.$ctxpscdb->groups.'`.ID
+                    WHERE sec_protect_id = %s',
+                $post_id
+            ));
+        //Return ALL groups, orderedby system first, then title (alphabetically)
+        }else{
+            return self::get_groups();
+        }
     }
 
 }

@@ -437,7 +437,7 @@ function ctx_ps_create_group($name, $description){
 
 
 /**
- * Adds the "Groups" functionality to the admin section under "Users"
+ * Adds various menu items to WordPress admin
  */
 function ctx_ps_create_menus(){
     //Add Groups option to the WP admin menu under Users (these also return hook names, which are needed for contextual help)
@@ -510,20 +510,7 @@ function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=t
 
     $linkBack = admin_url('users.php');
 
-    if($memberid==''){
-        $groups = $wpdb->get_results("
-            SELECT * FROM `{$wpdb->prefix}ps_groups`
-            ORDER BY `{$wpdb->prefix}ps_groups`.`group_system_id` DESC, `{$wpdb->prefix}ps_groups`.`group_title` ASC
-        ");
-    }else{
-        $groups = $wpdb->get_results("
-            SELECT * FROM `{$wpdb->prefix}ps_group_relationships`
-            JOIN `{$wpdb->prefix}ps_groups`
-                ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
-            WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '{$memberid}'
-            ORDER BY `{$wpdb->prefix}ps_groups`.`group_system_id` DESC, `{$wpdb->prefix}ps_groups`.`group_title` ASC
-        ");
-    }
+    $groups = CTXPSC_Queries::get_groups($memberid);
 
     $html = '';
     $htmlactions = '';
@@ -757,7 +744,7 @@ function ctx_ps_get_sysgroup($system_id){
  */
 function ctx_ps_getprotection($postid){
     //If this branch isn't protected, just stop now and save all that processing power
-    if (!ctx_ps_isprotected_section($postid)){
+    if (!CTXPSC_Queries::get_section_protection($postid)){
         return false;
     }
 
@@ -890,27 +877,6 @@ function ctx_ps_isprotected($postid){
 
 
 /**
- * Recursively checks security for this page/post and it's ancestors. Returns true
- * if any of them are protected or false if none of them are protected.
- *
- * @global wpdb $wpdb
- *
- * @return bool If this page or it's ancestors has the "protected page" flag
- */
-function ctx_ps_isprotected_section($postid){
-    global $wpdb;
-    if(get_post_meta($postid,'ctx_ps_security')){
-        return true;
-    } else {
-        $parentid = $wpdb->get_var("SELECT post_parent FROM $wpdb->posts WHERE `ID` = $postid");
-        if ($parentid != 0)
-            return ctx_ps_isprotected_section($parentid);
-        else
-            return false;
-    }
-}
-
-/**
  * Loads localized language files, if available
  */
 function ctx_ps_localization(){
@@ -927,8 +893,6 @@ function ctx_ps_localization(){
  */
 function ctx_ps_sidebar_security(){
     global $wpdb, $post;
-
-    require_once 'views/sidebar-security.php';
 
     //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
     if(!empty($_GET['post']) && intval($_GET['post']) == $_GET['post']){
@@ -1040,7 +1004,7 @@ function ctx_ps_tag_groups_attached($atts){
 
     //Create an array of groups that are already attached to the page
     $currentGroups = '';
-    foreach(CTXPSC_Queries::get_groups($post->ID) as $curGrp){
+    foreach(CTXPSC_Queries::get_post_groups($post->ID) as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
     $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.','contexture-page-security').'</em></li>' : $currentGroups;
@@ -1111,7 +1075,7 @@ function ctx_ps_tag_groups_required($atts){
 
 
 /**
- * Updated the admin pages/posts columns with an icon if a page is protected. This adds
+ * Update the admin pages/posts columns with an icon if a page is protected. This adds
  * a "Protected" icon (lock) immediately after the "Comments" icon (word bubble).
  */
 function ctx_ps_usability_showprotection($columns){
@@ -1140,7 +1104,7 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
         if(ctx_ps_isprotected($pageid))
             echo '<img alt="Protected" title="Protected" src="'.plugins_url('images/protected-inline.png',__FILE__).'" />';
         //If this page isnt protected, but an ancestor is, return a lighter icon
-        else if(ctx_ps_isprotected_section($pageid))
+        else if(CTXPSC_Queries::get_section_protection($pageid))
             echo '<img alt="Protected (inherited)" title="Inheriting an ancestors protection" src="'.plugins_url('images/protected-inline-descendant.png',__FILE__).'" />';
     }
 }

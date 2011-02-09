@@ -177,7 +177,7 @@ function psc_has_protection($post_id=null,$dontcheck=false){
         $parent_id = $wpdb->get_var(sprintf('SELECT post_parent FROM %s WHERE `ID` = %s',$wpdb->posts,$post_id));
         //If we have a parent, repeat this check with the parent.
         if ($parent_id != 0)
-            return ctx_ps_isprotected_section($parent_id);
+            return CTXPSC_Queries::get_section_protection($parent_id);
         else
             return false;
     }
