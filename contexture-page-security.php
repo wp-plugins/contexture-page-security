@@ -24,12 +24,8 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-//Get our globals out of the way
-define('CTXPSCDIR',basename(dirname(__FILE__)));
-global $wpdb, $ctxpscdb;
-
-
 /**************************** LOAD CORE FILES *********************************/
+require_once 'core/core.php';
 require_once 'core/model.php';
 require_once 'core/model_queries.php';
 require_once 'controllers/ajax.php';
@@ -426,28 +422,16 @@ function ctx_ps_admin_head_css(){
 function ctx_ps_create_group($name, $description){
     global $wpdb;
 
-    if($wpdb->get_var($wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->prefix}ps_groups WHERE group_title = '%s'",$name)) == '0'){
+    if(!CTXPSC_Queries::check_group_exists($name)){
         $current_user = wp_get_current_user();
-        $sql_addgroup = $wpdb->prepare("
-            INSERT INTO {$wpdb->prefix}ps_groups
-            (`group_title`,
-            `group_description`,
-            `group_creator`)
-            VALUES
-            ('%s',
-            '%s',
-            '%s')
-        ",
-        $name,
-        $description,
-        $current_user->ID);
-        if($wpdb->query($sql_addgroup) !== FALSE){
-            return '<div id="message" class="updated"><p>New group created</p></div>';
+
+        if(CTXPSC_Queries::add_group($name, $description, $current_user->ID) !== FALSE){
+            return '<div id="message" class="updated"><p>'.__('New group created','contexture-page-security').'</p></div>';
         }else{
-            return '<div id="message" class="error below-h2"><p>Unable to create group. There was an unspecified system error.</p></div>';
+            return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. There was an unspecified system error.','contexture-page-security').'</p></div>';
         }
     } else {
-        return '<div id="message" class="error below-h2"><p>Unable to create group. A group with that name already exists.</p></div>';
+        return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. A group with that name already exists.','contexture-page-security').'</p></div>';
     }
 }
 

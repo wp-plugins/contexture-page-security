@@ -99,7 +99,6 @@ class CTXPSC_Queries{
         }
     }
 
-
      /**
      * Removes custom tables and options from the WP database.
      *
@@ -124,6 +123,8 @@ class CTXPSC_Queries{
         delete_option("contexture_ps_db_version");
         delete_option("contexture_ps_options");
     }
+
+
 
     /**
      * Inserts a new security setting into the db.
@@ -283,13 +284,26 @@ class CTXPSC_Queries{
     }
 
     /**
+     * Gets the group-relationship id for a user's group membership.
+     *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
+     * @return mixed Returns the grel_id (int) if found, false otherwise.
      */
-    public static function get_grel(){
+    public static function get_grel($user_id,$group_id){
         global $wpdb,$ctxpscdb;
 
-        $wpdb->get_var($wpdb->prepare('',''), 0, 0);
+        $return = $wpdb->get_var($wpdb->prepare(
+                'SELECT `ID` FROM `'.$ctxpscdb->group_rels.'`
+                    WHERE grel_user_id=%s
+                    AND grel_group_id=%s LIMIT 1',
+                $user_id,
+                $group_id),
+            0,0
+        );
+
+        //Return false if above is empty (0 is not a valid starting id in MySQL), else return $result
+        return (empty($return)) ? false : $return;
     }
 
     /**
@@ -426,6 +440,61 @@ class CTXPSC_Queries{
         }
         //If $post_id is improper, return false
         return false;
+    }
+
+    /**
+     * Adds a group to the database.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param string $group_title A short title for the group.
+     * @param string $group_description A description of the group.
+     * @param int $creator_id The user_id for the person creating this group (can use 0 for none)
+     * @return mixed Returns the number of rows inserted (int) or false (bool) on error.
+     */
+    public static function add_group($group_title,$group_description,$creator_id='0'){
+        global $wpdb,$ctxpscdb;
+        //Get rid of extra whitespace
+        $group_title = trim($group_title);
+        //DB column requires names < 40 char
+        $group_title = str_truncate($group_title, 40);
+
+        //Only insert the group if the name isn't taken
+        if(!self::check_group_exists($group_title)){
+            return $wpdb->insert($ctxpscdb->groups, array(
+                'group_title'=>$group_title,
+                'group_description'=>$group_description,
+                'group_creator'=>$creator_id
+            ));
+        }
+        return 0;
+    }
+
+    /**
+     * Checks if a group with the provided name already exists. This is used to validate
+     * in self::create_group() to ensure duplicate group names don't crop up.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param string $group_name
+     * @return boolean Returns true if the group already exists, false if not.
+     */
+    public static function check_group_exists($group_name){
+        global $wpdb,$ctxpscdb;
+
+        //Get rid of extra whitespace
+        $group_title = trim($group_title);
+        //DB column requires names < 40 char
+        $group_name = str_truncate($group_name, 40);
+
+        //Check for a match
+        $check = $wpdb->get_var($wpdb->prepare(
+                'SELECT COUNT(*) FROM `'.$ctxpscdb->groups.'`
+                    WHERE group_title = %s',
+                $group_name
+        ));
+
+        return ($check>0);
     }
 
 }
