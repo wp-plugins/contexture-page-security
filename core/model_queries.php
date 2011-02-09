@@ -283,6 +283,16 @@ class CTXPSC_Queries{
     }
 
     /**
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     */
+    public static function get_grel(){
+        global $wpdb,$ctxpscdb;
+
+        $wpdb->get_var($wpdb->prepare('',''), 0, 0);
+    }
+
+    /**
      * Removes a user from a group.
      *
      * @global wpdb $wpdb
