@@ -577,26 +577,13 @@ function ctx_ps_generate_usergroupslist(){
  *
  * @global wpdb $wpdb
  *
- * @param int $GroupID The id of the group we need a member list for.
+ * @param int $group_id The id of the group we need a member list for.
  * @return string Html to go inside tbody.
  */
-function ctx_ps_display_member_list($GroupID){
+function ctx_ps_display_member_list($group_id){
     global $wpdb;
 
-    $sqlGetMembers = $wpdb->prepare("
-        SELECT
-            {$wpdb->users}.ID AS ID,
-            {$wpdb->prefix}ps_group_relationships.id AS grel_id,
-            {$wpdb->users}.user_login,
-            {$wpdb->users}.user_email,
-            {$wpdb->prefix}ps_group_relationships.grel_expires
-        FROM `{$wpdb->prefix}ps_group_relationships`
-        JOIN `{$wpdb->users}`
-            ON {$wpdb->prefix}ps_group_relationships.grel_user_id = {$wpdb->users}.ID
-        WHERE grel_group_id = '%s'",
-    $GroupID);
-
-    $members = $wpdb->get_results($sqlGetMembers);
+    $members = CTXPSC_Queries::get_group_members($group_id);
 
     $html = '';
     $countmembers = '';
@@ -669,9 +656,10 @@ function ctx_ps_display_member_list($GroupID){
 function ctx_ps_display_page_list($group_id){
     global $wpdb;
 
-    $sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `sec_access_id`=\'%3$s\'', $wpdb->prefix.'ps_security', $wpdb->posts, $group_id);
+    //$sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `sec_access_id`=\'%3$s\'', $wpdb->prefix.'ps_security', $wpdb->posts, $group_id);
 
-    $pagelist = $wpdb->get_results($sql);
+    //$pagelist = $wpdb->get_results($sql);
+    $pagelist = CTXPSC_Queries::get_group_pages($group_id);
 
     $html = '';
     $countpages = '';

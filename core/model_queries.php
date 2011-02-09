@@ -641,9 +641,13 @@ class CTXPSC_Queries{
     }
 
     /**
-     * 
-     * @param type $user_id
-     * @return type
+     * Returns a list of groups. If $user_id is provided, the list only includes
+     * groups that the specified user to attached to.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $user_id
+     * @return array
      */
     public static function get_groups($user_id=null){
         global $wpdb,$ctxpscdb;
@@ -669,6 +673,7 @@ class CTXPSC_Queries{
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpscdb
+     * @return array An array of group & security data attached to specified post
      */
     public static function get_post_groups($post_id=null){
         global $wpdb,$ctxpscdb;
@@ -682,10 +687,36 @@ class CTXPSC_Queries{
                     WHERE sec_protect_id = %s',
                 $post_id
             ));
-        //Return ALL groups, orderedby system first, then title (alphabetically)
-        }else{
-            return self::get_groups();
         }
+
+        //Return ALL groups
+        return self::get_groups();
+    }
+
+    /**
+     * This gets an array of all the users attached to a specified group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $group_id The ID of the group to get users for.
+     * @return array
+     */
+    public static function get_group_members($group_id){
+        global $wpdb,$ctxpscdb;
+
+        return $wpdb->get_results($wpdb->prepare(
+            'SELECT
+                `'.$wpdb->users.'`.ID AS ID,
+                `'.$ctxpscdb->group_rels.'`.ID AS grel_id,
+                `'.$wpdb->users.'`.user_login,
+                `'.$wpdb->users.'`.user_email,
+                `'.$ctxpscdb->group_rels.'`.grel_expires
+            FROM `'.$ctxpscdb->group_rels.'`
+            JOIN `'.$wpdb->users.'`
+                ON `'.$ctxpscdb->group_rels.'`.grel_user_id = `'.$wpdb->users.'`.ID
+            WHERE grel_group_id = %s',
+            $group_id
+        ));
     }
 
 }
