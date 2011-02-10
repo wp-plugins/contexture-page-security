@@ -1,12 +1,12 @@
 <?php
 
-if ( ! current_user_can( 'manage_options' ) )
+if ( ! current_user_can( 'delete_users' ) ){
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
+}
 
-$sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $sqlGetGroupPageCount = $wpdb->prepare("SELECT COUNT(*) FROM `{$wpdb->prefix}ps_security` WHERE `sec_access_id` = '%s' AND `sec_access_type` = 'group'",$_GET['groupid']);
 
-$groupInfo = $wpdb->get_row($sqlGetGroupInfo);
+$groupInfo = CTXPS_Queries::get_group_info($_GET['groupid']);
 $groupPageCount = $wpdb->get_var($sqlGetGroupPageCount);
 
 $actionmessage = '';

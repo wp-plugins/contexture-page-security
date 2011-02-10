@@ -125,7 +125,6 @@ class CTXPS_Queries{
     }
 
 
-
     /**
      * Inserts a new security setting into the db.
      *
@@ -638,6 +637,23 @@ class CTXPS_Queries{
         }
 
         return $array;
+    }
+
+
+    /**
+     * Gets all the information about a single group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param int $group_id The id of a group.
+     * @return mixed Returns an array, or false if $group_id is invalid.
+     */
+    public static function get_group_info($group_id){
+        global $wpdb,$ctxpsdb;
+        if(is_numeric($group_id) && !empty($group_id)){
+            return $wpdb->get_row($wpdb->prepare('SELECT * FROM `'.$ctxpsdb->groups.'` WHERE `ID` = %s',$group_id));
+        }
+        return false;
     }
 
     /**
