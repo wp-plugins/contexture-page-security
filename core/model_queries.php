@@ -632,7 +632,7 @@ class CTXPSC_Queries{
         //Registered Users Smart Group
         if($user_id != 0 && $multisitemember){
             //Get the ID for CPS01
-            $newArray = ctx_ps_get_sysgroup('CPS01');
+            $newArray = CTXPSC_Queries::get_system_group('CPS01');
             //Add CPS01 to the current users permissions array
             $array += array($newArray->ID => $newArray->group_title);
         }
@@ -718,6 +718,30 @@ class CTXPSC_Queries{
             $group_id
         ));
     }
+
+
+    /**
+     * Get's a system group (like Registered Users) by system id. The system id
+     * is usually CTX##.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpscdb
+     * @param int $group_system_id The ID of the group to get users for.
+     * @return array
+     */
+    public static function get_system_group($group_system_id){
+        global $wpdb,$ctxpscdb;
+
+        $array = $wpdb->get_row($ctxpscdb->prepare(
+            'SELECT * FROM `'.$ctxpscdb->groups.'`
+            WHERE group_system_id = %s
+            LIMIT 1',
+            $group_system_id
+        ));
+        return $array;
+    }
+
+
 
 }
 }

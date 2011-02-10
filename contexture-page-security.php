@@ -698,26 +698,6 @@ function ctx_ps_display_page_list($group_id){
     return $html;//'<td colspan="2">There are pages attached, but this feature is not yet working.</td>';
 }
 
-
-/**
- * Gets database record for the specified system group
- *
- * @global wpdb $wpdb
- *
- * @param string $system_id The group_system_id for the smart group to select (ie "CPS01")
- * @return object Returns $wpdb object for the selected system group
- */
-function ctx_ps_get_sysgroup($system_id){
-    global $wpdb;
-    $array = $wpdb->get_results("
-        SELECT * FROM `{$wpdb->prefix}ps_groups`
-        WHERE group_system_id = '{$system_id}'
-        LIMIT 1
-    ");
-    return $array[0];
-}
-
-
 /**
  * This function will check the security for the specified page and all parent pages.
  * If security exists, a multi-dimensional array will be returned following the format

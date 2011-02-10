@@ -140,7 +140,7 @@ function psc_get_groups($user_id=null){
     //Registered Users Smart Group
     if($current_user->ID != 0 && $multisitemember){
         //Get the ID for CPS01 (added in 1.1, so cant assume 1)
-        $newArray = ctx_ps_get_sysgroup('CPS01');
+        $newArray = CTXPSC_Queries::get_system_group('CPS01');
         //Add CPS01 to the current users permissions array
         $array += array($newArray->ID => $newArray->group_title);
     }
