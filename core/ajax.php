@@ -25,16 +25,16 @@ class CTXAjax{
 }
 }
 
-class CTXPSAjax extends CTXAjax {
+class CTXPS_Ajax extends CTXAjax {
 
     /**
      * Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
      * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
      * @global wpdb $wpdb
-     * @global CTXPSC_Tables $ctxpscdb
+     * @global CTXPSC_Tables $ctxpsdb
      */
     public static function add_group_to_page(){
-        global $wpdb, $ctxpscdb;
+        global $wpdb, $ctxpsdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
         if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
@@ -207,7 +207,7 @@ class CTXPSAjax extends CTXAjax {
             //If user isn't authorized
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
-    
+
         $response = array();
         switch($_GET['setting']){
             case 'on':

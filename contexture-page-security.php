@@ -25,11 +25,12 @@ License: GPL2
 */
 
 /***************************** SET GLOBALS ************************************/
-define('CTXPSCDIR',basename(dirname(__FILE__)));
-global $wpdb, $ctxpscdb;
+define('CTXPSPATH',dirname(__FILE__));
+define('CTXPSDIR',basename(CTXPSPATH));
+global $wpdb, $ctxpsdb;
 
 /**************************** LOAD CORE FILES *********************************/
-require_once 'core/model.php';          //Model instance ($ctxpscdb)
+require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
 require_once 'core/ajax.php';           //AJAX-specific methods
@@ -55,14 +56,14 @@ add_action('admin_init', 'ctx_ps_admin_init');
 add_action('init','ctx_ps_localization');
 
 //Handle Ajax for Edit Page/Post page
-add_action('wp_ajax_ctx_ps_add2page','CTXPSAjax::add_group_to_page');
-add_action('wp_ajax_ctx_ps_removefrompage','CTXPSAjax::remove_group_from_page');
-add_action('wp_ajax_ctx_ps_security_update','CTXPSAjax::update_security');
+add_action('wp_ajax_ctx_ps_add2page','CTXPS_Ajax::add_group_to_page');
+add_action('wp_ajax_ctx_ps_removefrompage','CTXPS_Ajax::remove_group_from_page');
+add_action('wp_ajax_ctx_ps_security_update','CTXPS_Ajax::update_security');
 
 //Handle Ajax for Edit User page
-add_action('wp_ajax_ctx_ps_add2user','CTXPSAjax::add_group_to_user');
-add_action('wp_ajax_ctx_ps_removefromuser','CTXPSAjax::remove_group_from_user');
-add_action('wp_ajax_ctx_ps_updatemember','CTXPSAjax::update_membership');
+add_action('wp_ajax_ctx_ps_add2user','CTXPS_Ajax::add_group_to_user');
+add_action('wp_ajax_ctx_ps_removefromuser','CTXPS_Ajax::remove_group_from_user');
+add_action('wp_ajax_ctx_ps_updatemember','CTXPS_Ajax::update_membership');
 
 //Add basic security to all public "static" pages and posts [highest priority]
 add_action('wp','ctx_ps_security_action',1);
@@ -446,12 +447,12 @@ function ctx_ps_create_group($name, $description){
  */
 function ctx_ps_create_menus(){
     //Add Groups option to the WP admin menu under Users (these also return hook names, which are needed for contextual help)
-    add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', 'ctx_ps_page_groups_view');
-    add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
-    add_submenu_page('', __('Edit Group','contexture-page-security'), __('Edit Group','contexture-page-security'), 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
-    add_submenu_page('', __('Delete Group','contexture-page-security'), __('Delete Group','contexture-page-security'), 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
+    add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', 'CTXPS_Router::groups_list');
+    add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', 'CTXPS_Router::group_add');
+    add_submenu_page('', __('Edit Group','contexture-page-security'), __('Edit Group','contexture-page-security'), 'manage_options', 'ps_groups_edit', 'CTXPS_Router::group_edit');
+    add_submenu_page('', __('Delete Group','contexture-page-security'), __('Delete Group','contexture-page-security'), 'manage_options', 'ps_groups_delete', 'CTXPS_Router::group_delete');
 
-    add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
+    add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'CTXPS_Router::options');
     //add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
 }
 

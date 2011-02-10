@@ -18,9 +18,9 @@ class CTXPS_Tables{
         $this->groups =     $wpdb->prefix.$this->prefix.'groups';
         $this->group_rels = $wpdb->prefix.$this->prefix.'group_relationships';
         $this->security =   $wpdb->prefix.$this->prefix.'security';
-        $this->pluginbase = CTXPSCDIR.'/contexture-page-security.php';
+        $this->pluginbase = CTXPSDIR.'/contexture-page-security.php';
     }
 }
 }
-$ctxpscdb = new CTXPS_Tables();
+$ctxpsdb = new CTXPS_Tables();
 ?>
