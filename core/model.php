@@ -1,6 +1,6 @@
 <?php
 if(!class_exists('CTXPSC_Tables')){
-class CTXPSC_Tables{
+class CTXPS_Tables{
     /** @var string Table name for groups  */
     public $prefix = 'ps_';
     /** @var string Table name for groups  */
@@ -22,5 +22,5 @@ class CTXPSC_Tables{
     }
 }
 }
-$ctxpscdb = new CTXPSC_Tables();
+$ctxpscdb = new CTXPS_Tables();
 ?>

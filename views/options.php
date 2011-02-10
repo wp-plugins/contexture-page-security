@@ -49,7 +49,7 @@ if(empty($_POST['action'])){
     $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
 
     //Update the options array
-    $saveStatus = CTXPSC_Queries::set_options($newopts);
+    $saveStatus = CTXPS_Queries::set_options($newopts);
 
     //If save was successful, show the message
     if(isset($saveStatus)){
@@ -59,7 +59,7 @@ if(empty($_POST['action'])){
 
 //Get AD messages from options
 $ADMsg = get_option('contexture_ps_options');
-$ProtPages = CTXPSC_Queries::get_protected_posts('string');
+$ProtPages = CTXPS_Queries::get_protected_posts('string');
 
 //Generate ddls with page heirarchy
 $pageDDLAuth = wp_dropdown_pages(array('name' => 'ad-page-auth', 'show_option_none' => __('-- Choose AD Message Page --','contexture-page-security'), 'show_option_none_value' => 0, 'selected'=>$ADMsg['ad_page_auth_id'], 'echo' => 0, 'exclude'=>$ProtPages));

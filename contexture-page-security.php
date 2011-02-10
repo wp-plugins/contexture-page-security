@@ -24,17 +24,22 @@ License: GPL2
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+/***************************** SET GLOBALS ************************************/
+define('CTXPSCDIR',basename(dirname(__FILE__)));
+global $wpdb, $ctxpscdb;
+
 /**************************** LOAD CORE FILES *********************************/
-require_once 'core/core.php';
-require_once 'core/model.php';
-require_once 'core/model_queries.php';
-require_once 'controllers/ajax.php';
+require_once 'core/model.php';          //Model instance ($ctxpscdb)
+require_once 'core/model_queries.php';  //Stored db queries
+require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
+require_once 'core/ajax.php';           //AJAX-specific methods
+require_once 'core/routing.php';        //All requests for views are sent through here
 
 /******************************** HOOKS ***************************************/
 // Install new tables (on activate)
-register_activation_hook(__FILE__,'CTXPSC_Queries::plugin_install');
+register_activation_hook(__FILE__,'CTXPS_Queries::plugin_install');
 // Remove tables from db (on delete)
-register_uninstall_hook(__FILE__,'CTXPSC_Queries::plugin_delete');
+register_uninstall_hook(__FILE__,'CTXPS_Queries::plugin_delete');
 
 
 // Add "Groups" option to "Users" in admin
@@ -101,7 +106,7 @@ function ctx_ps_security_action(){
 
     if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
         /**Groups that this user is a member of*/
-        $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
+        $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
         /**Groups required to access this page*/
         $pagereqs = ctx_ps_getprotection($post->ID);
 
@@ -180,13 +185,13 @@ function ctx_ps_security_filter_blog($content){
         return $content;
     }else{
         //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-        if( !current_user_can('manage_options') && ( is_home() || is_category() || is_tag() || is_feed() || is_search() )  && !is_admin()) {
+        if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_feed() || is_search() )  && !is_admin()) {
             foreach($content as $post->key => $post->value){
                 //Fun with manipulating the array
                 //$post->value->post_content = "<h2>{$post->value->ID}</h2>".$post->value->post_content;
 
                 /**Groups that this user is a member of*/
-                $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
+                $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
                 /**Groups required to access this page*/
                 $pagereqs = ctx_ps_getprotection($post->value->ID);
 
@@ -231,7 +236,7 @@ function ctx_ps_security_filter_menu($content){
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
-            $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
+            $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->ID);
 
@@ -285,7 +290,7 @@ function ctx_ps_security_filter_menu_custom($content){
         foreach($content as $post->key => $post->value){
 
             //Get groups that this user is a member of
-            $useraccess = CTXPSC_Queries::get_user_groups($current_user->ID);
+            $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             //Get groups required to access this page
             $pagereqs = ctx_ps_getprotection($post->value->object_id);
 
@@ -422,10 +427,10 @@ function ctx_ps_admin_head_css(){
 function ctx_ps_create_group($name, $description){
     global $wpdb;
 
-    if(!CTXPSC_Queries::check_group_exists($name)){
+    if(!CTXPS_Queries::check_group_exists($name)){
         $current_user = wp_get_current_user();
 
-        if(CTXPSC_Queries::add_group($name, $description, $current_user->ID) !== FALSE){
+        if(CTXPS_Queries::add_group($name, $description, $current_user->ID) !== FALSE){
             return '<div id="message" class="updated"><p>'.__('New group created','contexture-page-security').'</p></div>';
         }else{
             return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. There was an unspecified system error.','contexture-page-security').'</p></div>';
@@ -443,8 +448,8 @@ function ctx_ps_create_menus(){
     //Add Groups option to the WP admin menu under Users (these also return hook names, which are needed for contextual help)
     add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', 'ctx_ps_page_groups_view');
     add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', 'ctx_ps_page_groups_add');
-    add_submenu_page('', 'Edit Group', 'Edit Group', 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
-    add_submenu_page('', 'Delete Group', 'Delete Group', 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
+    add_submenu_page('', __('Edit Group','contexture-page-security'), __('Edit Group','contexture-page-security'), 'manage_options', 'ps_groups_edit', 'ctx_ps_page_groups_edit');
+    add_submenu_page('', __('Delete Group','contexture-page-security'), __('Delete Group','contexture-page-security'), 'manage_options', 'ps_groups_delete', 'ctx_ps_page_groups_delete');
 
     add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
     //add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
@@ -455,7 +460,7 @@ function ctx_ps_create_menus(){
  * This function takes an array of user groups and an array of page-required groups
  * and determines if the user should be allowed to access the specified content.
  *
- * @param array $UserGroupsArray The array returned by CTXPSC_Queries::get_user_groups()
+ * @param array $UserGroupsArray The array returned by CTXPS_Queries::get_user_groups()
  * @param array $PageSecurityArray The array returned by ctx_ps_get_protection()
  * @return bool Returns true if user has necessary permissions to access the page, false if not.
  */
@@ -510,7 +515,7 @@ function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=t
 
     $linkBack = admin_url('users.php');
 
-    $groups = CTXPSC_Queries::get_groups($memberid);
+    $groups = CTXPS_Queries::get_groups($memberid);
 
     $html = '';
     $htmlactions = '';
@@ -519,7 +524,7 @@ function ctx_ps_display_group_list($memberid='',$forpage='groups',$showactions=t
     $countusers = count_users();
 
     foreach($groups as $group){
-        $countmembers = (!isset($group->group_system_id)) ? CTXPSC_Queries::count_members($group->ID) : $countusers['total_users'];
+        $countmembers = (!isset($group->group_system_id)) ? CTXPS_Queries::count_members($group->ID) : $countusers['total_users'];
 
         //Only create the actions if $showactions is true
         if($showactions){
@@ -583,7 +588,7 @@ function ctx_ps_generate_usergroupslist(){
 function ctx_ps_display_member_list($group_id){
     global $wpdb;
 
-    $members = CTXPSC_Queries::get_group_members($group_id);
+    $members = CTXPS_Queries::get_group_members($group_id);
 
     $html = '';
     $countmembers = '';
@@ -659,7 +664,7 @@ function ctx_ps_display_page_list($group_id){
     //$sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `sec_access_id`=\'%3$s\'', $wpdb->prefix.'ps_security', $wpdb->posts, $group_id);
 
     //$pagelist = $wpdb->get_results($sql);
-    $pagelist = CTXPSC_Queries::get_group_pages($group_id);
+    $pagelist = CTXPS_Queries::get_group_pages($group_id);
 
     $html = '';
     $countpages = '';
@@ -712,7 +717,7 @@ function ctx_ps_display_page_list($group_id){
  */
 function ctx_ps_getprotection($postid){
     //If this branch isn't protected, just stop now and save all that processing power
-    if (!CTXPSC_Queries::get_section_protection($postid)){
+    if (!CTXPS_Queries::get_section_protection($postid)){
         return false;
     }
 
@@ -867,7 +872,7 @@ function ctx_ps_sidebar_security(){
 
         //Create an array of groups that are already attached to the page
         $currentGroups = array();
-        foreach(CTXPSC_Queries::page_groups($_GET['post']) as $curGrp){
+        foreach(CTXPS_Queries::page_groups($_GET['post']) as $curGrp){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
@@ -910,7 +915,7 @@ function ctx_ps_sidebar_security(){
             echo '      <select id="groups-available" name="groups-available">';
             echo '<option value="0">-- '.__('Select','contexture-page-security').' -- </option>';
             //Loop through all groups in the db to populate the drop-down list
-            foreach(CTXPSC_Queries::get_groups() as $group){
+            foreach(CTXPS_Queries::get_groups() as $group){
                 //Generate the option HTML, hiding it if it's already in our $currentGroups array
                 echo        '<option '.((!empty($currentGroups[$group->ID]))?'class="detach"':'').' value="'.$group->ID.'">'.$group->group_title.'</option>';
             }
@@ -972,7 +977,7 @@ function ctx_ps_tag_groups_attached($atts){
 
     //Create an array of groups that are already attached to the page
     $currentGroups = '';
-    foreach(CTXPSC_Queries::get_post_groups($post->ID) as $curGrp){
+    foreach(CTXPS_Queries::get_post_groups($post->ID) as $curGrp){
         $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
     }
     $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.','contexture-page-security').'</em></li>' : $currentGroups;
@@ -1072,7 +1077,7 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
         if(ctx_ps_isprotected($pageid))
             echo '<img alt="Protected" title="Protected" src="'.plugins_url('images/protected-inline.png',__FILE__).'" />';
         //If this page isnt protected, but an ancestor is, return a lighter icon
-        else if(CTXPSC_Queries::get_section_protection($pageid))
+        else if(CTXPS_Queries::get_section_protection($pageid))
             echo '<img alt="Protected (inherited)" title="Inheriting an ancestors protection" src="'.plugins_url('images/protected-inline-descendant.png',__FILE__).'" />';
     }
 }

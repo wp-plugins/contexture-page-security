@@ -47,7 +47,7 @@ if(!empty($_GET['action']) && !empty($_GET['submit']) && $_GET['action'] == "del
             <input type="hidden" name="groupid" value="<?php echo $_GET['groupid']; ?>" />
             <input type="hidden" name="action" value="delete" />
             <p>You are about to delete the group <strong><?php echo $groupInfo->group_title; ?></strong>.</p>
-            <p>Deleting this group will affect <strong><?php echo CTXPSC_Queries::count_members($groupInfo->ID); ?></strong> users and <strong><?php echo $groupPageCount; ?></strong> pages/posts. Are you sure you want to continue?</p>
+            <p>Deleting this group will affect <strong><?php echo CTXPS_Queries::count_members($groupInfo->ID); ?></strong> users and <strong><?php echo $groupPageCount; ?></strong> pages/posts. Are you sure you want to continue?</p>
             <?php wp_nonce_field('delete-group'); ?>
             <p class="submit">
                 <input class="button-secondary" type="submit" value="<?php _e('Confirm Deletion','contexture-page-security'); ?>" name="submit"/>

@@ -162,7 +162,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
                     <?php
-                        if(CTXPSC_Queries::count_members($_GET['groupid']) < 1){
+                        if(CTXPS_Queries::count_members($_GET['groupid']) < 1){
                             echo '<td colspan="4">'.__('No users have been added to this group.','contexture-page-security').'</td>';
                         } else {
                            echo '<tr id="inline-edit" class="inline-edit-row inline-options-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="4">
@@ -237,7 +237,7 @@ $groupInfo = $wpdb->get_row($sqlGetGroupInfo);
             </tfoot>
             <tbody id="users" class="list:content content-list">
                 <?php
-                    if(CTXPSC_Queries::count_protected($_GET['groupid']) < 1){
+                    if(CTXPS_Queries::count_protected($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No content is attached to this group.','contexture-page-security').'</td>';
                     } else {
                         echo ctx_ps_display_page_list($_GET['groupid']);

@@ -140,7 +140,7 @@ function psc_get_groups($user_id=null){
     //Registered Users Smart Group
     if($current_user->ID != 0 && $multisitemember){
         //Get the ID for CPS01 (added in 1.1, so cant assume 1)
-        $newArray = CTXPSC_Queries::get_system_group('CPS01');
+        $newArray = CTXPS_Queries::get_system_group('CPS01');
         //Add CPS01 to the current users permissions array
         $array += array($newArray->ID => $newArray->group_title);
     }
@@ -177,7 +177,7 @@ function psc_has_protection($post_id=null,$dontcheck=false){
         $parent_id = $wpdb->get_var(sprintf('SELECT post_parent FROM %s WHERE `ID` = %s',$wpdb->posts,$post_id));
         //If we have a parent, repeat this check with the parent.
         if ($parent_id != 0)
-            return CTXPSC_Queries::get_section_protection($parent_id);
+            return CTXPS_Queries::get_section_protection($parent_id);
         else
             return false;
     }

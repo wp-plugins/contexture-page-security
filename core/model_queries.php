@@ -1,9 +1,9 @@
 <?php
-if(!class_exists('CTXPSC_Queries')){
+if(!class_exists('CTXPS_Queries')){
 /**
  * Lets put as much SQL in here as possible to simplify our code
  */
-class CTXPSC_Queries{
+class CTXPS_Queries{
     /**
      * Adds the important tables to the wordpress database
      * @global wpdb $wpdb
@@ -68,7 +68,7 @@ class CTXPSC_Queries{
         add_option("contexture_ps_db_version", "1.2");
 
         //Set plugin options (not db version)
-        CTXPSC_Queries::set_options();
+        CTXPS_Queries::set_options();
 
         /********* START UPGRADE PATH < 1.1 ***********/
         $dbver = get_option("contexture_ps_db_version");
@@ -480,7 +480,7 @@ class CTXPSC_Queries{
         //Get rid of extra whitespace
         $group_title = trim($group_title);
         //DB column requires names < 40 char
-        $group_title = str_truncate($group_title, 40);
+        $group_title = substr($group_title, 0, 40);
 
         //Only insert the group if the name isn't taken
         if(!self::check_group_exists($group_title)){
@@ -508,7 +508,7 @@ class CTXPSC_Queries{
         //Get rid of extra whitespace
         $group_title = trim($group_title);
         //DB column requires names < 40 char
-        $group_name = str_truncate($group_name, 40);
+        $group_name = substr($group_title, 0, 40);
 
         //Check for a match
         $check = $wpdb->get_var($wpdb->prepare(
@@ -632,7 +632,7 @@ class CTXPSC_Queries{
         //Registered Users Smart Group
         if($user_id != 0 && $multisitemember){
             //Get the ID for CPS01
-            $newArray = CTXPSC_Queries::get_system_group('CPS01');
+            $newArray = CTXPS_Queries::get_system_group('CPS01');
             //Add CPS01 to the current users permissions array
             $array += array($newArray->ID => $newArray->group_title);
         }

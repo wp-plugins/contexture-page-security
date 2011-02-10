@@ -43,7 +43,7 @@ class CTXPSAjax extends CTXAjax {
         }
 
         //Run the query
-        $result = CTXPSC_Queries::add_security($_GET['postid'],$_GET['groupid']);
+        $result = CTXPS_Queries::add_security($_GET['postid'],$_GET['groupid']);
 
         if($result!==false){
             //Start with blank HTML output
@@ -99,7 +99,7 @@ class CTXPSAjax extends CTXAjax {
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
 
-        if(CTXPSC_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
+        if(CTXPS_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
             CTXAjax::response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
         }else{
             CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
@@ -122,17 +122,17 @@ class CTXPSAjax extends CTXAjax {
         }
 
         //If this user doesn't exist
-        if(CTXPSC_Queries::check_user_exists($_GET['user_id'])){
+        if(CTXPS_Queries::check_user_exists($_GET['user_id'])){
             CTXAjax::response(array('code'=>'0','message'=>'User not found'));
         } else {
 
             //Make sure user isnt already in the group
-            if(CTXPSC_Queries::check_membership($_GET['user_id'], $_GET['groupid'])){
+            if(CTXPS_Queries::check_membership($_GET['user_id'], $_GET['groupid'])){
                 CTXAjax::response( array('code'=>'0','message'=>__('Already in group','contexture-page-security')) );
             }
 
             //Add the user to the group
-            if(CTXPSC_Queries::enroll($_GET['user_id'], $_GET['groupid']) === false){
+            if(CTXPS_Queries::enroll($_GET['user_id'], $_GET['groupid']) === false){
                 CTXAjax::response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
             } else {
                 CTXAjax::response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
@@ -160,7 +160,7 @@ class CTXPSAjax extends CTXAjax {
         $db_expires = ($_POST['expires']=='1') ? $_POST['date'] : 'NULL';
 
         //Determine response
-        if(CTXPSC_Queries::grel_enrollment_update($_POST['grel'], $db_expires) === false){
+        if(CTXPS_Queries::grel_enrollment_update($_POST['grel'], $db_expires) === false){
             CTXAjax::response( array('code'=>'0','message'=>__('Query failed!','contexture-page-security')) );
         } else {
             CTXAjax::response( array('code'=>'1','message'=>__('User membership updated','contexture-page-security')) );
@@ -183,7 +183,7 @@ class CTXPSAjax extends CTXAjax {
         }
 
 
-        if(CTXPSC_Queries::unenroll($_GET['user_id'], $_GET['groupid'])){
+        if(CTXPS_Queries::unenroll($_GET['user_id'], $_GET['groupid'])){
             CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
         } else {
             $html = ctx_ps_display_group_list($_GET['user_id'],'users');
@@ -215,7 +215,7 @@ class CTXPSAjax extends CTXAjax {
                 $response['message'] = 'Security enabled';
                 break;
             case 'off':
-                if(CTXPSC_Queries::delete_security($_GET['postid']) !== false){
+                if(CTXPS_Queries::delete_security($_GET['postid']) !== false){
                     $response['code'] = delete_post_meta($_GET['postid'],'ctx_ps_security');
                     $response['message'] = 'Security disabled';
                 }else{
