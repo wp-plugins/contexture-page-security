@@ -26,7 +26,7 @@ class CTXPS_Router{
     public static function group_add(){ self::render('group-add'); }
     public static function group_delete(){ self::render('group-delete'); }
     public static function group_edit(){ self::render('group-edit'); }
-    public static function group_edit(){ self::render('groups-list'); }
+    public static function groups_list(){ self::render('groups-list'); }
 }}
 
 ?>
