@@ -151,22 +151,58 @@ class CTXPS_Queries{
     }
 
     /**
+     * Deletes a group from the database. Also uses self::delete_group_members and
+     * self::delete_security to ensure a completely 'clean' delete.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param type $group_id
+     * @return type
+     */
+    public static function delete_group($group_id){
+        global $wpdb, $ctxpsdb;
+        if(self::delete_group_membership($group_id)===false){
+            return false;
+        }
+        if(self::delete_security($group_id)===false){
+            return false;
+        }
+        if($wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpsdb->groups.'` WHERE `ID` = %s',$group_id))===false){
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Deletes one or more security records from the db.
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Props $ctxpsdb
-     * @param string $content_id The id of the page or post to protect
+     * @param string $content_id The id of the page or post to unprotect
      * @param string $protection_id The id of the protector to be revoked. If empty, ALL groups will be removed from the content.
      * @param string $content_type Unused. Will tell PSC what type of content to protect.
      * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
      */
-    public static function delete_security($content_id,$protection_id='',$content_type='page',$protection_type='group'){
+    public static function delete_security($content_id='',$protection_id='',$content_type='page',$protection_type='group'){
         global $wpdb, $ctxpsdb;
         $sql=false;
 
-        if(!empty($protection_id)){
-            //To be used for removing specific access from content
-            $sql = $wpdb->prepare('
+        if(empty($content_id) && !empty($protection_id) && is_numeric($protection_id)){
+            return $wpdb->query($wpdb->prepare('
+            DELETE FROM `'.$ctxpsdb->security.'`
+            WHERE   sec_protect_type    = %s
+            AND     sec_access_id       = %s
+            AND     sec_access_type     = %s',
+                /*1*/$content_type,
+                /*2*/$protection_id,
+                /*3*/$protection_type
+            ));
+        }
+
+        //Remove specific access from specific content
+        if(!empty($content_id) && is_numeric($content_id) &&
+           !empty($protection_id) && is_numeric($protection_id)){
+            return $wpdb->query($wpdb->prepare('
             DELETE FROM `'.$ctxpsdb->security.'`
             WHERE   sec_protect_id      = %s
             AND     sec_protect_type    = %s
@@ -176,19 +212,52 @@ class CTXPS_Queries{
                 /*2*/$content_type,
                 /*3*/$protection_id,
                 /*4*/$protection_type
-            );
-        }else{
-            //To be used for removing ALL access from content
-            $sql = $wpdb->prepare('
+            ));
+        }
+
+        //Removing ALL access from content
+        return $wpdb->query($wpdb->prepare('
             DELETE FROM `'.$ctxpsdb->security.'`
             WHERE   sec_protect_id      = %s
             AND     sec_protect_type    = %s',
                 /*1*/$content_id,
                 /*2*/$content_type
-            );
-        }
+        ));
+    }
 
-        return $wpdb->query($sql);
+    /**
+     * Deletes membership records for a specified group. If $user_id is null, this
+     * method will delete ALL membership records the specified group.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param type $group_id
+     * @param mixed $user_id Null will delete ALL relationships. Array will delete multiple specified relationships. String or int will delete one relationship.
+     * @return bool Returns true if all deleted, false if error.
+     */
+    public static function delete_group_membership($group_id,$user_id=null){
+        global $wpdb, $ctxpsdb;
+        //Delete ALL relationships
+        if($user_id===null || $user_id==='all'){
+            return $wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpsdb->group_rels.'` WHERE `grel_group_id` = %s',$group_id));
+        }
+        //Delete specified relationships (array)
+        if(is_array($user_id) && count($user_id)>0){
+            $uid_sql = '';
+            $uid_loop = 1;
+            $uid_cnt = count($user_id);
+            foreach($user_id as $uid){
+                $uid_sql .= $wpdb->prepare('`grel_user_id`=%s',$uid);
+                if($uid_cnt>$uid_loop){ $uid_sql.=' OR '; }
+                $uid_loop++;
+            }
+            return $wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpsdb->group_rels.'` WHERE `grel_group_id` = %s AND ('.$uid_sql.')'));
+        }
+        //Delete one relationship
+        if(is_string($user_id) || is_numeric($user_id)){
+            return $wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpsdb->group_rels.'` WHERE `grel_group_id` = %s AND `grel_user_id` = %s',$group_id,$user_id));
+        }
+        return false;
     }
 
     /**
@@ -212,6 +281,7 @@ class CTXPS_Queries{
 
     /**
      * Checks if user exists in WP db. Returns true if user exists, false if not.
+     * If checking a username, use WordPress' username_exists() function instead.
      *
      * @global wpdb $wpdb
      * @param integer $user_id
@@ -235,7 +305,7 @@ class CTXPS_Queries{
      * @param int $group_id
      * @return bool Returns 1 if success, false if failed.
      */
-    public static function enroll($user_id,$group_id){
+    public static function add_membership($user_id,$group_id){
         global $wpdb,$ctxpsdb;
         return $wpdb->insert($ctxpsdb->group_rels,
                 array(
@@ -314,7 +384,7 @@ class CTXPS_Queries{
      * @param int $group_id
      * @return boolean Returns true if delete was successful, false if it failed for any reason.
      */
-    public static function unenroll($user_id,$group_id){
+    public static function delete_membership($user_id,$group_id){
         global $wpdb,$ctxpsdb;
 
         $count = $wpdb->query($wpdb->prepare('DELETE FROM `'.$ctxpsdb->group_rels.'` WHERE grel_group_id = %s AND grel_user_id = %s',
@@ -391,10 +461,17 @@ class CTXPS_Queries{
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
      * @param int $group_id The id of the group to count for pages.
+     * @param string $type Optional. The type of protection to count (null for "any").
      * @return int The number of groups attached to this page.
      */
-    public static function count_protected($group_id=null){
+    public static function count_protected($group_id=null,$type=null){
         global $wpdb,$ctxpsdb;
+
+        if($type!==null){
+            //At some point we'll need to specify protection type. ie: 'group' or 'user'
+            trigger_error('$type parameter is currently unused.', E_USER_NOTICE);
+        }
+
         if(is_numeric($group_id) && !empty($group_id)){
             return $wpdb->get_var($wpdb->prepare('SELECT COUNT(DISTINCT(sec_protect_id)) FROM `'.$ctxpsdb->security.'` WHERE sec_access_id=%s',$group_id));
         }
@@ -601,6 +678,7 @@ class CTXPS_Queries{
 
         /**Empty array to be used for building output*/
         $array = array();
+        $newArray = array();
         /**Todays date for MySQL comparison*/
         $today = date('Y-m-d');
         /**Assume user is multi-site user*/
@@ -757,7 +835,26 @@ class CTXPS_Queries{
         return $array;
     }
 
-
+    /**
+     * Updates basic group information.
+     * 
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param int $group_id
+     * @param array $args
+     * @return bool
+     */
+    public static function update_group($group_id,$name,$description){
+        global $wpdb,$ctxpsdb;
+        return $wpdb->update(
+                $ctxpsdb->groups,
+                array(
+                    'group_title'=>$name,
+                    'group_description'=>$description),
+                array(
+                    'ID'=>$group_id
+        ));
+    }
 
 }
 }

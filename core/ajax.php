@@ -132,7 +132,7 @@ class CTXPS_Ajax extends CTXAjax {
             }
 
             //Add the user to the group
-            if(CTXPS_Queries::enroll($_GET['user_id'], $_GET['groupid']) === false){
+            if(CTXPS_Queries::add_membership($_GET['user_id'], $_GET['groupid']) === false){
                 CTXAjax::response( array('code'=>'0','message'=>__('Query failed','contexture-page-security')) );
             } else {
                 CTXAjax::response( array('code'=>'1','message'=>__('User enrolled in group','contexture-page-security'),'html'=>'<![CDATA['.ctx_ps_display_group_list($_GET['user_id'],'users').']]>') );
@@ -183,7 +183,7 @@ class CTXPS_Ajax extends CTXAjax {
         }
 
 
-        if(CTXPS_Queries::unenroll($_GET['user_id'], $_GET['groupid'])){
+        if(CTXPS_Queries::delete_membership($_GET['user_id'], $_GET['groupid'])){
             CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
         } else {
             $html = ctx_ps_display_group_list($_GET['user_id'],'users');
