@@ -8,8 +8,6 @@ if ( ! current_user_can( 'manage_options' ) ){
     wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
 }
 
-//Get info about the current group
-$sqlGetGroupInfo = $wpdb->prepare("SELECT * FROM `{$wpdb->prefix}ps_groups` WHERE `ID` = '%s'",$_GET['groupid']);
 $actionmessage = '';
 
 //If we're submitting a change to the group...
@@ -56,7 +54,7 @@ if(!empty($_GET['action'])){
     }
 }
 
-$groupInfo = $wpdb->get_row($sqlGetGroupInfo);
+$groupInfo = CTXPS_Queries::get_group_info($_GET['groupid']);
 
 
 //  if($_GET['page']==='ps_groups_edit') //What was this supposed to do?

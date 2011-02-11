@@ -4,7 +4,7 @@
 if ( ! current_user_can( 'manage_options' ) )
 	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
-$creategroup_message = "";
+$creategroup_message = '';
 
 //Several forms post back to this page, so we catch the action and process accordingly
 if(!empty($_POST['action'])){
