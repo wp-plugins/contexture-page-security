@@ -1,14 +1,14 @@
 <?php
 
 /*************************** THEME FUNCTIONS *****************************
- * These are generally "friendlier", more-generic versions of basic plugin 
+ * These are generally "friendlier", more-generic versions of basic plugin
  * functions that theme designers can use to more easily customize PSC.
  *************************************************************************/
 
 if(!function_exists('psc_add_user_to_group')){
 /**
  * Can be used by developers to add a user to a group programatically.
- * 
+ *
  * @param int $user_id Required. The id of the user to add to a group.
  * @param int $group_id Required. The id of the group to add the user to.
  * @param string $expires Optional. A string-formatted datetime (YYYY-MM-DD). If provided, the user wont be able to access group content after this date.
@@ -21,12 +21,12 @@ function psc_add_user_to_group($user_id,$group_id,$expires=null){
     if(!is_numeric($user_id) || !is_numeric($group_id)){
         return false;
     }
-    
+
     //Make sure user exists in db
     $UserInfo = (int)$wpdb->get_var(
         $wpdb->prepare("SELECT COUNT(*) FROM {$wpdb->users} WHERE {$wpdb->users}.ID = %s",$user_id)
     );
-        
+
     //Make sure user isnt already in the group
     $UserInGroup = $wpdb->prepare('SELECT COUNT(*) FROM `'.$wpdb->prefix.'ps_group_relationships` WHERE grel_group_id=%s AND grel_user_id=%s',$group_id,$user_id);
     if($wpdb->get_var($sqlUpdateGroup)>0){ return false; }
@@ -54,8 +54,8 @@ function psc_add_user_to_group($user_id,$group_id,$expires=null){
 if(!function_exists('psc_update_user_membership')){
 /**
  * This function is primarily used to update expiration information for a user's group membership, but may be used for other things in future updates.
- * 
- * 
+ *
+ *
  * @param int $user_id Required. The users userid. Can usually be retrieved with $current_user->ID.
  * @param int $group_id Required. The id of the group the user is a member of.
  * @param string $expires Optional. A date formatted as a string (YYYY-MM-DD). If left blank or null, membership never expires.
@@ -63,13 +63,13 @@ if(!function_exists('psc_update_user_membership')){
  */
 function psc_update_user_membership($user_id,$group_id,$expires=null){
     global $wpdb;
-    
+
     //Fail if the id's aren't numeric
     if(!is_numeric($user_id) || !is_numeric($group_id)){ return false; }
-    
+
     //Check if expires date is null
     $expires = (empty($expires) || strtolower($expires)==='null') ? 'NULL' : "'".date('Y-m-d',strtotime($expires))."'";
-    
+
     $query = sprintf('UPDATE `%1$sps_group_relationships` SET grel_expires=%2$s WHERE `grel_group_id`=\'%3$s\' AND `grel_user_id`=\'%4$s\'',
         /*1*/$wpdb->prefix,
         /*2*/$expires,
@@ -85,7 +85,7 @@ if(!function_exists('psc_remove_user_from_group')){
  *
  * @param int $user_id The id of the user to unenroll.
  * @param int $group_id The group to unenroll from.
- * @return bool Returns true if the query succeeded. False if it failed. 
+ * @return bool Returns true if the query succeeded. False if it failed.
  */
 function psc_remove_user_from_group($user_id,$group_id){
     global $wpdb;
@@ -102,14 +102,14 @@ if(!function_exists('psc_get_groups')){
 /**
  * Gets an assoc array containing a list of all groups. This can also be used to get
  * a list of only groups belonging to an individual user.
- * 
+ *
  * @param int $user_id Optional. Include if you want groups a user is attached to. Leave blank for all groups.
  * @return array Associative array with groups. Format: Group_ID => Group_Title
  */
 function psc_get_groups($user_id=null){
     global $wpdb, $current_user;
     $array = array();
-    
+
     //Determine if we're looking up groups for a user, or all groups
     if(is_numeric($user_id)){
         $groups = $wpdb->get_results("
@@ -153,22 +153,22 @@ if(!function_exists('psc_has_protection')){
 /**
  * Recursively checks security for this page/post and it's ancestors. Returns true
  * if any of them are protected or false if none of them are protected.
- * 
+ *
  * @param int $post_id Optional. The id of the page or post to check. If left null, will try to check current post id from the loop (if available).
  * @param bool $dontcheck Optional. Set to true to prevent automatically checking current post id in the loop (if $post_id is null).
  * @return bool If this page or it's ancestors has the "protected page" flag
  */
 function psc_has_protection($post_id=null,$dontcheck=false){
     global $wpdb, $post;
-        
+
     //If $post_id isnt set, try to get global post id
     if(empty($post_id) && !$dontcheck && isset($post->ID)){ $post_id=$post->ID; }
     //Fail if the post id isn't numeric
     if(!is_numeric($post_id)){ return false; }
-        
+
     //Try to get post meta
     $mymeta=get_post_meta($post_id,'ctx_ps_security');
-    
+
     //Check permissions for current page
     if( !empty( $mymeta ) ){
         return true;
@@ -177,7 +177,7 @@ function psc_has_protection($post_id=null,$dontcheck=false){
         $parent_id = $wpdb->get_var(sprintf('SELECT post_parent FROM %s WHERE `ID` = %s',$wpdb->posts,$post_id));
         //If we have a parent, repeat this check with the parent.
         if ($parent_id != 0)
-            return CTXPS_Queries::get_section_protection($parent_id);
+            return CTXPS_Queries::check_section_protection($parent_id);
         else
             return false;
     }

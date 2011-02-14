@@ -497,22 +497,53 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns an array containing the groups attached to the specified page.
+     * Returns an array containing the groups attached to the specified page. This can be used
+     * to either return a "simple" group list (used in tables) or a "security" group list (which
+     * includes security info necessary to check permissions). Default is "simple" style list.
+     *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
      * @param integer $post_id The post_id of the content to get groups for (can be any content type that uses posts table)
-     * @return integer
+     * @param boolean $security If true, will return a 'protection' array (used for validating access). Default is false.
+     * @return array
      */
-    public static function get_page_groups($post_id){
+    public static function get_groups_by_post($post_id,$security=false){
         global $wpdb,$ctxpsdb;
+
+        //Only continue if $post_id is a valid int
         if(is_numeric($post_id) && !empty($post_id)){
-            return $wpdb->get_results($wpdb->prepare(
-                'SELECT * FROM `'.$ctxpsdb->security.'`
+
+            //If this is a simple query, do this...
+            if($security==false){
+
+                return $wpdb->get_results($wpdb->prepare(
+                    'SELECT * FROM `'.$ctxpsdb->security.'`
+                        JOIN `'.$ctxpsdb->groups.'`
+                            ON '.$ctxpsdb->security.'.sec_access_id = '.$ctxpsdb->groups.'.ID
+                        WHERE sec_protect_id = %s',
+                    $post_id
+                ));
+
+            }else{
+
+                //If we need to include security info, use this...
+                return $wpdb->get_results($wpdb->prepare(
+                    'SELECT
+                        `'.$wpdb->posts.'`.id AS post_id,
+                        `'.$wpdb->posts.'`.post_parent AS post_parent_id,
+                        `'.$ctxpsdb->groups.'`.ID AS group_id,
+                        `'.$ctxpsdb->groups.'`.group_title
+                    FROM `'.$ctxpsdb->security.'`
+                    JOIN `'.$wpdb->posts.'`
+                        ON `'.$ctxpsdb->security.'`.sec_protect_id = `'.$wpdb->posts.'`.ID
                     JOIN `'.$ctxpsdb->groups.'`
-                        ON '.$ctxpsdb->security.'.sec_access_id = '.$ctxpsdb->groups.'.ID
-                    WHERE sec_protect_id = %s',
-                $post_id
-            ));
+                        ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
+                    WHERE `'.$ctxpsdb->security.'`.sec_protect_id = %s
+                ',
+                 $post_id));
+
+            }
+
         }
         //If $post_id is improper, return false
         return false;
@@ -526,7 +557,7 @@ class CTXPS_Queries{
      * @param type $group_id
      * @return type
      */
-    public static function get_group_pages($group_id){
+    public static function get_content_by_group($group_id){
         global $wpdb,$ctxpsdb;
         if(is_numeric($group_id) && !empty($group_id)){
             return $wpdb->get_results($wpdb->prepare(
@@ -837,7 +868,7 @@ class CTXPS_Queries{
 
     /**
      * Updates basic group information.
-     * 
+     *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
      * @param int $group_id
