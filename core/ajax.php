@@ -50,7 +50,7 @@ class CTXPS_Ajax extends CTXAjax {
             $OutputHTML = '';
 
             //Get security info for the specified page and it's parents
-            $securityStatus = ctx_ps_getprotection( $_GET['postid'] );
+            $securityStatus = CTXPS_Security::get_protection( $_GET['postid'] );
 
             //Set $groupcount to 0, because we are about to count the number of groups attached to THIS page...
             $groupcount = 0;

@@ -321,138 +321,6 @@ function ctx_ps_display_page_list($group_id){
     return $html;//'<td colspan="2">There are pages attached, but this feature is not yet working.</td>';
 }
 
-/**
- * This function will check the security for the specified page and all parent pages.
- * If security exists, a multi-dimensional array will be returned following the format
- * array( pageid=>array(groupid=>groupname) ), with the first item being the current
- * page and additional items being parents. If no security is present for any ancestor
- * then the function will return false.
- *
- * @global wpdb $wpdb
- *
- * @param int $post_id The id of the post to get permissions for.
- * @return mixed Returns an array with all the required permissions to access this page. If no security is present, returns false.
- */
-function ctx_ps_getprotection($post_id){
-    //If this branch isn't protected, just stop now and save all that processing power
-    if (!CTXPS_Queries::check_section_protection($post_id)){
-        return false;
-    }
-
-    //If we're still going, then it means something above us is protected, so lets get the list of permissions
-    global $wpdb;
-    $array = array();
-    $grouparray = array();
-    /**Gets the parent id of the current page/post*/
-    $parent_id = $wpdb->get_var($wpdb->prepare("SELECT post_parent FROM {$wpdb->posts} WHERE `ID` = '%s'",$post_id));
-    /**Gets the ctx_ps_security data for this post (if it exists) - used to determine if this is the topmost secured page*/
-    //$amisecure = get_post_meta($postid,'ctx_ps_security',true);
-
-    //1. If I am secure, get my groups
-    //if(!empty($amisecure)){
-        //Get Group relationship info for this page from wp_ps_security, join wp_posts on postid
-        $groups = CTXPS_Queries::get_groups_by_post($post_id, true);
-
-        //If 0 results, dont do anything. Otherwise...
-        if(!empty($groups)){
-            foreach($groups as $group){
-                $grouparray[$group->group_id] = $group->group_title;
-            }
-        }
-    //}
-    //Add an item to the array. 'pageid'=>array('groupid','groupname')
-    $array[(string)$post_id] = $grouparray;
-    unset($grouparray);
-    //2. If I have a parent, recurse
-        //Using our earlier results, check post_parent. If it's != 0 then recurse this function, adding the return value to $array
-        if($parent_id != '0'){
-            //$recursedArray = ctx_ps_getprotection($parentid);
-            //$array = array_merge($array,$recursedArray);
-            $parentArray = ctx_ps_getprotection($parent_id);
-            if(!!$parentArray){
-              $array += $parentArray;
-            }
-        }
-
-    //3. Return the completed $array
-    return $array;
-}
-
-
-/**
- * Filters menu made by WP3 custom menu system (NOT IMPLEMENTED)
- * @param array $args
- * @return string
- */
-function ctx_ps_menu_filter_custom($array){
-    //wp_die("<array>".print_r($array,true)."</array>");
-    return $array;
-}
-
-
-/**
- * Creates the "Add Group" page
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_page_groups_add(){
-    global $wpdb;
-    require_once 'views/group-new.php';
-}
-
-
-/**
- * Creates the "Delete Group" page
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_page_groups_delete(){
-    global $wpdb;
-    require_once 'views/group-delete.php';
-}
-
-
-/**
- * Creates the "Edit Group" page
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_page_groups_edit(){
-    global $wpdb;
-    require_once 'views/group-edit.php';
-}
-
-
-/**
- * Creates the "Groups" page
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_page_groups_view(){
-    global $wpdb;
-    require_once 'views/groups.php';
-}
-
-
-/**
- * Creates the "Settings" page
- *
- * @global wpdb $wpdb
- */
-function ctx_ps_page_options(){
-    require_once 'views/options.php';
-}
-
-/**
- * Checks this page/post's metadata to see if it's protected. Returns true if
- * protected false if not.
- *
- * @return bool Whether this page has the "protected page" flag
- */
-function ctx_ps_isprotected($postid){
-    return (bool)get_post_meta($postid,'ctx_ps_security');
-}
-
 
 /**
  * Loads localized language files, if available
@@ -482,7 +350,7 @@ function ctx_ps_sidebar_security(){
         }
 
         //Get array with security requirements for this page
-        $securityStatus = ctx_ps_getprotection( $_GET['post'] );
+        $securityStatus = CTXPS_Security::get_protection( $_GET['post'] );
 
         //Get options
         $dbOpts = get_option('contexture_ps_options');
@@ -614,7 +482,7 @@ function ctx_ps_tag_groups_required($atts){
         'showempty' => 'true',
     ), $atts);
 
-    $requiredGroups = ctx_ps_getprotection( $post->ID );
+    $requiredGroups = CTXPS_Security::get_protection( $post->ID );
 
     //Set this var to count groups for current page
     $groupcount = 0;
@@ -679,7 +547,7 @@ function ctx_ps_usability_showprotection_content($column_name, $pageid){
     //Only do this if we've got the right column
     if($column_name==='protected'){
         //If page is protected, return lock icon
-        if(ctx_ps_isprotected($pageid))
+        if(CTXPS_Queries::check_protection($pageid))
             echo '<img alt="Protected" title="Protected" src="'.plugins_url('images/protected-inline.png',__FILE__).'" />';
         //If this page isnt protected, but an ancestor is, return a lighter icon
         else if(CTXPS_Queries::check_section_protection($pageid))

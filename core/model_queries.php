@@ -887,6 +887,16 @@ class CTXPS_Queries{
         ));
     }
 
+    /**
+     * Checks this page/post's metadata to see if it's protected. Returns true if
+     * protected false if not.
+     *
+     * @return bool Whether this page has the "protected page" flag
+     */
+    public static function check_protection($post_id){
+        return (bool)get_post_meta($post_id,'ctx_ps_security');
+    }
+
 }
 }
 ?>
