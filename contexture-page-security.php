@@ -38,6 +38,7 @@ require_once(ABSPATH . WPINC . '/ms-functions.php');
 require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
+require_once 'core/components.php';     //Bits that specifically are used for generating bits of views
 require_once 'controllers/app_controller.php';//Common, reusable classes, methods, functions
 require_once 'core/ajax.php';           //AJAX-specific methods
 require_once 'core/routing.php';        //All requests for views are sent through here
@@ -83,8 +84,8 @@ add_filter('get_pages','CTXPS_Security::filter_auto_menus',1);
 add_filter('wp_get_nav_menu_items','CTXPS_Security::filter_custom_menus',1);
 
 //Add shortcodes!
-add_shortcode('groups_attached', 'ctx_ps_tag_groups_attached'); //Current page permissions only
-add_shortcode('groups_required', 'ctx_ps_tag_groups_required'); //Complete permissions for current page
+add_shortcode('groups_attached', 'CTXPS_Tags::groups_attached'); //Current page permissions only
+add_shortcode('groups_required', 'CTXPS_Tags::groups_required'); //Complete permissions for current page
 
 //Update the edit.php pages & posts lists to include a "Protected" column
 add_filter('manage_pages_columns','ctx_ps_usability_showprotection');
@@ -432,92 +433,6 @@ function ctx_ps_sidebar_security(){
     }
 }
 
-/**
- * This tag will output a list of groups attached to the current page.
- *
- * @global wpdb $wpdb
- * @global array $post
- */
-function ctx_ps_tag_groups_attached($atts){
-    global $wpdb, $post;
-
-    //Attribute defaults
-    $output = shortcode_atts(
-    array(
-        'public' => 'false',
-        'label' => __('Groups attached to this page:','contexture-page-security'),
-    ), $atts);
-
-    //Create an array of groups that are already attached to the page
-    $currentGroups = '';
-    foreach(CTXPS_Queries::get_post_groups($post->ID) as $curGrp){
-        $currentGroups .= "<li>".$curGrp->group_title." (id:{$curGrp->sec_access_id})</li>";
-    }
-    $currentGroups = (empty($currentGroups)) ? '<li><em>'.__('No groups attached.','contexture-page-security').'</em></li>' : $currentGroups;
-    $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><ol>{$currentGroups}</ol></div>";
-    if($output['public']==='true'){
-        return $return;
-    }else{
-        return (current_user_can('manage_options')) ? $return : '';
-    }
-}
-
-/**
- * This tag will output a list of groups required to access the current page
- *
- * @global wpdb $wpdb
- * @global array $post
- * @attr public
- * @attr label
- */
-function ctx_ps_tag_groups_required($atts){
-    global $wpdb, $post;
-
-    //Attribute defaults
-    $output = shortcode_atts(
-    array(
-        'public' => 'false',
-        'label' => __('Groups Required:','contexture-page-security'),
-        'description' => __('To access this page, users must be a member of at least one group from each set of groups.','contexture-page-security'),
-        'showempty' => 'true',
-    ), $atts);
-
-    $requiredGroups = CTXPS_Security::get_protection( $post->ID );
-
-    //Set this var to count groups for current page
-    $groupcount = 0;
-
-    $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><p>{$output['description']}</p><ul>";
-
-    foreach($requiredGroups as $pageGroup->ID => $pageGroups->groups){
-
-        //List the page title
-        $return .= "<li><strong>".get_the_title($pageGroup->ID)." (id:{$pageGroup->ID})</strong><ul>";
-
-        foreach($pageGroups->groups as $curGrp->ID => $curGrp->title){
-            ++$groupcount;
-            $return .= "<li>".$curGrp->title." (id:{$curGrp->ID})</li>";
-        }
-
-        //If there were no groups attached, show that there's no access at that level
-        if(empty($groupcount) && $output['showempty']==='true'){
-            $return .= "<li><em>".__('No groups attached','contexture-page-security')."</em></li>";
-        }
-
-        //Reset groupcount
-        $groupcount = 0;
-
-        $return .= '</ul></li>';
-    }
-
-    $return .= '</ul></div>';
-
-    if($output['public']==='true'){
-        return $return;
-    }else{
-        return (current_user_can('manage_options')) ? $return : '';
-    }
-}
 
 
 /**
@@ -538,7 +453,7 @@ function ctx_ps_usability_showprotection($columns){
 }
 
 /**
- * Generates the "lock" symbol for protected pages. See template.php -> display_page_row() for  more.
+ * Generates the "lock" symbol for protected pages. See WP's template.php -> display_page_row() for  more.
  */
 function ctx_ps_usability_showprotection_content($column_name, $pageid){
 
