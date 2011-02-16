@@ -11,7 +11,7 @@ if(!empty($_POST['action'])){
     //Launch code based on action
     switch($_POST['action']){
         case 'addgroup':
-            $creategroup_message = ctx_ps_create_group($_POST['group_name'], $_POST['group_description']);
+            $creategroup_message = CTXPS_App::create_group($_POST['group_name'], $_POST['group_description']);
             break;
         default: break;
     }

@@ -85,14 +85,14 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                         if(CTXPS_Queries::count_groups($display_user) == '0'){
                             echo '<td colspan="4">',__('You are not currently a member of any groups.','contexture-page-security'),'</td>';
                         } else {
-                            echo ctx_ps_display_group_list($display_user,'users',false);
+                            echo CTXPS_Components::render_group_list($display_user,'users',false);
                         }
                     }else{
                         //IF THIS IS A USER-EDIT PAGE (admin version)
                         if(CTXPS_Queries::count_groups($display_user) == '0'){
                             echo '<td colspan="4">',sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'),admin_url('users.php?page=ps_groups')),'</td>';
                         } else {
-                            echo ctx_ps_display_group_list($display_user,'users',true);
+                            echo CTXPS_Components::render_group_list($display_user,'users',true);
                         }
                     }
                 ?>

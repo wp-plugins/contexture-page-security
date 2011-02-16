@@ -793,32 +793,6 @@ class CTXPS_Queries{
     }
 
     /**
-     * Finds the groups attached to the specified post/page and returns them as
-     * an array.
-     *
-     * @global wpdb $wpdb
-     * @global CTXPSC_Tables $ctxpsdb
-     * @return array An array of group & security data attached to specified post
-     */
-    public static function get_post_groups($post_id=null){
-        global $wpdb,$ctxpsdb;
-
-        //Return an object/array of groups attached to the current page
-        if(is_numeric($post_id) && !empty($post_id)){
-            return $wpdb->get_results($wpdb->prepare(
-                'SELECT * FROM `'.$ctxpsdb->security.'`
-                    JOIN `'.$ctxpsdb->groups.'`
-                        ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
-                    WHERE sec_protect_id = %s',
-                $post_id
-            ));
-        }
-
-        //Return ALL groups
-        return self::get_groups();
-    }
-
-    /**
      * This gets an array of all the users attached to a specified group.
      *
      * @global wpdb $wpdb

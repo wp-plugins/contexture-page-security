@@ -13,8 +13,8 @@ class CTXPS_App{
         add_action('admin_head', 'CTXPS_App::js_strings_init');
 
         //Add restrict access sidebar to pages and posts
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'page', 'side', 'low');
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'ctx_ps_sidebar_security', 'post', 'side', 'low');
+        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', 'page', 'side', 'low');
+        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', 'post', 'side', 'low');
         //TODO: Add support for custom post types
 
         //Add our custom admin styles
@@ -92,6 +92,39 @@ class CTXPS_App{
 
         add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'CTXPS_Router::options');
         //add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
+    }
+
+    /**
+     * Loads localized language files, if available
+     */
+    public static function localize_init(){
+       if (function_exists('load_plugin_textdomain')) {
+          load_plugin_textdomain('contexture-page-security', false, dirname(plugin_basename(__FILE__)).'/languages' );
+       }
+    }
+
+    /**
+     * Creates a new group
+     *
+     * @global wpdb $wpdb
+     * @param string $name A short, meaningful name for the group
+     * @param string $description A more detailed description for the group
+     * @return <type>
+     */
+    public static function create_group($name, $description){
+        global $wpdb;
+
+        if(!CTXPS_Queries::check_group_exists($name)){
+            $current_user = wp_get_current_user();
+
+            if(CTXPS_Queries::add_group($name, $description, $current_user->ID) !== FALSE){
+                return '<div id="message" class="updated"><p>'.__('New group created','contexture-page-security').'</p></div>';
+            }else{
+                return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. There was an unspecified system error.','contexture-page-security').'</p></div>';
+            }
+        } else {
+            return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. A group with that name already exists.','contexture-page-security').'</p></div>';
+        }
     }
 
 }

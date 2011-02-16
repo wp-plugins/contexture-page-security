@@ -42,10 +42,10 @@
             <tbody>
                 <?php
                     if(CTXPS_Queries::count_groups() == 0){
-                        echo ctx_ps_display_group_list();
+                        echo CTXPS_Components::render_group_list();
                         echo sprintf( '<td colspan="4">'.__('You have not created any groups. Please <a href="%s">add a group</a>.','contexture-page-security').'</td>',admin_url('users.php?page=ps_groups_add') );
                     } else {
-                        echo ctx_ps_display_group_list();
+                        echo CTXPS_Components::render_group_list();
                 }
                 ?>
             </tbody>

@@ -144,7 +144,7 @@
                                     <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display:none;" class="waiting"/>
                                 </p>
                                 </td></tr>';
-                                echo ctx_ps_display_member_list($_GET['groupid']);
+                                echo CTXPS_Components::render_member_list($_GET['groupid']);
                         }
                     ?>
                 </tbody>
@@ -171,7 +171,7 @@
                     if(CTXPS_Queries::count_protected($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No content is attached to this group.','contexture-page-security').'</td>';
                     } else {
-                        echo ctx_ps_display_page_list($_GET['groupid']);
+                        echo CTXPS_Components::render_pages_by_group_list($_GET['groupid']);
                     }
                 ?>
             </tbody>
