@@ -25,8 +25,11 @@ License: GPL2
 */
 
 /***************************** SET GLOBALS ************************************/
+/**The absolute local path to the plugin*/
 define('CTXPSPATH',dirname(__FILE__));
+/**The directory path to the plugin*/
 define('CTXPSDIR',basename(CTXPSPATH));
+/**The URL of the plugin directory*/
 define('CTXPSURL',plugin_dir_url(__FILE__));
 global $wpdb, $ctxpsdb;
 

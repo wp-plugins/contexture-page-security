@@ -13,7 +13,7 @@ class CTXPS_Components{
         $date = $columns['date'];
         unset($columns['date']);
         //Add new column
-        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',__FILE__).'" /></div>';
+        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png'.'" /></div>';
         //Add date back on (now at end of array);
         $columns['date'] = $date;
 
@@ -38,7 +38,7 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected','contexture-page-security'),
                     'title'=>__('Protected','contexture-page-security'),
-                    'src'=>plugins_url('images/protected-inline.png',__FILE__)
+                    'src'=>CTXPSURL.'images/protected-inline.png'
                 ));
             }
             //If this page isnt protected, but an ancestor is, return a lighter icon
@@ -46,7 +46,7 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected (inherited)','contexture-page-security'),
                     'title'=>__('Inheriting an ancestors protection','contexture-page-security'),
-                    'src'=>plugins_url('images/protected-inline-descendant.png',__FILE__)
+                    'src'=>CTXPSURL.'images/protected-inline-descendant.png'
                 ));
             }
         }
