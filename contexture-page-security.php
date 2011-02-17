@@ -35,15 +35,19 @@ global $wpdb, $ctxpsdb;
 /************************** LOAD WP DEPENDENCIES ******************************/
 require_once(ABSPATH . WPINC . '/registration.php');
 require_once(ABSPATH . WPINC . '/ms-functions.php');
-
 /**************************** LOAD CORE FILES *********************************/
 require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
-require_once 'core/components.php';     //Bits that specifically are used for generating bits of views
+/**************************** LOAD COMPONENTS *********************************/
+require_once 'components/app.php';           //Plugin-wide components
+require_once 'components/shortcodes.php';    //Short-codes
+require_once 'components/tables.php';        //Table generator
+require_once 'components/table-packages.php';//Table generator packages
+/**************************** LOAD CONTROLLERS ********************************/
 require_once 'controllers/app_controller.php';//Common, reusable classes, methods, functions
-require_once 'core/ajax.php';           //AJAX-specific methods
-require_once 'core/routing.php';        //All requests for views are sent through here
+require_once 'controllers/ajax.php';          //AJAX-specific methods
+require_once 'core/routing.php';              //All requests for views are sent through here
 
 /******************************** HOOKS ***************************************/
 // Install new tables (on activate)
