@@ -92,61 +92,7 @@
                     </tr>
                 </tfoot>
                 <tbody id="users" class="list:user user-list">
-                    <?php
-                        if(CTXPS_Queries::count_members($_GET['groupid']) < 1){
-                            echo '<td colspan="4">'.__('No users have been added to this group.','contexture-page-security').'</td>';
-                        } else {
-                           echo '<tr id="inline-edit" class="inline-edit-row inline-options-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="4">
-                                <h4>MEMBERSHIP DETAILS</h4>
-                                <fieldset class="inline-edit-col-left">
-                                    <label>
-                                        <span class="title">'.__('User','contexture-page-security').'</span>
-                                        <span class="input-text-wrap username" style="color:silver;">
-                                            username
-                                        </span>
-                                    </label>
-                                    <label>&nbsp;</label>
-                                </fieldset>
-                                <fieldset class="inline-edit-col-right">
-                                    <label>
-                                        <span class="title">'.__('Expires','contexture-page-security').'</span>
-                                        <span class="input-text-wrap">
-                                            <input type="checkbox" value="" name="membership_permanent"/>
-                                        </span>
-                                    </label>
-                                    <label>
-                                        <span class="title">'.__('End Date','contexture-page-security').'</span>
-                                    </label>
-                                    <div class="inline-edit-date">
-                                        <div class="timestamp-wrap">
-                                            <select tabindex="4" name="mm" disabled="disabled">
-                                                <option value="01">Jan</option>
-                                                <option value="02">Feb</option>
-                                                <option value="03">Mar</option>
-                                                <option value="04">Apr</option>
-                                                <option value="05">May</option>
-                                                <option value="06">Jun</option>
-                                                <option value="07">Jul</option>
-                                                <option value="08">Aug</option>
-                                                <option value="09">Sep</option>
-                                                <option value="10">Oct</option>
-                                                <option value="11">Nov</option>
-                                                <option value="12">Dec</option>
-                                            </select>
-                                            <input type="text" autocomplete="off" tabindex="4" maxlength="2" size="2" value="" name="jj" disabled="disabled">,
-                                            <input type="text" autocomplete="off" tabindex="4" maxlength="4" size="4" value="" name="aa" disabled="disabled">
-                                        </div>
-                                    </div>
-                                </fieldset>
-                                <p class="submit inline-edit-save">
-                                    <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel','contexture-page-security').'</a>
-                                    <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update','contexture-page-security').'</a>
-                                    <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display:none;" class="waiting"/>
-                                </p>
-                                </td></tr>';
-                                echo CTXPS_Components::render_member_list($_GET['groupid']);
-                        }
-                    ?>
+                    <?php echo CTXPS_Components::render_member_list($_GET['groupid']); ?>
                 </tbody>
             </table>
         </form>
@@ -168,13 +114,7 @@
                 </tr>
             </tfoot>
             <tbody id="users" class="list:content content-list">
-                <?php
-                    if(CTXPS_Queries::count_protected($_GET['groupid']) < 1){
-                        echo '<td colspan="3">'.__('No content is attached to this group.','contexture-page-security').'</td>';
-                    } else {
-                        echo CTXPS_Components::render_content_by_group_list($_GET['groupid']);
-                    }
-                ?>
+                <?php echo CTXPS_Components::render_content_by_group_list($_GET['groupid']); ?>
             </tbody>
         </table>
         <?php } //ENDS : if (empty($groupInfo->group_title)) ?>

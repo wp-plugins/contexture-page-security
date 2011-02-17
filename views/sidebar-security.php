@@ -70,7 +70,7 @@
                 foreach($securityStatus as $securityArray->pageid => $securityArray->grouparray){
                     if($securityArray->pageid == $_GET['post']){
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                            echo '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title"><a href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">'.$currentGroup->name.'</a></span><span class="removegrp" onclick="ctxps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){

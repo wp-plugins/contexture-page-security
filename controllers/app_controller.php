@@ -73,6 +73,7 @@ class CTXPS_App{
             var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
             var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
             var msgYearRequired = '<?php _e('You must specify an expiration year.','contexture-page-security') ?>';
+            var msgGeneralError = '<?php _e('An error occurred: ','contexture-page-security') ?>';
         </script>
         <script type="text/javascript" src="<?php echo CTXPSURL.'/views/js/core-ajax.dev.js' ?>"></script>
         <?php

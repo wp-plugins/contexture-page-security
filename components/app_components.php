@@ -69,6 +69,10 @@ class CTXPS_Components{
 
         $pagelist = CTXPS_Queries::get_content_by_group($group_id);
 
+        if(count($pagelist)===0){
+            return sprintf('<td colspan="3">%s</td>',__('No content is attached to this group.','contexture-page-security'));
+        }
+
         $html = '';
         $countpages = '';
         $alternatecss = ' class="alternate" ';
@@ -83,7 +87,7 @@ class CTXPS_Components{
                     <strong><a href="%3$s">%4$s</a></strong>
                     <div class="row-actions">
                         <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
-                        <span class="trash"><a id="remcontent-%1$s" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove this group from the content">'.__('Remove','contexture-page-security').'</a> | </span>
+                        <span class="trash"><a id="remcontent-%1$s" onclick="ctxps_remove_page_from_group(%1$s,jQuery(this))" title="Remove this group from the content">'.__('Remove','contexture-page-security').'</a> | </span>
                         <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
                     </div>
                 </td>
@@ -118,12 +122,22 @@ class CTXPS_Components{
      *
      * @return string Returns the html
      */
-    public static function render_group_list($user_id='',$view='groups',$show_actions=true){
+    public static function render_group_list($user_id='',$view='groups',$show_actions=true,$profile=true){
         global $wpdb;
 
         $linkBack = admin_url('users.php');
 
         $groups = CTXPS_Queries::get_groups($user_id);
+
+        //If there are no groups, stop right here
+        if(count($groups)===0){
+            if ( $profile ) {
+                return sprintf('<td colspan="4">%s</td>',sprintf(__('You are not currently a member of any groups.','contexture-page-security'),admin_url('users.php?page=ps_groups')));
+            }
+            else{
+                return sprintf( '<td colspan="4">%s</td>', sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'), admin_url('users.php?page=ps_groups') ) );
+            }
+        }
 
         $html = '';
         $htmlactions = '';
@@ -139,7 +153,7 @@ class CTXPS_Components{
                 switch($view){
                     case 'users':
                         //Button for "Remove" takes user out of group (ajax)
-                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"ctx_ps_remove_group_from_user({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
+                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"ctxps_remove_group_from_user({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
                         break;
                     case 'groups':
                         //Button for "Delete" removes group from db (postback)
@@ -188,10 +202,60 @@ class CTXPS_Components{
         global $wpdb;
 
         $members = CTXPS_Queries::get_group_members($group_id);
+        if(count($members)===0){
+            return '<td colspan="4">'.__('No users have been added to this group.','contexture-page-security').'</td>';
+        }
 
-        $html = '';
         $countmembers = '';
         $alternatecss = ' class="alternate" ';
+        $html = '<tr id="inline-edit" class="inline-edit-row inline-options-row-page inline-edit-page quick-edit-row quick-edit-row-page inline-edit-page" style="display: none"><td colspan="4">
+                    <h4>'.__('MEMBERSHIP DETAILS','contexture-page-security').'</h4>
+                    <fieldset class="inline-edit-col-left">
+                        <label>
+                            <span class="title">'.__('User','contexture-page-security').'</span>
+                            <span class="input-text-wrap username" style="color:silver;">
+                                username
+                            </span>
+                        </label>
+                        <label>&nbsp;</label>
+                    </fieldset>
+                    <fieldset class="inline-edit-col-right">
+                        <label>
+                            <span class="title">'.__('Expires','contexture-page-security').'</span>
+                            <span class="input-text-wrap">
+                                <input type="checkbox" value="" name="membership_permanent"/>
+                            </span>
+                        </label>
+                        <label>
+                            <span class="title">'.__('End Date','contexture-page-security').'</span>
+                        </label>
+                        <div class="inline-edit-date">
+                            <div class="timestamp-wrap">
+                                <select tabindex="4" name="mm" disabled="disabled">
+                                    <option value="01">Jan</option>
+                                    <option value="02">Feb</option>
+                                    <option value="03">Mar</option>
+                                    <option value="04">Apr</option>
+                                    <option value="05">May</option>
+                                    <option value="06">Jun</option>
+                                    <option value="07">Jul</option>
+                                    <option value="08">Aug</option>
+                                    <option value="09">Sep</option>
+                                    <option value="10">Oct</option>
+                                    <option value="11">Nov</option>
+                                    <option value="12">Dec</option>
+                                </select>
+                                <input type="text" autocomplete="off" tabindex="4" maxlength="2" size="2" value="" name="jj" disabled="disabled">,
+                                <input type="text" autocomplete="off" tabindex="4" maxlength="4" size="4" value="" name="aa" disabled="disabled">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <p class="submit inline-edit-save">
+                        <a class="button-secondary cancel alignleft" title="Cancel" href="#inline-membership" accesskey="c">'.__('Cancel','contexture-page-security').'</a>
+                        <a class="button-primary save alignright" title="Update" href="#inline-membership" accesskey="s">'.__('Update','contexture-page-security').'</a>
+                        <img alt="" src="'.admin_url('/images/wpspin_light.gif').'" style="display:none;" class="waiting"/>
+                    </p>
+                    </td></tr>';
 
         foreach($members as $member){
             $fname = get_user_meta($member->ID, 'first_name', true);

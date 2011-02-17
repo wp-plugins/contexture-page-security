@@ -40,9 +40,9 @@ require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
 /**************************** LOAD COMPONENTS *********************************/
-require_once 'components/app.php';           //Plugin-wide components
-require_once 'components/shortcodes.php';    //Short-codes
-require_once 'components/tables.php';        //Table generator
+require_once 'components/app_components.php';           //Plugin-wide components
+require_once 'components/shortcode_components.php';    //Short-codes
+require_once 'components/table_components.php';        //Table generator
 require_once 'components/table-packages.php';//Table generator packages
 /**************************** LOAD CONTROLLERS ********************************/
 require_once 'controllers/app_controller.php';//Common, reusable classes, methods, functions

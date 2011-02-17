@@ -72,7 +72,7 @@ class CTXPS_Ajax extends CTXAjax {
                     if($securityArray->pageid == $_GET['postid']){
                         //Loop through all groups for the CURRENT page
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctx_ps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctxps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
                         //Loop through all groups for the ANCESTOR page
@@ -100,37 +100,29 @@ class CTXPS_Ajax extends CTXAjax {
             //If user isn't authorized
             $response = array(
                 'what'=>'remove_group',
-                'action'=>'remove_1',
-                'id'=>new WP_Error('',__('Admin user is not authorized.','contexture-page-security')),
-                'data'=>__('Admin user is not authorized.','contexture-page-security')
+                'action'=>'remove',
+                'id'=>new WP_Error('error',__('Admin user is not authorized.','contexture-page-security'))
             );
         }
 
         if(CTXPS_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
-            //CTXAjax::response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
+            //SUCCESS!
             $response = array(
                 'what'=>'remove_group',
-                'action'=>'remove_1',
+                'action'=>'remove',
                 'id'=>1,
-                'data'=>__('Group removed from content','contexture-page-security')
-            );
-                        //CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
-            $response = array(
-                'what'=>'remove_group',
-                'action'=>'remove_1',
-                'id'=>new WP_Error('query_failed',__('Query failed or content not in group.','contexture-page-security')),
-                'data'=>__('test test test','contexture-page-security')
-            );
-        }else{
-            //CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
-            $response = array(
-                'what'=>'remove_group',
-                'action'=>'remove_1',
-                'id'=>new WP_Error('',__('Query failed or content not in group.','contexture-page-security')),
-                'data'=>__('Query failed','contexture-page-security')
+                'data'=>__('Group removed from content','contexture-page-security'),
+                'supplemental'=>array('html'=>CTXPS_Components::render_content_by_group_list($_GET['groupid']))//We need to regenerate table content
             );
         }
-        //CTXAjax::response($response);
+        else{
+            //Some other problem
+            $response = array(
+                'what'=>'remove_group',
+                'action'=>'remove',
+                'id'=>new WP_Error('error',__('Query failed or content not in group.','contexture-page-security'))
+            );
+        }
         $response = new WP_Ajax_Response($response);
         $response->send();
     }
@@ -203,22 +195,37 @@ class CTXPS_Ajax extends CTXAjax {
      */
     public static function remove_group_from_user(){
         global $wpdb;
+        $response = array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
         if(!current_user_can('edit_users')){
-            //If user isn't authorized
-            CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+            //Error - membership not found.
+            $response = array(
+                'what'=>'unenroll',
+                'action'=>'unenroll',
+                'id'=>new WP_Error('error',__('User is not authorized.','contexture-page-security'))
+            );
         }
 
         if(!CTXPS_Queries::delete_membership($_GET['user_id'], $_GET['groupid'])){
-            CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
+            //Error - membership not found.
+            $response = array(
+                'what'=>'unenroll',
+                'action'=>'unenroll',
+                'id'=>new WP_Error('error',__('User not found in group.','contexture-page-security'))
+            );
         } else {
-            $html = CTXPS_Components::render_group_list($_GET['user_id'],'users');
-            if(empty($html)){
-                $html = '<td colspan="4">'.__('This user has not been added to any static groups. Select a group above or visit any <a href="users.php?page=ps_groups">group detail page</a>.</td>','contexture-page-security');
-            }
-            CTXAjax::response(array('code'=>'1','message'=>__('User unenrolled from group','contexture-page-security'),'html'=>'<![CDATA['.$html.']]>'));
+            //SUCCESS!
+            $response = array(
+                'what'=>'unenroll',
+                'action'=>'unenroll',
+                'id'=>1,
+                'data'=>__('User removed from group.','contexture-page-security'),
+                'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_GET['user_id'],'users',true))//We need to regenerate table content
+            );
         }
+        $response = new WP_Ajax_Response($response);
+        $response->send();
     }
 
     /**

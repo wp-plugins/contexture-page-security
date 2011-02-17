@@ -4,19 +4,19 @@ jQuery(function(){
         .data('options',jQuery('#groups-available').html())
         .children('.detach')
             .remove();
-    jQuery('#add_group_page').click(function(){ctx_ps_add_group_to_page()});
-    jQuery('#ctx_ps_protectmy').click(function(){ctx_ps_togglesecurity()});
+    jQuery('#add_group_page').click(function(){ctxps_add_group_to_page()});
+    jQuery('#ctx_ps_protectmy').click(function(){ctxps_toggle_security()});
     jQuery('label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
             alert(msgNoUnprotect);
         }
     });
-    jQuery('#btn-add-grp-2-user').click(function(){ctx_ps_add_group_to_user()});
+    jQuery('#btn-add-grp-2-user').click(function(){ctxps_add_group_to_user()});
 });
 
 //Will display a "Security Updated" message in the sidebar when successful change to security
-function ctx_showSavemsg(selector){
+function ctxps_showSavemsg(selector){
     if(jQuery(selector+' .ctx-ajax-status').length==0){
         jQuery(selector)
             .append('<span class="ctx-ajax-status">Saved</span>')
@@ -31,8 +31,8 @@ function ctx_showSavemsg(selector){
 }
 
 //Updates the security status of the page
-function ctx_ps_togglesecurity(){
-    var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
+function ctxps_toggle_security(){
+    var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
 
     if(jQuery('#ctx_ps_protectmy:checked').length !== 0){
         //Turn security ON for this group
@@ -40,12 +40,12 @@ function ctx_ps_togglesecurity(){
             {
                 action:'ctxps_security_update',
                 setting:'on',
-                postid:ipostid
+                postid:post_id
             },
             function(data){ data = jQuery(data);
                 if(data.find('code').text() == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
-                    ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
+                    ctxps_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
                 }
             },'xml'
         );
@@ -56,13 +56,13 @@ function ctx_ps_togglesecurity(){
                 {
                     action:'ctxps_security_update',
                     setting:'off',
-                    postid:ipostid
+                    postid:post_id
                 },
                 function(data){
                     data = jQuery(data);
                     if(data.find('code').text() =='1'){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
-                        ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
+                        ctxps_showSavemsg('#ctx_ps_sidebar_security h3.hndle')
                     }
                 },'xml'
             );
@@ -75,7 +75,7 @@ function ctx_ps_togglesecurity(){
 }
 
 //Adds a group to a user
-function ctx_ps_add_group_to_user(){
+function ctxps_add_group_to_user(){
     var igroupid = parseInt(jQuery('#groups-available').val());
     var iusrid = parseInt(jQuery('#ctx-group-user-id').val());
     if(igroupid!=0){
@@ -107,7 +107,7 @@ function ctx_ps_add_group_to_user(){
                             .remove(); //Remove them
 
                     jQuery('#btn-add-grp-2-user').removeAttr('disabled');
-                    ctx_showSavemsg('.ctx-ps-tablenav');
+                    ctxps_showSavemsg('.ctx-ps-tablenav');
                 }
             },'xml'
         );
@@ -117,7 +117,7 @@ function ctx_ps_add_group_to_user(){
 }
 
 //Removes a group from a user
-function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
+function ctxps_remove_group_from_user(igroupid,iuserid,me,action){
     jQuery.get('admin-ajax.php',
         {
             action:'ctxps_remove_group_from_user',
@@ -125,8 +125,8 @@ function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
             user_id:iuserid
         },
         function(response){
-            response = jQuery(response);
-            if(response.find('code').text() == '1'){
+            response = jQuery(response).find('unenroll');
+            if(response.attr('id') == '1'){
 
                var grpsAvail = jQuery('#groups-available');
                 grpsAvail
@@ -141,10 +141,12 @@ function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
                 //Take me out of the table
                 me.parents('tr:first').fadeOut(500,function(){
                     //Rebuild the group
-                    jQuery('#grouptable > tbody').html(response.find('html').text());
+                    me.parents('tbody:first').html(response.find('supplemental html').text());
                 });
 
-                ctx_showSavemsg('.ctx-ps-tablenav');
+                ctxps_showSavemsg('.ctx-ps-tablenav');
+            }else{
+                alert(msgGeneralError+data.find('wp_error').text());
             }
         },'xml'
     );
@@ -153,7 +155,7 @@ function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
 
 
 //Adds a group to a page with security
-function ctx_ps_add_group_to_page(){
+function ctxps_add_group_to_page(){
     var igroupid = parseInt(jQuery('#groups-available').val());
     var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
     if(igroupid!=0){
@@ -181,7 +183,7 @@ function ctx_ps_add_group_to_page(){
                         .children('.detach')
                             .remove();
 
-                    ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
+                    ctxps_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
                 }
             },'xml'
         );
@@ -191,7 +193,7 @@ function ctx_ps_add_group_to_page(){
 }
 
 //Removes a group from a page with security
-function ctx_ps_remove_group_from_page(igroupid,me){
+function ctxps_remove_group_from_page(igroupid,me){
     if(confirm(msgRemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
         var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
         //alert("The group you want to add is: "+$groupid);
@@ -216,7 +218,7 @@ function ctx_ps_remove_group_from_page(igroupid,me){
                             .remove();
                     me.parent().fadeOut(500,function(){jQuery(this).remove();});
 
-                    ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
+                    ctxps_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
                 }
             },'xml'
         );
@@ -224,24 +226,28 @@ function ctx_ps_remove_group_from_page(igroupid,me){
 }
 
 //Removes a page from a group via the group screen
-function ctx_ps_remove_page_from_group(post_id,me){
+function ctxps_remove_page_from_group(post_id,me){
     if(confirm( msgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
         //Get the id of the current group
-        var igroupid = parseInt(jQuery('#groupid').val());
+        var group_id = parseInt(jQuery('#groupid').val());
 
         jQuery.get('admin-ajax.php',
             {
                 action:'ctxps_remove_group_from_page',
-                groupid:igroupid,
+                groupid:group_id,
                 postid:post_id
             },
             function(data){
-                data = jQuery(data);
-                if(data.find('code').text() == '1'){
-
-                    me.parents('tr:first').fadeOut(500,function(){jQuery(this).remove();});
-
-                    //ctx_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
+                data = jQuery(data).find('remove_group');
+                if(data.attr('id') == '1'){
+                    me.parents('tr:first').fadeOut(500,function(){
+                        jQuery(this).parents('tbody:first')
+                            .html(data.find('supplemental html').text());
+                    });
+                    //ctxps_showSavemsg('#ctx_ps_sidebar_security h3.hndle');
+                }
+                else{
+                    alert(msgGeneralError+data.find('wp_error').text());
                 }
             },'xml'
         );

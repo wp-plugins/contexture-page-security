@@ -97,7 +97,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                     <strong><a href="%3$s">%4$s</a></strong>
                     <div class="row-actions">
                         <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
-                        <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove','contexture-page-security').'</a> | </span>
+                        <span class="trash"><a href="#" onclick="ctxps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove','contexture-page-security').'</a> | </span>
                         <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
                     </div>
                 </td>
