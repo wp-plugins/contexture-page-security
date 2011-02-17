@@ -64,12 +64,9 @@ class CTXPS_Components{
      * @param int $group_id The id of the group we need a member list for.
      * @return string Html to go inside tbody.
      */
-    public static function render_pages_by_group_list($group_id){
+    public static function render_content_by_group_list($group_id){
         global $wpdb;
 
-        //$sql = sprintf('SELECT * FROM `%1$s` JOIN `%2$s` ON `%1$s`.`sec_protect_id` = `%2$s`.`ID` WHERE `sec_access_id`=\'%3$s\'', $wpdb->prefix.'ps_security', $wpdb->posts, $group_id);
-
-        //$pagelist = $wpdb->get_results($sql);
         $pagelist = CTXPS_Queries::get_content_by_group($group_id);
 
         $html = '';
@@ -86,7 +83,7 @@ class CTXPS_Components{
                     <strong><a href="%3$s">%4$s</a></strong>
                     <div class="row-actions">
                         <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
-                        <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove','contexture-page-security').'</a> | </span>
+                        <span class="trash"><a id="remcontent-%1$s" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove this group from the content">'.__('Remove','contexture-page-security').'</a> | </span>
                         <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
                     </div>
                 </td>
@@ -357,6 +354,100 @@ if(!class_exists('CTX_Tables')){
  */
 class CTX_Tables {
 
+    /** Assoc array.
+     * Default list-table configuration settings.
+     * @var array
+     * @var 'form_id' : The id to be used in <form>
+     * @var 'form_method' : Whether to use 'get' or 'post' in the form
+     * @var 'list_id' : The id to use in the table's <tbody>
+     * @var 'record_slug' : Used for generating table row classes
+     * @var 'bulk' : true will show bulk options (if any are set). False will hide them.
+     * @var 'no_records' : The text/html to render out if the query returns no records
+     */
+    public $table_conf      = array();
+    /** Index array => Assoc arrays.
+     * An array of column options. Each indexed array represents another column to be displayed.
+     * Each associative array must have the following values...
+     * @var array
+     * @var 'title' : The title to display in the thead and tfoot
+     * @var 'slug' : Slug to use for css class of columns
+     * @var 'class' : Additional css classes to add to columns (ie: col-first or col-last)
+     * @var 'width' : Optional css value for width. Leave blank for auto.
+     */
+    public $column_conf     = array();
+    /** Index array => Assoc arrays.
+     * An array of action options. Each indexed array represents another row-action to be displayed.
+     * Each associative array must have the following values...
+     * @var array
+     * @var 'title' : The text to display for the action
+     * @var 'tip' : Tooltip renders into the link's title attribute
+     * @var 'slug' : Slug to render into css
+     * @var 'color' : Optional css value for text color. Leave blank for auto.
+     */
+    public $actions_conf    = array();
+    /**
+     * Assoc array. Allows configuration of bulk actions. If empty, bulk actions will be
+     * hidden and no checkboxes will be rendered.
+     * @var array
+     * @var KEY : Visible bulk action text. ie: "Delete"
+     * @var VALUE : Slug-value to be passed in querystring. Use $_GET['action'] to get value. ie: "delete"
+     */
+    public $bulk_conf       = array();
+    /**
+     * An array of configuration packages we've included in this class.
+     * @var array
+     */
+    private $lists          = array('demo','forms');
+    /**
+     * Store final, processed query data here. This is passed directly to $this->create
+     * @var array
+     */
+    public $list_data      = array();
+
+    /**
+     * Routes request to correct configuration package then runs the create function
+     * @param string $list The name of the list to generate (if using packaged ;ist table)
+     */
+    public function __construct($list,$echo=true){
+        if( in_array(strtolower($list),$this->lists) ){
+            //Run configuration package for specified list (if list exists)
+            eval(sprintf('$this->package_%s();',$list));
+        }else{
+            //If list isn't a package, try using hooked package
+            do_action('ctx_list_table_prepare-'.$list,$this);
+        }
+        if($echo){
+            //Spit the created table onto the page
+            $this->render();
+        }
+    }
+
+    /** Immediately renders/echos the table in it's current state. */
+    public function render(){
+        echo $this->create($this->table_conf, $this->column_conf, $this->actions_conf, $this->bulk_conf, $this->list_data);
+    }
+
+    /** Procedural setter for $this->table_conf */
+    public function set_table_conf($array){
+        $this->table_conf = $array;
+    }
+    /** Procedural setter for $this->column_conf */
+    public function set_column_conf($array){
+        $this->column_conf = $array;
+    }
+    /** Procedural setter for $this->actions_conf */
+    public function set_actions_conf($array){
+        $this->actions_conf = $array;
+    }
+    /** Procedural setter for $this->bulk_conf */
+    public function set_bulk_conf($array){
+        $this->bulk_conf = $array;
+    }
+    /** Procedural setter for $this->list_data */
+    public function set_list_data($array){
+        $this->list_data = $array;
+    }
+
     /**
      * Returns an associative array compatible with a single entry in the self::create()'s $records array.
      * Use $records[] = prepare_row(); to append returned record to your $records array for use in list_table.
@@ -571,148 +662,20 @@ if(!class_exists('CTXPS_Table_Packages')){
  */
 class CTXPS_Table_Packages extends CTX_Tables{
 
-    /** Assoc array.
-     * Default list-table configuration settings.
-     * @var array
-     * @var 'form_id' : The id to be used in <form>
-     * @var 'form_method' : Whether to use 'get' or 'post' in the form
-     * @var 'list_id' : The id to use in the table's <tbody>
-     * @var 'record_slug' : Used for generating table row classes
-     * @var 'bulk' : true will show bulk options (if any are set). False will hide them.
-     * @var 'no_records' : The text/html to render out if the query returns no records
-     */
-    public $table_conf      = array();
-    /** Index array => Assoc arrays.
-     * An array of column options. Each indexed array represents another column to be displayed.
-     * Each associative array must have the following values...
-     * @var array
-     * @var 'title' : The title to display in the thead and tfoot
-     * @var 'slug' : Slug to use for css class of columns
-     * @var 'class' : Additional css classes to add to columns (ie: col-first or col-last)
-     * @var 'width' : Optional css value for width. Leave blank for auto.
-     */
-    public $column_conf     = array();
-    /** Index array => Assoc arrays.
-     * An array of action options. Each indexed array represents another row-action to be displayed.
-     * Each associative array must have the following values...
-     * @var array
-     * @var 'title' : The text to display for the action
-     * @var 'tip' : Tooltip renders into the link's title attribute
-     * @var 'slug' : Slug to render into css
-     * @var 'color' : Optional css value for text color. Leave blank for auto.
-     */
-    public $actions_conf    = array();
     /**
-     * Assoc array. Allows configuration of bulk actions. If empty, bulk actions will be
-     * hidden and no checkboxes will be rendered.
-     * @var array
-     * @var KEY : Visible bulk action text. ie: "Delete"
-     * @var VALUE : Slug-value to be passed in querystring. Use $_GET['action'] to get value. ie: "delete"
+     * CONFIG PACKAGE for Associated Content
      */
-    public $bulk_conf       = array();
-    /**
-     * An array of configuration packages we've included in this class.
-     * @var array
-     */
-    private $lists          = array('demo','forms');
-    /**
-     * Store final, processed query data here. This is passed directly to $this->create
-     * @var array
-     */
-    public $list_data      = array();
+    public function package_associated_content(){
 
-    /**
-     * Routes request to correct configuration package then runs the create function
-     * @param string $list The name of the list to generate (if using packaged ;ist table)
-     */
-    public function __construct($list){
-        if( in_array(strtolower($list),$this->lists) ){
-            //Run configuration package for specified list (if list exists)
-            eval(sprintf('$this->package_%s();',$list));
-        }else{
-            //If list isn't a package, try use hooked package
-            do_action('ctx_list_table_prepare-'.$list,$this);
-        }
-        //Spit the created table onto the page
-        echo $this->create($this->table_conf, $this->column_conf, $this->actions_conf, $this->bulk_conf, $this->list_data);
-    }
-
-    /**
-     * CONFIG PACKAGE for forms LT
-     */
-    public function package_forms(){
-        global $fpdb;
-        /******** SET CONFIGURATION FOR LIST-TABLE ****************************/
         $this->table_conf = array(
-            'form_id'       =>'ctx-forms-form', //id value for the form (css-friendly id)
-            'form_method'   =>'get',            //how to submit the form get/post
-            'list_id'       =>'ctx-forms-list', //id value for the table (css-friendly id)
-            'record_slug'   =>'ctx-form',       //css-class-friendly slug for uniquely referring to records
-            'bulk'          =>'false',          //set to true to include checkboxes (if false, bulk options will be disabled)
-            'no_records'    =>__('There are no forms yet. Create one!','contexture-page-security') //HTML to show if no records are provided
-        );
-        $this->column_conf = array(
-            array(
-                'title'=>'id',
-                'slug'=>'id',
-                'class'=>'col-first',
-                'width'=>'30px'
-            ),
-            array(
-                'title'=>'Title',
-                'slug'=>'title',
-                'class'=>'',
-                'width'=>'300px'
-            ),
-            array(
-                'title'=>'Description',
-                'slug'=>'description',
-                'class'=>'',
-                'width'=>''
-            ),
-            array(
-                'title'=>'Shortcode',
-                'slug'=>'shortcode',
-                'class'=>'col-last',
-                'width'=>'200px'
-            )
-        );
-        $this->actions_conf = array(
-            array(
-                'title'=>'Edit',
-                'tip'=>'',
-                'slug'=>'edit',
-                'color'=>''
-            )
+            'form_id'=>'assoc_content_form', //id value for the form (css-friendly id)
+            'form_method'=>'get',   //how to submit the form get/post
+            'list_id'=>'assoc_content_list',  //id value for the table (css-friendly id)
+            'record_slug'=>'assoc_cont_rec',//css-class-friendly slug for uniquely referring to records
+            'bulk'=>'false',       //set to true to include checkboxes (if false, bulk options will be disabled)
+            'no_records'=>__('No content is attached to this group.','contexture-page-security') //HTML to show if no records are provided
         );
         $this->bulk_conf = array();
-
-        /******** PROCESS DB RECORDS FOR DISPLAY ******************************/
-        $data = CTXFPQueries::select_all($fpdb->forms);
-
-        foreach($data as $datum){
-
-        }
-
-    }
-
-    /**
-     * CONFIG PACKAGE for demo LT
-     */
-    public function package_demo(){
-
-        $this->table_conf = array(
-            'form_id'=>'new_table', //id value for the form (css-friendly id)
-            'form_method'=>'get',   //how to submit the form get/post
-            'list_id'=>'new-list',  //id value for the table (css-friendly id)
-            'record_slug'=>'record',//css-class-friendly slug for uniquely referring to records
-            'bulk'=>'true',       //set to true to include checkboxes (if false, bulk options will be disabled)
-            'no_records'=>__('There are no records to show... yet!','contexture-page-security') //HTML to show if no records are provided
-        );
-        $this->bulk_conf = array(
-            'Delete'=>'delete',
-            'Duplicate'=>'duplicate'
-        );
 
         // Indexed array. Each entry is an assoc array. All values required.
         $this->column_conf = array(
@@ -723,22 +686,22 @@ class CTXPS_Table_Packages extends CTX_Tables{
              * width: Leave empty for auto. Specify a css width value to force
              */
             array(
-                'title'=>'Column 1',
-                'slug'=>'col1',
+                'title'=>'Title',
+                'slug'=>'title',
                 'class'=>'col-first',
-                'width'=>'200px'
+                'width'=>''
             ),
             array(
-                'title'=>'Column 2',
-                'slug'=>'col2',
+                'title'=>'Protection',
+                'slug'=>'protected',
                 'class'=>'',
-                'width'=>''
+                'width'=>'50px'
             ),
             array(
-                'title'=>'Column 3',
-                'slug'=>'col3',
+                'title'=>'Type',
+                'slug'=>'type',
                 'class'=>'col-last',
-                'width'=>''
+                'width'=>'80px'
             )
         );
 
@@ -750,24 +713,65 @@ class CTXPS_Table_Packages extends CTX_Tables{
              * color: Set to any css color value to override default color
              */
             array(
-                'title'=>'View',
-                'tip'=>'',
-                'slug'=>'view',
-                'color'=>''
-            ),
-            array(
                 'title'=>'Edit',
-                'tip'=>'',
+                'tip'=>'Edit this content.',
                 'slug'=>'edit',
                 'color'=>''
             ),
             array(
-                'title'=>'Delete',
-                'tip'=>'',
-                'slug'=>'delete',
+                'title'=>'Remove',
+                'tip'=>'Detach this group from the content.',
+                'slug'=>'remove',
+                'color'=>'red'
+            ),
+            array(
+                'title'=>'View',
+                'tip'=>'View this content on the website.',
+                'slug'=>'view',
                 'color'=>'red'
                 )
         );
+        //Get list of pages...
+        $pagelist = CTXPS_Queries::get_content_by_group($_GET['groupid']);
+        foreach($pagelist as $page){
+            $page_title = $page->post_title;
+            $this->list_data[] = array(
+                'id'=>$page->sec_protect_id,
+                'columns'=>array(
+                    'title'=>sprintf('<strong><a href="%s">%s</a></strong>',admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),$page_title),
+                    'protected'=>'',
+                    'type'=>$page->post_type
+                ),
+                'actions'=>array(
+                    'edit'=>admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
+                    'remove'=>'',
+                    'view'=>''
+                )
+            );
+            $html .= sprintf('
+            <tr id="page-%1$s" %2$s>
+                <td class="post-title page-title column-title">
+                    <strong><a href="%3$s">%4$s</a></strong>
+                    <div class="row-actions">
+                        <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
+                        <span class="trash"><a href="#" onclick="ctx_ps_remove_page_from_group(%1$s,jQuery(this))" title="Remove current group from this page\'s security">'.__('Remove','contexture-page-security').'</a> | </span>
+                        <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
+                    </div>
+                </td>
+                <td class="protected column-protected">%5$s</td>
+                <td class="type column-type">%6$s</td>
+            </tr>',
+                /*1*/$page->sec_protect_id,
+                /*2*/$alternatecss,
+                /*3*/admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
+                /*4*/$page_title,
+                /*5*/'',
+                /*6*/$page->post_type,
+                /*7*/get_permalink($page->sec_protect_id),
+                /*8*/admin_url()
+            );
+        }
+
         // Indexed array. Each entry is an associative array. All values required.
         $this->list_data = array(
             array(
@@ -818,24 +822,6 @@ class CTXPS_Table_Packages extends CTX_Tables{
             )
         );
     }
-
-
-    function set_table_conf($array){
-        $this->table_conf = $array;
-    }
-    function set_column_conf($array){
-        $this->column_conf = $array;
-    }
-    function set_actions_conf($array){
-        $this->actions_conf = $array;
-    }
-    function set_bulk_conf($array){
-        $this->bulk_conf = $array;
-    }
-    function set_list_data($array){
-        $this->list_data = $array;
-    }
-
 
 }}
 ?>

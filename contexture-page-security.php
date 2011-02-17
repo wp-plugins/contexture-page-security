@@ -23,7 +23,6 @@ License: GPL2
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
 /***************************** SET GLOBALS ************************************/
 /**The absolute local path to the plugin*/
 define('CTXPSPATH',dirname(__FILE__));
@@ -66,9 +65,9 @@ add_action('admin_init', 'CTXPS_App::admin_init');
 add_action('init','CTXPS_App::localize_init');
 
 //Handle Ajax for Edit Page/Post page
-add_action('wp_ajax_ctx_ps_add2page','CTXPS_Ajax::add_group_to_page');
-add_action('wp_ajax_ctx_ps_removefrompage','CTXPS_Ajax::remove_group_from_page');
-add_action('wp_ajax_ctx_ps_security_update','CTXPS_Ajax::update_security');
+add_action('wp_ajax_ctxps_add_group_to_page','CTXPS_Ajax::add_group_to_page');
+add_action('wp_ajax_ctxps_remove_from_page','CTXPS_Ajax::remove_group_from_page');
+add_action('wp_ajax_ctxps_security_update','CTXPS_Ajax::update_security');
 
 //Handle Ajax for Edit User page
 add_action('wp_ajax_ctxps_add_group_to_user','CTXPS_Ajax::add_group_to_user');

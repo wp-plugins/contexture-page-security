@@ -16,3 +16,4 @@ option.cts-ps-system-group { font-weight:bold; }
 .widefat th#protected { vertical-align:middle; width:30px; }
 .widefat td.protected { vertical-align:top; }
 .widefat td.protected img { margin-top:4px; }
+.widefat .trash { cursor:pointer; }

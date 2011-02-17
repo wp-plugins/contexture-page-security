@@ -93,18 +93,46 @@ class CTXPS_Ajax extends CTXAjax {
     public static function remove_group_from_page(){
         global $wpdb;
 
+        $response='';
+
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
         if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
             //If user isn't authorized
-            CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
+            $response = array(
+                'what'=>'remove_group',
+                'action'=>'remove_1',
+                'id'=>new WP_Error('',__('Admin user is not authorized.','contexture-page-security')),
+                'data'=>__('Admin user is not authorized.','contexture-page-security')
+            );
         }
 
         if(CTXPS_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
-            CTXAjax::response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
+            //CTXAjax::response(array('code'=>'1','message'=>__('Group removed','contexture-page-security')));
+            $response = array(
+                'what'=>'remove_group',
+                'action'=>'remove_1',
+                'id'=>1,
+                'data'=>__('Group removed from content','contexture-page-security')
+            );
+                        //CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
+            $response = array(
+                'what'=>'remove_group',
+                'action'=>'remove_1',
+                'id'=>new WP_Error('query_failed',__('Query failed or content not in group.','contexture-page-security')),
+                'data'=>__('test test test','contexture-page-security')
+            );
         }else{
-            CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
+            //CTXAjax::response(array('code'=>'0','message'=>__('Query failed','contexture-page-security')));
+            $response = array(
+                'what'=>'remove_group',
+                'action'=>'remove_1',
+                'id'=>new WP_Error('',__('Query failed or content not in group.','contexture-page-security')),
+                'data'=>__('Query failed','contexture-page-security')
+            );
         }
-        CTXAjax::response($response);
+        //CTXAjax::response($response);
+        $response = new WP_Ajax_Response($response);
+        $response->send();
     }
 
     /**

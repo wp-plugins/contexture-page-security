@@ -32,8 +32,8 @@
             });
 
             //Confirm before removing a user
-            $('.row-actions .trash').click(function(){
-                return confirm(msgRemoveUser);
+            $('#grouptable .row-actions .trash').click(function(){
+                    return confirm(msgRemoveUser);
             });
 
         },

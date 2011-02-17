@@ -38,7 +38,7 @@ function ctx_ps_togglesecurity(){
         //Turn security ON for this group
         jQuery.get('admin-ajax.php',
             {
-                action:'ctx_ps_security_update',
+                action:'ctxps_security_update',
                 setting:'on',
                 postid:ipostid
             },
@@ -54,7 +54,7 @@ function ctx_ps_togglesecurity(){
             //Turn security OFF for this group
             jQuery.get('admin-ajax.php',
                 {
-                    action:'ctx_ps_security_update',
+                    action:'ctxps_security_update',
                     setting:'off',
                     postid:ipostid
                 },
@@ -160,7 +160,7 @@ function ctx_ps_add_group_to_page(){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctx_ps_add2page',
+                action:'ctxps_add_group_to_page',
                 groupid:igroupid,
                 postid:ipostid
             },
@@ -197,7 +197,7 @@ function ctx_ps_remove_group_from_page(igroupid,me){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctx_ps_removefrompage',
+                action:'ctxps_remove_from_page',
                 groupid:igroupid,
                 postid:ipostid
             },
@@ -224,16 +224,16 @@ function ctx_ps_remove_group_from_page(igroupid,me){
 }
 
 //Removes a page from a group via the group screen
-function ctx_ps_remove_page_from_group(ipostid,me){
-    if(confirm( varMsgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
+function ctx_ps_remove_page_from_group(post_id,me){
+    if(confirm( msgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
         //Get the id of the current group
         var igroupid = parseInt(jQuery('#groupid').val());
 
         jQuery.get('admin-ajax.php',
             {
-                action:'ctx_ps_removefrompage',
+                action:'ctxps_remove_from_page',
                 groupid:igroupid,
-                postid:ipostid
+                postid:post_id
             },
             function(data){
                 data = jQuery(data);

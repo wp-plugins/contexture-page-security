@@ -151,6 +151,7 @@
             </table>
         </form>
         <?php _e('<h3>Associated Content</h3>','contexture-page-security'); ?>
+        <?php //new CTXPS_Table_Packages('associated_content'); ?>
         <table id="pagetable" class="widefat fixed" cellspacing="0">
             <thead>
                 <tr class="thead">
@@ -171,7 +172,7 @@
                     if(CTXPS_Queries::count_protected($_GET['groupid']) < 1){
                         echo '<td colspan="3">'.__('No content is attached to this group.','contexture-page-security').'</td>';
                     } else {
-                        echo CTXPS_Components::render_pages_by_group_list($_GET['groupid']);
+                        echo CTXPS_Components::render_content_by_group_list($_GET['groupid']);
                     }
                 ?>
             </tbody>
