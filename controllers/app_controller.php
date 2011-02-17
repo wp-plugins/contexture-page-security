@@ -74,7 +74,7 @@ class CTXPS_App{
             var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
             var msgYearRequired = '<?php _e('You must specify an expiration year.','contexture-page-security') ?>';
         </script>
-        <script type="text/javascript" src="<?php echo plugins_url('/views/js/core-ajax.dev.js',__FILE__) ?>"></script>
+        <script type="text/javascript" src="<?php echo CTXPSURL.'/views/js/core-ajax.dev.js' ?>"></script>
         <?php
     }
 

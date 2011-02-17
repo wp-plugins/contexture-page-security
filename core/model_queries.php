@@ -290,7 +290,7 @@ class CTXPS_Queries{
     public static function check_user_exists($user_id){
         global $wpdb;
         $check = (integer)$wpdb->get_var($wpdb->prepare(
-            'SELECT COUNT(*) FROM '.$wpdb->users.' WHERE '.$wpdb->users.'.ID = \'%s\'',
+            'SELECT COUNT(*) FROM `'.$wpdb->users.'` WHERE `'.$wpdb->users.'`.ID = %s',
                 $user_id
         ));
         return ($check>0);
@@ -777,19 +777,18 @@ class CTXPS_Queries{
     public static function get_groups($user_id=null){
         global $wpdb,$ctxpsdb;
         //If $user_id is any kind of empty, get a list of ALL groups
-        if(empty($user_id)){
-            return $wpdb->get_results('SELECT * FROM `'.$ctxpsdb->groups.'` ORDER BY `group_system_id` DESC, `group_title` ASC');
+        if(is_numeric($user_id) && !empty($user_id)){
+            //Otherwise, let's only fetch the ones relevant to the specified user
+            return $wpdb->get_results($wpdb->prepare(
+                'SELECT * FROM `'.$ctxpsdb->group_rels.'`
+                JOIN `'.$ctxpsdb->groups.'`
+                    ON grel_group_id = `'.$ctxpsdb->groups.'`.ID
+                WHERE grel_user_id = %s
+                ORDER BY `group_system_id` DESC, `group_title` ASC',
+                    $user_id
+            ));
         }
-
-        //Otherwise, let's only fetch the ones relevant to the specified user
-        return $wpdb->get_results($wpdb->prepare(
-            'SELECT * FROM `'.$ctxpsdb->group_rels.'`
-            JOIN `'.$ctxpsdb->groups.'`
-                ON grel_group_id = `'.$ctxpsdb->groups.'`.ID
-            WHERE grel_user_id = %s
-            ORDER BY `group_system_id` DESC, `group_title` ASC',
-                $user_id
-        ));
+        return $wpdb->get_results('SELECT * FROM `'.$ctxpsdb->groups.'` ORDER BY `group_system_id` DESC, `group_title` ASC');
     }
 
     /**

@@ -1,4 +1,4 @@
-    <script type="text/javascript" src="<?php echo plugins_url('/views/js/inline-edit-membership.dev.js',dirname(__FILE__)) ?>"></script>
+    <script type="text/javascript" src="<?php echo CTXPSURL.'/views/js/inline-edit-membership.dev.js' ?>"></script>
     <style type="text/css">
         .group-actions { text-align:right; }
         .group-actions a { color:red; font-weight:bold; }
@@ -155,14 +155,14 @@
             <thead>
                 <tr class="thead">
                     <th class="title"><?php _e('Title','contexture-page-security') ?></th>
-                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png" /></div>'?></th>
                     <th class="type"><?php _e('Type','contexture-page-security') ?></th>
                 </tr>
             </thead>
             <tfoot>
                 <tr class="thead">
                     <th class="title"><?php _e('Title','contexture-page-security') ?></th>
-                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.plugins_url('images/protected.png',dirname(__FILE__)).'" /></div>'?></th>
+                    <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png" /></div>'?></th>
                     <th class="type"><?php _e('Type','contexture-page-security') ?></th>
                 </tr>
             </tfoot>

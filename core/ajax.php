@@ -122,8 +122,8 @@ class CTXPS_Ajax extends CTXAjax {
         }
 
         //If this user doesn't exist
-        if(CTXPS_Queries::check_user_exists($_GET['user_id'])){
-            CTXAjax::response(array('code'=>'0','message'=>'User not found'));
+        if(!CTXPS_Queries::check_user_exists($_GET['user_id'])){
+            CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
         } else {
 
             //Make sure user isnt already in the group
@@ -182,8 +182,7 @@ class CTXPS_Ajax extends CTXAjax {
             CTXAjax::response(array('code'=>'0','message'=>__('Admin user is unauthorized.','contexture-page-security')));
         }
 
-
-        if(CTXPS_Queries::delete_membership($_GET['user_id'], $_GET['groupid'])){
+        if(!CTXPS_Queries::delete_membership($_GET['user_id'], $_GET['groupid'])){
             CTXAjax::response(array('code'=>'0','message'=>__('User not found','contexture-page-security')));
         } else {
             $html = CTXPS_Components::render_group_list($_GET['user_id'],'users');

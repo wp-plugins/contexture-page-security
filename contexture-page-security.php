@@ -71,9 +71,9 @@ add_action('wp_ajax_ctx_ps_removefrompage','CTXPS_Ajax::remove_group_from_page')
 add_action('wp_ajax_ctx_ps_security_update','CTXPS_Ajax::update_security');
 
 //Handle Ajax for Edit User page
-add_action('wp_ajax_ctx_ps_add2user','CTXPS_Ajax::add_group_to_user');
-add_action('wp_ajax_ctx_ps_removefromuser','CTXPS_Ajax::remove_group_from_user');
-add_action('wp_ajax_ctx_ps_updatemember','CTXPS_Ajax::update_membership');
+add_action('wp_ajax_ctxps_add_group_to_user','CTXPS_Ajax::add_group_to_user');
+add_action('wp_ajax_ctxps_remove_group_from_user','CTXPS_Ajax::remove_group_from_user');
+add_action('wp_ajax_ctxps_update_member','CTXPS_Ajax::update_membership');
 
 //Add basic security to all public "static" pages and posts [highest priority]
 add_action('wp','CTXPS_Security::protect_content',1);

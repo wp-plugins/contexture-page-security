@@ -83,7 +83,7 @@ function ctx_ps_add_group_to_user(){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctx_ps_add2user',
+                action:'ctxps_add_group_to_user',
                 groupid:igroupid,
                 user_id:iusrid
             },
@@ -120,7 +120,7 @@ function ctx_ps_add_group_to_user(){
 function ctx_ps_remove_group_from_user(igroupid,iuserid,me,action){
     jQuery.get('admin-ajax.php',
         {
-            action:'ctx_ps_removefromuser',
+            action:'ctxps_remove_group_from_user',
             groupid:igroupid,
             user_id:iuserid
         },

@@ -103,7 +103,7 @@
             //Submit ajax data to server
             $.post('admin-ajax.php',
             {
-                action:'ctx_ps_updatemember',
+                action:'ctxps_update_member',
                 grel:newData.grel,
                 expires:hasExpire,
                 date:newDate
