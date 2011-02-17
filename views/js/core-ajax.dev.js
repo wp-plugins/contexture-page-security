@@ -197,7 +197,7 @@ function ctx_ps_remove_group_from_page(igroupid,me){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_remove_from_page',
+                action:'ctxps_remove_group_from_page',
                 groupid:igroupid,
                 postid:ipostid
             },
@@ -231,7 +231,7 @@ function ctx_ps_remove_page_from_group(post_id,me){
 
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_remove_from_page',
+                action:'ctxps_remove_group_from_page',
                 groupid:igroupid,
                 postid:post_id
             },

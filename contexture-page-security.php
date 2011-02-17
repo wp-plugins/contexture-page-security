@@ -70,7 +70,7 @@ add_action('init','CTXPS_App::localize_init');
 
 //Handle Ajax for Edit Page/Post page
 add_action('wp_ajax_ctxps_add_group_to_page','CTXPS_Ajax::add_group_to_page');
-add_action('wp_ajax_ctxps_remove_from_page','CTXPS_Ajax::remove_group_from_page');
+add_action('wp_ajax_ctxps_remove_group_from_page','CTXPS_Ajax::remove_group_from_page');
 add_action('wp_ajax_ctxps_security_update','CTXPS_Ajax::update_security');
 
 //Handle Ajax for Edit User page
