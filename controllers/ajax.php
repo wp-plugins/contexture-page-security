@@ -94,6 +94,7 @@ class CTXPS_Ajax extends CTXAjax {
         global $wpdb;
 
         $response='';
+        $supplemental=array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
         if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
@@ -106,13 +107,19 @@ class CTXPS_Ajax extends CTXAjax {
         }
 
         if(CTXPS_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
+            if($_GET['requester']=='sidebar'){
+                $supplemental = array('html'=>CTXPS_Components::render_sidebar_attached_groups($_GET['postid']));//We need to regenerate sidebar content
+            }else{
+                $supplemental = array('html'=>CTXPS_Components::render_content_by_group_list($_GET['groupid']));//We need to regenerate list-table content
+            }
+
             //SUCCESS!
             $response = array(
                 'what'=>'remove_group',
                 'action'=>'remove',
                 'id'=>1,
                 'data'=>__('Group removed from content','contexture-page-security'),
-                'supplemental'=>array('html'=>CTXPS_Components::render_content_by_group_list($_GET['groupid']))//We need to regenerate table content
+                'supplemental'=>$supplemental
             );
         }
         else{

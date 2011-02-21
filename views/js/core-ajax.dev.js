@@ -193,15 +193,16 @@ function ctxps_add_group_to_page(){
 }
 
 //Removes a group from a page with security
-function ctxps_remove_group_from_page(igroupid,me){
+function ctxps_remove_group_from_page(group_id,me){
     if(confirm(msgRemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
-        var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
+        var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
                 action:'ctxps_remove_group_from_page',
-                groupid:igroupid,
-                postid:ipostid
+                groupid:group_id,
+                postid:post_id,
+                requester:'sidebar'
             },
             function(data){
                 data = jQuery(data);
@@ -210,7 +211,7 @@ function ctxps_remove_group_from_page(igroupid,me){
                    var grpsAvail = jQuery('#groups-available');
                     grpsAvail
                         .html(grpsAvail.data('options'))
-                        .children('option[value="'+igroupid+'"]')
+                        .children('option[value="'+group_id+'"]')
                             .removeClass('detach')
                         .end()
                         .data('options',grpsAvail.html())

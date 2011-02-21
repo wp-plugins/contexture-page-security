@@ -20,6 +20,16 @@ class CTX_Helper{
         return $return;
     }
     /**
+     * Combines a default attributes array with new values
+     * @global $atts Uses the $atts variable.
+     * @param array $defaults An associative array of default key=>value pairs
+     * @return array Returns an array where the defaults are overwritten with the new values
+     */
+    public static function atts_default($defaults=array()){
+        global $atts;
+        return array_merge($defaults,$atts);
+    }
+    /**
      * Generates HTML for any tag.
      *
      * @param string $tag The element name.
@@ -39,6 +49,18 @@ class CTX_Helper{
             $return .= '/>';
         }
         return $return;
+    }
+    /**
+     * Takes an opening HTML tag and automagically generates the closing tag after any provided content.
+     * @param string $string
+     * @return string The full HTML string with closing tag.
+     */
+    public static function wrap($string,$content=''){
+        $tag=array();
+        preg_match('/^\<([a-zA-Z]+)/',$string,$tag);
+        if(empty($tag[1])){ new WP_Error('bad_data',__('Invalid html was passed to CTX_Helper:wrap','contexture-page-security')); }
+        $string .= sprintf('%s</%s>',$content,$tag[1]);
+        return $string;
     }
     public static function img($atts,$echo=true){
         if($echo){ echo self::gen('img', $atts); }
@@ -91,6 +113,15 @@ class CTX_Helper{
     public static function a($atts,$content,$echo=true){
         if($echo){ echo self::gen('a', $atts, $content); }
         else{ return self::gen('a', $atts, $content); }
+    }
+    public static function input($atts,$echo=true){
+        self::atts_default(array(
+            'id'=>'rand'.mt_rand(1000,9999),
+            'name'=>'rand'.mt_rand(1000,9999),
+            'type'=>'text'
+        ));
+        if($echo){ echo self::gen('input', $atts); }
+        else{ return self::gen('input', $atts); }
     }
     public static function message($atts,$content,$echo=true){
         if($echo){ echo self::gen('a', $atts, $content); }

@@ -313,5 +313,44 @@ class CTXPS_Components{
     }
 
 
+    public static function render_sidebar_attached_groups($security=null){
+
+        if(is_numeric($security) || is_string($security)){
+            //Get array with security requirements for this page
+            $security = CTXPS_Security::get_protection( $security );
+        }
+
+        //Set this to 0, we are going to count the number of groups attached to this page next...
+        $groupcount = 0;
+        $return = '';
+
+        //Count the number of groups attached to this page (including inherited groups)
+        if(!!$security){
+            foreach($security as $securityGroups){
+                $groupcount = $groupcount+count($securityGroups);
+            }
+        }
+
+        //Show groups that are already added to this page
+        if($groupcount===0){
+            //Display this if we have no groups (inherited or otherwise)
+            $return .= '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
+        }else{
+            foreach($security as $sec_array->pageid => $sec_array->grouparray){
+                if($sec_array->pageid == $_GET['post']){
+                    foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
+                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="ctxps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                    }
+                }else{
+                    foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
+                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
+                    }
+                }
+            }
+        }
+        return $return;
+    }
+
+
 }}
 ?>

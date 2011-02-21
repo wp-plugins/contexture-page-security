@@ -104,7 +104,6 @@ add_action('admin_head', 'CTXPS_App::help_init');
 
 /*********************** FUNCTIONS **********************************/
 
-
 //Load theme functions
 require_once 'controllers/theme-functions.php';
 

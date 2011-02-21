@@ -28,7 +28,7 @@ class CTXPS_Router{
     public static function group_edit(){ self::render('group-edit'); }
     public static function groups_list(){ self::render('groups-list'); }
     public static function user_groups(){ self::render('user-groups'); }
-    public static function sidebar_security(){ self::render('sidebar-security'); }
+    public static function sidebar_security(){ self::render('sidebar-security',false); }
 }}
 
 ?>
