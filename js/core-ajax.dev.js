@@ -15,12 +15,16 @@ jQuery(function(){
     jQuery('#btn-add-grp-2-user').click(function(){CTXPS.addGroupToUser()});
 });
 
-//Let's define the custom static class
+/**
+ * Let's define the custom static class
+ */
 function CTXPS(){
     //Constructor
 }
 
-//Will display a "Security Updated" message in the sidebar when successful change to security
+/**
+ * GENERAL. Will display a "Security Updated" message in the sidebar when successful change to security
+ */
 CTXPS.showSaveMsg = function(selector){
     if(jQuery(selector+' .ctx-ajax-status').length==0){
         jQuery(selector)
@@ -35,7 +39,9 @@ CTXPS.showSaveMsg = function(selector){
     }
 }
 
-//Updates the security status of the page
+/**
+ * SIDEBAR. Updates the security status of the page
+ */
 CTXPS.toggleSecurity = function(){
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
 
@@ -43,14 +49,16 @@ CTXPS.toggleSecurity = function(){
         //Turn security ON for this group
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_security_update',
-                setting:'on',
-                postid:post_id
+                action:     'ctxps_security_update',
+                setting:    'on',
+                postid:     post_id
             },
-            function(data){ data = jQuery(data);
-                if(data.find('code').text() == '1'){
+            function(response){ response = jQuery(response);
+                if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
                     CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                }else{
+                    alert(msgGeneralError+response.find('wp_error').text());
                 }
             },'xml'
         );
@@ -59,15 +67,17 @@ CTXPS.toggleSecurity = function(){
             //Turn security OFF for this group
             jQuery.get('admin-ajax.php',
                 {
-                    action:'ctxps_security_update',
-                    setting:'off',
-                    postid:post_id
+                    action:     'ctxps_security_update',
+                    setting:    'off',
+                    postid:     post_id
                 },
-                function(data){
-                    data = jQuery(data);
-                    if(data.find('code').text() =='1'){
+                function(response){
+                    response = jQuery(response);
+                    if(response.find('update_sec').attr('id') == '1'){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
                         CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                    }else{
+                        alert(msgGeneralError+response.find('wp_error').text());
                     }
                 },'xml'
             );
@@ -78,64 +88,70 @@ CTXPS.toggleSecurity = function(){
     }
 }
 
-//Adds a group to a user
+/**
+ * USER PROFILE MEMBERSHIP TABLE. Adds a group to a user
+ */
 CTXPS.addGroupToUser = function(){
-    var igroupid = parseInt(jQuery('#groups-available').val());
-    var iusrid = parseInt(jQuery('#ctx-group-user-id').val());
-    if(igroupid!=0){
+    var group_id = parseInt(jQuery('#groups-available').val());
+    var user_id = parseInt(jQuery('#ctx-group-user-id').val());
+    if(group_id!=0){
         jQuery('#btn-add-grp-2-user').attr('disabled','disabled');
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_add_group_to_user',
-                groupid:igroupid,
-                user_id:iusrid
+                action:     'ctxps_add_group_to_user',
+                groupid:    group_id,
+                user_id:    user_id
             },
             function(response){
                 response = jQuery(response);
-                if(response.find('html').length > 0){
+                if(response.find('enroll').attr('id') == '1'){
 
-                    //Add group to the Allowed Groups list from our stored data
-                    jQuery('#grouptable > tbody').html(response.find('html').text());
+                    //Add group to the Allowed Groups list from our stored response
+                    jQuery('#grouptable > tbody').html(response.find('supplemental html').text());
 
                     //Load the select drop down list
                     var grpsAvail = jQuery('#groups-available');
-
                     grpsAvail
-                        .html(grpsAvail.data('options')) //Set the ddl content = saved data
-                        .children('option[value="'+igroupid+'"]') //Select option that we just added
+                        .html(grpsAvail.data('options')) //Set the ddl content = saved response
+                        .children('option[value="'+group_id+'"]') //Select option that we just added
                             .addClass('detach') //Add detach class to it
                         .end() //Reselect ddl again
-                        .data('options',grpsAvail.html()) //Re-save the options html as data
+                        .data('options',grpsAvail.html()) //Re-save the options html as response
                         .children('.detach') //Select all detached options
                             .remove(); //Remove them
 
                     jQuery('#btn-add-grp-2-user').removeAttr('disabled');
                     CTXPS.showSaveMsg('.ctx-ps-tablenav');
+                }else{
+                    alert(msgGeneralError+data.find('wp_error').text());
                 }
             },'xml'
         );
     }else{
-        alert('You must select a group to add.');
+        alert(msgNoGroupSel);
     }
 }
 
-//Removes a group from a user
-CTXPS.removeGroupFromUser = function(igroupid,iuserid,me,action){
+/**
+ * USER PROFILE MEMBERSHIP TABLE. Removes a group from a user
+ */
+CTXPS.removeGroupFromUser = function(group_id,user_id,me,action){
     jQuery.get('admin-ajax.php',
         {
-            action:'ctxps_remove_group_from_user',
-            groupid:igroupid,
-            user_id:iuserid
+            action:     'ctxps_remove_group_from_user',
+            groupid:    group_id,
+            user_id:    user_id
         },
         function(response){
-            response = jQuery(response).find('unenroll');
-            if(response.attr('id') == '1'){
+            response = jQuery(response);
+            if(response.find('unenroll').attr('id') == '1'){
 
-               var grpsAvail = jQuery('#groups-available');
+                //Use a cool fade effect to remove item from the list
+                var grpsAvail = jQuery('#groups-available');
                 grpsAvail
                     .html(grpsAvail.data('options'))
-                    .children('option[value="'+igroupid+'"]')
+                    .children('option[value="'+group_id+'"]')
                         .removeClass('detach')
                     .end()
                     .data('options',grpsAvail.html())
@@ -156,29 +172,31 @@ CTXPS.removeGroupFromUser = function(igroupid,iuserid,me,action){
     );
 }
 
-//Adds a group to a page with security
+/**
+ * SIDEBAR. Adds a group to a page with security
+ */
 CTXPS.addGroupToPage = function(){
-    var igroupid = parseInt(jQuery('#groups-available').val());
-    var ipostid = parseInt(jQuery('#ctx_ps_post_id').val());
-    if(igroupid!=0){
+    var group_id = parseInt(jQuery('#groups-available').val());
+    var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
+    if(group_id!=0){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_add_group_to_page',
-                groupid:igroupid,
-                postid:ipostid
+                action:     'ctxps_add_group_to_page',
+                groupid:    group_id,
+                postid:     post_id
             },
             function(data){
                 data = jQuery(data);
-                if(data.find('html').length > 0){
+                if(data.find('add_group').attr('id')=='1'){
                     //Add group to the Allowed Groups list
-                    jQuery('#ctx-ps-page-group-list').html(data.find('html').text());
+                    jQuery('#ctx-ps-page-group-list').html(data.find('supplemental html').text());
 
+                    //Update the select box and the attached group list
                     var grpsAvail = jQuery('#groups-available');
-
                     grpsAvail
                         .html(grpsAvail.data('options'))
-                        .children('option[value="'+igroupid+'"]')
+                        .children('option[value="'+group_id+'"]')
                             .addClass('detach')
                         .end()
                         .data('options',grpsAvail.html())
@@ -190,27 +208,31 @@ CTXPS.addGroupToPage = function(){
             },'xml'
         );
     }else{
-        alert('You must select a group to add.');
+        alert(msgNoGroupSel);
     }
 }
 
-//Removes a group from a page with security
+/**
+ * SIDEBAR. Removes a group from a page with security
+ */
 CTXPS.removeGroupFromPage = function(group_id,me){
     if(confirm(msgRemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
+        //Get the post id from the form field
         var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
-        //alert("The group you want to add is: "+$groupid);
+        //Submit the ajax request
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_remove_group_from_page',
-                groupid:group_id,
-                postid:post_id,
-                requester:'sidebar'
+                action:     'ctxps_remove_group_from_page',
+                groupid:    group_id,
+                postid:     post_id,
+                requester:  'sidebar'
             },
-            function(data){
-                data = jQuery(data);
-                if(data.find('code').text() == '1'){
-
-                   var grpsAvail = jQuery('#groups-available');
+            function(response){
+                response = jQuery(response);
+                //If request was successful
+                if(response.find('remove_group').attr('id') == '1'){
+                    //Remove the row from the sidebar with a nifty fade effect, and add it back to the select box
+                    var grpsAvail = jQuery('#groups-available');
                     grpsAvail
                         .html(grpsAvail.data('options'))
                         .children('option[value="'+group_id+'"]')
@@ -219,16 +241,23 @@ CTXPS.removeGroupFromPage = function(group_id,me){
                         .data('options',grpsAvail.html())
                         .children('.detach')
                             .remove();
-                    me.parent().fadeOut(500,function(){jQuery(this).remove();});
+                    me.parent().fadeOut(500,function(){
+                        console.log('Removed');
+                        jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
+                    });
 
                     CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                }else{
+                    alert(msgGeneralError+response.find('wp_error').text());
                 }
             },'xml'
         );
     }
 }
 
-//Removes a page from a group via the group screen
+/**
+ * SECURE CONTENT TABLE. Removes a page from a group via the group screen
+ */
 CTXPS.removePageFromGroup = function(post_id,me){
     if(confirm( msgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
         //Get the id of the current group
@@ -236,13 +265,13 @@ CTXPS.removePageFromGroup = function(post_id,me){
 
         jQuery.get('admin-ajax.php',
             {
-                action:'ctxps_remove_group_from_page',
-                groupid:group_id,
-                postid:post_id
+                action:     'ctxps_remove_group_from_page',
+                groupid:    group_id,
+                postid:     post_id
             },
             function(data){
-                data = jQuery(data).find('remove_group');
-                if(data.attr('id') == '1'){
+                data = jQuery(data);
+                if(data.find('remove_group').attr('id') == '1'){
                     me.parents('tr:first').fadeOut(500,function(){
                         jQuery(this).parents('tbody:first')
                             .html(data.find('supplemental html').text());

@@ -313,7 +313,13 @@ class CTXPS_Components{
     }
 
 
-    public static function render_sidebar_attached_groups($security=null){
+    /**
+     *
+     * @param type $security
+     * @param int $cur_page_id Optional. The current page id. If null, tries to get current page id from $_GET['post'] or $_GET['postid'].
+     * @return string
+     */
+    public static function render_sidebar_attached_groups($security=null,$cur_page_id=null){
 
         if(is_numeric($security) || is_string($security)){
             //Get array with security requirements for this page
@@ -323,6 +329,19 @@ class CTXPS_Components{
         //Set this to 0, we are going to count the number of groups attached to this page next...
         $groupcount = 0;
         $return = '';
+
+        //If $cur_page_id isn't set, try to get the value from the querystring
+        if(empty($cur_page_id)){
+            if (!empty($_GET['post_id'])){
+                $cur_page_id = $_GET['post_id'];
+            }
+            else if(!empty($_GET['post'])){
+                $cur_page_id = $_GET['post'];
+            }
+            else if (!empty($_GET['postid'])){
+                $cur_page_id = $_GET['postid'];
+            }
+        }
 
         //Count the number of groups attached to this page (including inherited groups)
         if(!!$security){
@@ -337,7 +356,7 @@ class CTXPS_Components{
             $return .= '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
         }else{
             foreach($security as $sec_array->pageid => $sec_array->grouparray){
-                if($sec_array->pageid == $_GET['post']){
+                if($sec_array->pageid == $cur_page_id){
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
                         $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="CTXPS.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                     }

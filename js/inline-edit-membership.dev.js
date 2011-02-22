@@ -111,7 +111,7 @@
             function(response){ response = $(response);
                 var showDate = 'Never',today = new Date();
                 //If success (code 1), update original tr, then revert
-                if(response.find('code').text() == '1'){
+                if(response.find('update').attr('id') == '1'){
                     //Choose what to show for expiration
                     if(hasExpire==1){
                         showDate = newData.mon+'-'+newData.day+'-'+newData.yr;
@@ -135,7 +135,7 @@
                     //Hide waiting anigif
                     $('.inline-edit-save .waiting').hide();
                     //Show error
-                    alert(response.find('message').text());
+                    alert(msgGeneralError+response.find('wp_error').text());
                 }
             },'xml');
         },

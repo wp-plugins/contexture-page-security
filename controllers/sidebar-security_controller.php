@@ -74,7 +74,7 @@
             $outputHtml .= '<div id="ctx-ps-page-group-list">';
 
 
-            $outputHtml .= CTXPS_Components::render_sidebar_attached_groups($securityStatus);
+            $outputHtml .= CTXPS_Components::render_sidebar_attached_groups($securityStatus,$_GET['post']);
 
 
             $outputHtml .= '      </div>'; //ctx-ps-page-group-list
