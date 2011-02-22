@@ -12,10 +12,11 @@ class CTXPS_App{
         //Add our JS strings (using PHP allows us to localize JS strings)
         add_action('admin_head', 'CTXPS_App::js_strings_init');
 
-        //Add restrict access sidebar to pages and posts
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', 'page', 'side', 'low');
-        add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', 'post', 'side', 'low');
-        //TODO: Add support for custom post types
+        //Enable Restrict Access sidebar for ALL post types (will also automatically enable support for any custom types)
+        $post_types = get_post_types();
+        foreach($post_types as $type){
+            add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', $type, 'side', 'low');
+        }
 
         //Add our custom admin styles
         wp_enqueue_style('psc_admin',CTXPSURL.'views/admin.css');
@@ -151,7 +152,7 @@ class CTXPS_Security{
         global $post,$page,$id,$current_user;
         $secureallowed = true;
 
-        if(!current_user_can('manage_options') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
+        if(!current_user_can('edit_others_posts') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
             /**Groups that this user is a member of*/
             $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             /**Groups required to access this page*/
@@ -279,7 +280,7 @@ class CTXPS_Security{
         $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
         //Do this filtering only if the user isn't an admin (and isn't in admin section)... and provided the user hasn't explicitly set menu filtering to false
-        if( !current_user_can('manage_options')  && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false') {
+        if( !current_user_can('edit_others_posts')  && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false') {
 
             //Loop through the content array
             foreach($content as $post->key => $post->value){
@@ -331,7 +332,7 @@ class CTXPS_Security{
         $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
         //Do this filtering only if user isn't an admin, in admin section... and provided the user hasn't explicitly set menu filtering to false
-        if( !current_user_can('manage_options') && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false' ) {
+        if( !current_user_can('edit_others_posts') && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false' ) {
 
             //Get options (in case we need to strip access denied pages)
             $dbOpts = get_option('contexture_ps_options');

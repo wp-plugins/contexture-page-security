@@ -33,8 +33,8 @@ define('CTXPSURL',plugin_dir_url(__FILE__));
 global $wpdb, $ctxpsdb;
 
 /************************** LOAD WP DEPENDENCIES ******************************/
-require_once(ABSPATH . WPINC . '/registration.php');
-require_once(ABSPATH . WPINC . '/ms-functions.php');
+require_once ABSPATH . WPINC . '/registration.php';
+require_once ABSPATH . WPINC . '/ms-functions.php';
 /**************************** LOAD CORE FILES *********************************/
 require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries

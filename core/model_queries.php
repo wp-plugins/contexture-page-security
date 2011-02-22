@@ -681,7 +681,7 @@ class CTXPS_Queries{
                 $string .= $page[0].',';
             }
             //get rid of the last comma before returning
-            return preg_replace('/,$/','',$string);
+            return (string)preg_replace('/,$/','',$string);
         //HANDLE DEFAULT (ARRAY)
         }
 
