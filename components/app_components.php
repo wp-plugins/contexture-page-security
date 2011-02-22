@@ -87,7 +87,7 @@ class CTXPS_Components{
                     <strong><a href="%3$s">%4$s</a></strong>
                     <div class="row-actions">
                         <span class="edit"><a href="%8$spost.php?post=%1$s&action=edit" title="Edit this page">'.__('Edit','contexture-page-security').'</a> | </span>
-                        <span class="trash"><a id="remcontent-%1$s" onclick="ctxps_remove_page_from_group(%1$s,jQuery(this))" title="Remove this group from the content">'.__('Remove','contexture-page-security').'</a> | </span>
+                        <span class="trash"><a id="remcontent-%1$s" onclick="CTXPS.removePageFromGroup(%1$s,jQuery(this))" title="Remove this group from the content">'.__('Remove','contexture-page-security').'</a> | </span>
                         <span class="view"><a href="%7$s" title="View the page">'.__('View','contexture-page-security').'</a></span>
                     </div>
                 </td>
@@ -153,7 +153,7 @@ class CTXPS_Components{
                 switch($view){
                     case 'users':
                         //Button for "Remove" takes user out of group (ajax)
-                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"ctxps_remove_group_from_user({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
+                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"CTXPS.removeGroupFromUser({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
                         break;
                     case 'groups':
                         //Button for "Delete" removes group from db (postback)
@@ -339,7 +339,7 @@ class CTXPS_Components{
             foreach($security as $sec_array->pageid => $sec_array->grouparray){
                 if($sec_array->pageid == $_GET['post']){
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="ctxps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="CTXPS.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                     }
                 }else{
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){

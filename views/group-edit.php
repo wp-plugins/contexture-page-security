@@ -1,4 +1,4 @@
-    <script type="text/javascript" src="<?php echo CTXPSURL.'/views/js/inline-edit-membership.dev.js' ?>"></script>
+    <script type="text/javascript" src="<?php echo CTXPSURL.'/js/inline-edit-membership.dev.js' ?>"></script>
     <style type="text/css">
         .group-actions { text-align:right; }
         .group-actions a { color:red; font-weight:bold; }

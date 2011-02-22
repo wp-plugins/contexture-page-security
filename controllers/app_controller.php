@@ -75,7 +75,7 @@ class CTXPS_App{
             var msgYearRequired = '<?php _e('You must specify an expiration year.','contexture-page-security') ?>';
             var msgGeneralError = '<?php _e('An error occurred: ','contexture-page-security') ?>';
         </script>
-        <script type="text/javascript" src="<?php echo CTXPSURL.'/views/js/core-ajax.dev.js' ?>"></script>
+        <script type="text/javascript" src="<?php echo CTXPSURL.'/js/core-ajax.dev.js' ?>"></script>
         <?php
     }
 

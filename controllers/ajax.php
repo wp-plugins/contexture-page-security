@@ -72,7 +72,7 @@ class CTXPS_Ajax extends CTXAjax {
                     if($securityArray->pageid == $_GET['postid']){
                         //Loop through all groups for the CURRENT page
                         foreach($securityArray->grouparray as $currentGroup->id => $currentGroup->name){
-                            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="ctxps_remove_group_from_page('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                            $OutputHTML .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span><span class="removegrp" onclick="CTXPS.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
                         //Loop through all groups for the ANCESTOR page
