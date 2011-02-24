@@ -63,19 +63,23 @@ class CTXPS_App{
     }
 
     /**
-     * Adds some custom JS to the header, primarily AJAX
+     * Adds some custom JS to the header, primarily AJAX. We can't enqueue these since we need PHP localization for the strings.
      */
     public static function js_strings_init(){
         ?>
         <script type="text/javascript">
-            var msgNoUnprotect = '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.','contexture-page-security') ?>';
-            var msgEraseSec = "<?php _e("This will completely erase this page's security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>";
-            var msgRemoveGroup = '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>';
-            var msgRemovePage = '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>';
-            var msgRemoveUser = '<?php _e('Remove this user from the group?','contexture-page-security') ?>';
-            var msgYearRequired = '<?php _e('You must specify an expiration year.','contexture-page-security') ?>';
-            var msgGeneralError = '<?php _e('An error occurred: ','contexture-page-security') ?>';
-            var msgNoGroupSel = '<?php _e('You must select a group to add.','contexture-page-security') ?>';
+            var ctxpsmsg = {
+                NoUnprotect : '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.','contexture-page-security') ?>',
+                EraseSec : "<?php _e("This will completely erase this page's security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>",
+                RemoveGroup : '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>',
+                RemovePage : '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>',
+                RemoveUser : '<?php _e('Remove this user from the group?','contexture-page-security') ?>',
+                YearRequired : '<?php _e('You must specify an expiration year.','contexture-page-security') ?>',
+                GeneralError : '<?php _e('An error occurred: ','contexture-page-security') ?>',
+                NoGroupSel : '<?php _e('You must select a group to add.','contexture-page-security') ?>',
+                SiteProtectAdd : '<?php _e('This adds protection at a site level. Until you add groups to the site, non-admin users will be unable to access the website.','contexture-page-security') ?>',
+                SiteProtectDel : "<?php _e("This will completely erase the websites security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>"
+            };
         </script>
         <script type="text/javascript" src="<?php echo CTXPSURL.'/js/core-ajax.dev.js' ?>"></script>
         <?php

@@ -91,7 +91,7 @@
                 hasExpire = 1;
                 //Validate day and year data (if empty, adjust or error
                 if(newData.day==''){ newData.day=1 }
-                if(newData.yr==''){ $('.inline-edit-save .waiting').hide();alert(msgYearRequired);return false; }
+                if(newData.yr==''){ $('.inline-edit-save .waiting').hide();alert(ctxpsmsg.YearRequired);return false; }
                 //Build new date string
                 newDate = newData.yr+'-'+newData.mon+'-'+newData.day;
             }else{
@@ -135,7 +135,7 @@
                     //Hide waiting anigif
                     $('.inline-edit-save .waiting').hide();
                     //Show error
-                    alert(msgGeneralError+response.find('wp_error').text());
+                    alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
             },'xml');
         },

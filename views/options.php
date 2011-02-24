@@ -78,16 +78,19 @@
                             </td>
                         </tr>
                         
-                        <!-- USE REPLACEMENT -->
+                        <!-- PROTECTION METHOD -->
                         <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
-                                <label for="ad-page-replace"><?php _e('Use Replacement:','contexture-page-security') ?></label>
+                                <label><?php _e('Protection Type:','contexture-page-security') ?></label>
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="ad-page-replace" id="ad-page-replace" <?php echo ($ADMsg['ad_msg_page_replace']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Replace protected content instead of redirect','contexture-page-security') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*By default, unauthorized users are redirected to AD pages. If enabled, this will replace content on the protected page instead.','contexture-page-security') ?></div>
+                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="redirect" <?php echo ($ADMsg['ad_msg_page_replace']!=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Redirect','contexture-page-security') ?>
                                 </label>
+                                <label style="margin-left:15px;">
+                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="replace" <?php echo ($ADMsg['ad_msg_page_replace']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Replace','contexture-page-security') ?>
+                                </label><br/>
+                                <div class="ctx-footnote"><?php _e('This dictates <strong>how</strong> users are shown the Access Denied page. They can either be redirected to a different page, or the content of the restricted page can be replaced.','contexture-page-security') ?></span>
                             </td>
                         </tr>
                         
@@ -126,8 +129,8 @@
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_protect_site']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Protect the entire website*','contexture-page-security') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*The website will be automatically protected, and groups can be added at a site level.','contexture-page-security') ?></div>
+                                    <input type="checkbox" name="ad-protect-site" id="ad-protect-site" <?php echo ($ADMsg['ad_msg_protect_site']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Protect the entire website','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('Enable protection for the entire site (useful for intranet implementations).<br/>Warning: This will prevent all unathenticated users from accessing the site.','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>
@@ -139,8 +142,8 @@
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_usefilter_menus']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter menu items*','contexture-page-security') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Restricted content will be removed from menus unless user is authenticated','contexture-page-security') ?></div>
+                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_usefilter_menus']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter menu items','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('Remove restricted content from menus unless user is authenticated.','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>
@@ -152,8 +155,8 @@
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content*','contexture-page-security') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('*Feed content for restricted posts will be removed unless user is authenticated<br/> Warning: This will hide protected content from most RSS readers.','contexture-page-security') ?></div>
+                                    <input type="checkbox" name="filter-rss" id="filter-rss" <?php echo ($ADMsg['ad_msg_usefilter_rss']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Use permissions to filter RSS content','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('Remove restricted posts from RSS unless user is authenticated<br/> Warning: This will hide protected content from most RSS readers.','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>

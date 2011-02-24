@@ -413,8 +413,7 @@ class CTXPS_Queries{
             'ad_msg_usefilter_menus'=>'true',
             'ad_msg_usefilter_rss'  =>'true',
             'ad_msg_protect_site'   =>'false',
-            'ad_msg_page_replace'   =>'false',
-            'ad_site_protect_groups'=>array()
+            'ad_msg_page_replace'   =>'false'
         );
 
         //Let's see if the options already exist...

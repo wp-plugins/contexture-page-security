@@ -33,12 +33,7 @@ if(empty($_POST['action'])){
 
         //Set new AD page ids
         $newopts['ad_page_auth_id'] = (is_numeric($_POST['ad-page-auth'])) ? $_POST['ad-page-auth'] : ''; //If not numeric, use blank
-        $newopts['ad_page_anon_id'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
-        //Set option for AD replacement
-        $newopts['ad_msg_page_replace'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
-        //Set option for sitewide lockdown
-        $newopts['ad_msg_protect_site'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
-        
+        $newopts['ad_page_anon_id'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank      
 
         //Disable comments and trackbacks for currently set AD pages
         if(!empty($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-auth']))
@@ -53,6 +48,10 @@ if(empty($_POST['action'])){
     //Update filtering options
     $newopts['ad_msg_usefilter_menus'] = (isset($_POST['filter-menus'])) ? 'true' : 'false';
     $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
+    //Set option for AD replacement
+    $newopts['ad_msg_page_replace'] = ($_POST['ad-page-replace']==='replace') ? 'true' : 'false';
+    //Set option for sitewide lockdown
+    $newopts['ad_msg_protect_site'] = (isset($_POST['ad-protect-site'])) ? 'true' : 'false';
 
     //Update the options array
     $saveStatus = CTXPS_Queries::set_options($newopts);
@@ -75,19 +74,35 @@ $pageDDLAnon = wp_dropdown_pages(array('name' => 'ad-page-anon', 'show_option_no
 
 //If there aren't any pages that can be used for AD, replace with this helpful message
 if(empty($pageDDLAuth)){
-    $pageDDLAuth = __('No available pages were found. <a href="post-new.php?post_type=page">Add New Page</a>','contexture-page-security');
+    $pageDDLAuth = sprintf(__('No available pages were found. <a href="%s">Add Page</a>','contexture-page-security'),admin_url('post-new.php?post_type=page'));
 }else{
+    //Only show edit button if something is already selected
+    if(!empty($ADMsg['ad_page_anon_id'])){
+        $pageDDLAuth .= sprintf('<a href="%s">%s</a> | ',
+            admin_url('post.php?post='.$ADMsg['ad_page_auth_id'].'&action=edit'),
+            __('Edit Page')
+        );
+    }
+    //Add an "Add Page" button...
     $pageDDLAuth .= sprintf('<a href="%s">%s</a>',
-        admin_url('post.php?post='.$ADMsg['ad_page_auth_id'].'&action=edit'),
-        __('Edit Page')
+            admin_url('post-new.php?post_type=page'),
+            __('Add Page')
     );
 }
 if(empty($pageDDLAnon)){
-    $pageDDLAnon = __('No available pages were found. <a href="post-new.php?post_type=page">Add New Page</a>','contexture-page-security');
+    $pageDDLAnon = sprintf(__('No available pages were found. <a href="%s">Add Page</a>','contexture-page-security'),admin_url('post-new.php?post_type=page'));
 }else{
+    //Only show edit button if something is already selected
+    if(!empty($ADMsg['ad_page_anon_id'])){
+        $pageDDLAnon .= sprintf('<a href="%s">%s</a> | ',
+            admin_url('post.php?post='.$ADMsg['ad_page_anon_id'].'&action=edit'),
+            __('Edit Page')
+        );
+    }
+    //Add an "Add Page" button...
     $pageDDLAnon .= sprintf('<a href="%s">%s</a>',
-        admin_url('post.php?post='.$ADMsg['ad_page_anon_id'].'&action=edit'),
-        __('Edit Page')
+            admin_url('post-new.php?post_type=page'),
+            __('Add Page')
     );
 }
 

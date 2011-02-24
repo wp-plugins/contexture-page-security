@@ -4,15 +4,28 @@ jQuery(function(){
         .data('options',jQuery('#groups-available').html())
         .children('.detach')
             .remove();
-    jQuery('#add_group_page').click(function(){CTXPS.addGroupToPage()});
-    jQuery('#ctx_ps_protectmy').click(function(){CTXPS.toggleSecurity()});
+    jQuery('#add_group_page').click(function(){
+        CTXPS.addGroupToPage()
+    });
+    jQuery('#ctx_ps_protectmy').click(function(){
+        CTXPS.toggleSecurity()
+    });
     jQuery('label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
-            alert(msgNoUnprotect);
+            alert(ctxpsmsg.NoUnprotect);
         }
     });
-    jQuery('#btn-add-grp-2-user').click(function(){CTXPS.addGroupToUser()});
+    jQuery('#btn-add-grp-2-user').click(function(){
+        CTXPS.addGroupToUser()
+    });
+    //Notify users if they are trying to remove site security (options.php)
+    jQuery('#ad-protect-site:checked').click(function(){
+        if(jQuery(this).filter(':checked').length===0){
+            return confirm(ctxpsmsg.SiteProtectDel);
+        }
+        return true;
+    });
 });
 
 /**
@@ -58,7 +71,7 @@ CTXPS.toggleSecurity = function(){
                     jQuery("#ctx_ps_pagegroupoptions").show();
                     CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
                 }else{
-                    alert(msgGeneralError+response.find('wp_error').text());
+                    alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
             },'xml'
         );
@@ -77,7 +90,7 @@ CTXPS.toggleSecurity = function(){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
                         CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
                     }else{
-                        alert(msgGeneralError+response.find('wp_error').text());
+                        alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                     }
                 },'xml'
             );
@@ -124,12 +137,12 @@ CTXPS.addGroupToUser = function(){
                     jQuery('#btn-add-grp-2-user').removeAttr('disabled');
                     CTXPS.showSaveMsg('.ctx-ps-tablenav');
                 }else{
-                    alert(msgGeneralError+data.find('wp_error').text());
+                    alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
                 }
             },'xml'
         );
     }else{
-        alert(msgNoGroupSel);
+        alert(ctxpsmsg.NoGroupSel);
     }
 }
 
@@ -166,7 +179,7 @@ CTXPS.removeGroupFromUser = function(group_id,user_id,me,action){
 
                 CTXPS.showSaveMsg('.ctx-ps-tablenav');
             }else{
-                alert(msgGeneralError+data.find('wp_error').text());
+                alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
             }
         },'xml'
     );
@@ -208,7 +221,7 @@ CTXPS.addGroupToPage = function(){
             },'xml'
         );
     }else{
-        alert(msgNoGroupSel);
+        alert(ctxpsmsg.NoGroupSel);
     }
 }
 
@@ -216,7 +229,7 @@ CTXPS.addGroupToPage = function(){
  * SIDEBAR. Removes a group from a page with security
  */
 CTXPS.removeGroupFromPage = function(group_id,me){
-    if(confirm(msgRemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
+    if(confirm(ctxpsmsg.RemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
         //Get the post id from the form field
         var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
         //Submit the ajax request
@@ -248,7 +261,7 @@ CTXPS.removeGroupFromPage = function(group_id,me){
 
                     CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
                 }else{
-                    alert(msgGeneralError+response.find('wp_error').text());
+                    alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
             },'xml'
         );
@@ -279,7 +292,7 @@ CTXPS.removePageFromGroup = function(post_id,me){
                     //CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
                 }
                 else{
-                    alert(msgGeneralError+data.find('wp_error').text());
+                    alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
                 }
             },'xml'
         );
