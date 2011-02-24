@@ -151,10 +151,24 @@ class CTXPS_Security{
     public static function protect_content(){
         global $post,$page,$id,$current_user;
         $secureallowed = true;
+        /**Get plugin options*/
+        $plugin_opts = get_option('contexture_ps_options');
 
-        if(!current_user_can('edit_others_posts') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
+        //SITE-WIDE PROTECTION
+        if($plugin_opts['ad_msg_protect_site']=='true'){
             /**Groups that this user is a member of*/
             $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
+            foreach($useraccess as $group){
+                ///////////////////////////////////////////////////////////////////////
+            }
+        }
+
+        //CONTENT-SPECIFIC PROTECTION
+        if(!current_user_can('edit_others_posts') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
+            if(empty($useraccess)){
+                /**Groups that this user is a member of*/
+                $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
+            }
             /**Groups required to access this page*/
             $pagereqs = CTXPS_Security::get_protection($post->ID);
 
@@ -170,45 +184,7 @@ class CTXPS_Security{
                     //If we're allowed to access this page (do nothing)
                 }else{
                     //If we're NOT allowed to access this page
-
-                    //Get AD messages from options
-                    $dbOpt = get_option('contexture_ps_options');
-
-                    //If user is NOT logged in...
-                    if($current_user->ID == 0 && !is_user_logged_in()){
-                        //Check options to determine if we're using a PAGE or a MESSAGE
-                        if($dbOpt['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
-                            //Send user to the new page
-                            if(is_numeric($dbOpt['ad_page_anon_id'])){
-                                $redir_anon_link = get_permalink($dbOpt['ad_page_anon_id']);
-                                wp_safe_redirect($redir_anon_link,401);
-                                exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
-                            }else{
-                                //Just in case theres a config problem...
-                                wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
-                            }
-                        }else{
-                            //If user is anonymous, show this message
-                            $blogurl = get_bloginfo('url');
-                            wp_die($dbOpt['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
-                        }
-                    }else{
-                        //Check options to determine if we're using a PAGE or a MESSAGE
-                        if($dbOpt['ad_msg_usepages']==='true'){
-                            //Send user to the new page
-                            if(is_numeric($dbOpt['ad_page_auth_id'])){
-                                $redir_auth_link = get_permalink($dbOpt['ad_page_auth_id']);
-                                wp_safe_redirect($redir_auth_link,401);
-                                exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
-                            }else{
-                                //Just in case theres a config problem...
-                                wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
-                            }
-                        }else{
-                            //If user is authenticated, show this message
-                            wp_die($dbOpt['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
-                        }
-                    }
+                    self::deny_access($plugin_opts);
                 }
             }
         }
@@ -478,6 +454,54 @@ class CTXPS_Security{
      */
     public static function check_protection($post_id){
         return CTXPS_Queries::check_protection($post_id);
+    }
+    
+    /**
+     * When called, will determined which AD message or page to show, then show it
+     * @param array $plugin_opts If db options are provided, we won't have to query this again
+     */
+    public static function deny_access($plugin_opts=array()){
+        global $current_user;
+        
+        if(empty($plugin_opts)){
+            $plugin_opts = get_option('contexture_ps_options');
+        }
+        
+        //If user is NOT logged in...
+        if($current_user->ID == 0 && !is_user_logged_in()){
+            //Check options to determine if we're using a PAGE or a MESSAGE
+            if($plugin_opts['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
+                //Send user to the new page
+                if(is_numeric($plugin_opts['ad_page_anon_id'])){
+                    $redir_anon_link = get_permalink($plugin_opts['ad_page_anon_id']);
+                    wp_safe_redirect($redir_anon_link,401);
+                    exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
+                }else{
+                    //Just in case theres a config problem...
+                    wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+                }
+            }else{
+                //If user is anonymous, show this message
+                $blogurl = get_bloginfo('url');
+                wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+            }
+        }else{
+            //Check options to determine if we're using a PAGE or a MESSAGE
+            if($plugin_opts['ad_msg_usepages']==='true'){
+                //Send user to the new page
+                if(is_numeric($plugin_opts['ad_page_auth_id'])){
+                    $redir_auth_link = get_permalink($plugin_opts['ad_page_auth_id']);
+                    wp_safe_redirect($redir_auth_link,401);
+                    exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
+                }else{
+                    //Just in case theres a config problem...
+                    wp_die($plugin_opts['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+                }
+            }else{
+                //If user is authenticated, show this message
+                wp_die($plugin_opts['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+            }
+        }
     }
 
 }

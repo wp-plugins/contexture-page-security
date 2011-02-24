@@ -35,10 +35,14 @@
                 <?php echo $updatesettingsMessage,$InvADPagesMsg;/*print_r($ADMsg)*/ ?>
                 <p></p>
                 <form method="post" action="">
+                    
+                    <!-- ACCESS DENIED CONFIG -->
                     <input type="hidden" name="action" id="action" value="updateopts" />
                     <h3 class="title"><?php _e('Access Denied Messages','contexture-page-security') ?></h3>
                     <p><?php _e('Use these settings to determine what your users will see when accessing content they are not allowed to view.','contexture-page-security') ?></p>
                     <table class="form-table">
+                        
+                        <!-- USE PAGES INSTEAD OF MESSAGES -->
                         <tr valign="top" class="toggle-opts-ad">
                             <th scope="row">
                                 <label for="ad-msg-enable"> <?php _e('Use Custom Pages:','contexture-page-security') ?></label>
@@ -49,6 +53,8 @@
                                 </label>
                             </td>
                         </tr>
+                        
+                        <!-- AD PAGE AUTHENTICATED SELECT -->
                         <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-page-auth"><?php _e('Authenticated Users:','contexture-page-security') ?></label>
@@ -59,6 +65,8 @@
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who <strong><em>are logged in</em></strong>.','contexture-page-security') ?></div>
                             </td>
                         </tr>
+                        
+                        <!-- AD PAGE ANONYMOUS SELECT -->
                         <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-page-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
@@ -69,6 +77,21 @@
                                 <div class="ctx-footnote"><?php _e('The "access denied" page to show users who are <strong><em>not</em></strong> logged in.','contexture-page-security') ?></div>
                             </td>
                         </tr>
+                        
+                        <!-- USE REPLACEMENT -->
+                        <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
+                            <th scope="row">
+                                <label for="ad-page-replace"><?php _e('Use Replacement:','contexture-page-security') ?></label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="ad-page-replace" id="ad-page-replace" <?php echo ($ADMsg['ad_msg_page_replace']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Replace protected content instead of redirect','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*By default, unauthorized users are redirected to AD pages. If enabled, this will replace content on the protected page instead.','contexture-page-security') ?></div>
+                                </label>
+                            </td>
+                        </tr>
+                        
+                        <!-- MESSAGE AUTHENTICATED -->
                         <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-msg-auth"><?php _e('Authenticated Users:','contexture-page-security') ?></label>
@@ -78,6 +101,8 @@
                                 <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are logged in (HTML OK).','contexture-page-security') ?></div>
                             </td>
                         </tr>
+                        
+                        <!-- MESSAGE ANONYMOUS -->
                         <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-msg-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
@@ -88,9 +113,26 @@
                             </td>
                         </tr>
                     </table>
+                    
+                    <!-- GLOBAL SECURITY -->
                     <h3 class="title"><?php _e('Global Security Features','contexture-page-security') ?></h3>
                     <p><?php _e('These options selectively enable/disable Page Security features.','contexture-page-security') ?></p>
                     <table class="form-table">
+                        
+                        <!-- PROTECT ENTIRE SITE -->
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="filter-all"><?php _e('Protect Entire Site:','contexture-page-security') ?></label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="filter-menus" id="filter-menus" <?php echo ($ADMsg['ad_msg_protect_site']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Protect the entire website*','contexture-page-security') ?><br/>
+                                    <div class="ctx-footnote"><?php _e('*The website will be automatically protected, and groups can be added at a site level.','contexture-page-security') ?></div>
+                                </label>
+                            </td>
+                        </tr>
+                        
+                        <!-- MENU FILTERING -->
                         <tr valign="top">
                             <th scope="row">
                                 <label for="filter-menu"><?php _e('Enable Menu Filtering:','contexture-page-security') ?></label>
@@ -102,6 +144,8 @@
                                 </label>
                             </td>
                         </tr>
+                        
+                        <!-- RSS FILTERING -->
                         <tr valign="top">
                             <th scope="row">
                                 <label for="filter-rss"><?php _e('Enable RSS Filtering:','contexture-page-security') ?></label>

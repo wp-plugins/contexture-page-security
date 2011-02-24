@@ -165,7 +165,7 @@ class CTXPS_Components{
             }
 
             //If user isnt admin, we wont even link to group edit page (useful for profile pages)
-            if ( current_user_can('manage_options') ){
+            if ( current_user_can('edit_users') ){
                 //User is admin - determined if link is system or not
                 $grouplink = (!isset($group->group_system_id))
                     //This is a user group (editable)

@@ -53,7 +53,7 @@
 
             $outputHtml .=    sprintf('<h5>%1$s <a href="%3$s" title="%2$s" style="text-decoration:none;">+</a></h5>',__('Available Groups','contexture-page-security'),__('New Group','contexture-page-security'),admin_url('users.php?page=ps_groups_add'));
 
-            $group_avail_opts .= sprintf( '<option value="0">-- %s -- </option>',__('Select','contexture-page-security') );
+            $group_avail_opts = sprintf( '<option value="0">-- %s -- </option>',__('Select','contexture-page-security') );
 
             //Loop through all groups in the db to populate the drop-down list
             foreach(CTXPS_Queries::get_groups() as $group){

@@ -405,13 +405,16 @@ class CTXPS_Queries{
 
         //Set defaults
         $defaultOpts = array(
-            "ad_msg_usepages"=>"false",
-            "ad_msg_anon"=>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
-            "ad_msg_auth"=>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
-            "ad_page_anon_id"=>"",
-            "ad_page_auth_id"=>"",
-            "ad_msg_usefilter_menus"=>"true",
-            "ad_msg_usefilter_rss"=>"true"
+            'ad_msg_usepages'       =>'false',
+            'ad_msg_anon'           =>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
+            'ad_msg_auth'           =>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
+            'ad_page_anon_id'       =>'',
+            'ad_page_auth_id'       =>'',
+            'ad_msg_usefilter_menus'=>'true',
+            'ad_msg_usefilter_rss'  =>'true',
+            'ad_msg_protect_site'   =>'false',
+            'ad_msg_page_replace'   =>'false',
+            'ad_site_protect_groups'=>array()
         );
 
         //Let's see if the options already exist...

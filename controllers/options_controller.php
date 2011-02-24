@@ -6,6 +6,7 @@ if ( !current_user_can('manage_options') )
 	wp_die( __( 'You do not have sufficient permissions to manage options for this site.','contexture-page-security' ) );
 
 $updatesettingsMessage = '';
+$InvADPagesMsg = '';
 
 //Several forms post back to this page, so we catch the action and process accordingly
 if(empty($_POST['action'])){
@@ -33,6 +34,11 @@ if(empty($_POST['action'])){
         //Set new AD page ids
         $newopts['ad_page_auth_id'] = (is_numeric($_POST['ad-page-auth'])) ? $_POST['ad-page-auth'] : ''; //If not numeric, use blank
         $newopts['ad_page_anon_id'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
+        //Set option for AD replacement
+        $newopts['ad_msg_page_replace'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
+        //Set option for sitewide lockdown
+        $newopts['ad_msg_protect_site'] = (is_numeric($_POST['ad-page-anon'])) ? $_POST['ad-page-anon'] : ''; //If not numeric, use blank
+        
 
         //Disable comments and trackbacks for currently set AD pages
         if(!empty($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-auth']))
