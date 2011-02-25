@@ -64,6 +64,14 @@ hosting dashboard).
 
 PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
 
+= How does "Protect Entire Site" Work? =
+
+We added this option specifically for those who want to create private, intranet-like sites. When this option is enabled, only groups that you approve will be able to access any part of the website. Anonymous users are automatically denied access, while users who are logged in have their group permissions checked. 
+
+It's important to remember that ALL OTHER SECURITY RESTRICTIONS are still applied. For instance, if I am in a group with site access, but try to access protected content that isn't attached to my group, I will STILL be denied access.
+
+This allows you create an intranet-style site while keeping multiple levels of security for the site content.
+
 = Can I help translate PSC into my language? =
 
 Absolutely! PO files are now included with each PSC download. You can use a WordPress plugin like "CodeStyling Localization" or a program like "Poedit" to easily create language-specific translations. If you'd like us to include your translation in the official release, simply email it to opensource@contextureintl.com!

@@ -870,13 +870,18 @@ class CTXPS_Queries{
      * @param array $args
      * @return bool
      */
-    public static function update_group($group_id,$name,$description){
+    public static function update_group($group_id,$name,$description,$site_access='none'){
         global $wpdb,$ctxpsdb;
+        //Just in case we override $site_access with an empty value
+        if(empty($site_access)){
+            $site_access='none';
+        }
         return $wpdb->update(
                 $ctxpsdb->groups,
                 array(
                     'group_title'=>$name,
-                    'group_description'=>$description),
+                    'group_description'=>$description,
+                    'group_site_access'=>$site_access),
                 array(
                     'ID'=>$group_id
         ));

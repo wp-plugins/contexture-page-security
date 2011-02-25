@@ -50,7 +50,7 @@ class CTXPS_App{
             //Add our contextual help
             add_contextual_help( 'users_page_ps_groups', __('<p>This screen shows a list of all the groups currently available. Groups are used to arbitrarily "group" users together for permissions purposes. Once you "attach" one or more groups to a page or post, only users in one of those groups will be able to access it!</p><p>To view users in a group, simply click on the group\'s name.</p><p><strong>Registered Users</strong> - This is a system group that is automatically applied to all registered users. It can\'t be edited or deleted because it\'s managed by WordPress automatically.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl );
             add_contextual_help( 'users_page_ps_groups_add', __('<p>This screen allows you to add a new group. Simply enter a new, unique name for your group, and an optional description.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl );
-            $ps_groups_edit = __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages and posts this group is attached to.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl;
+            $ps_groups_edit = __('<p>This screen shows you all the details about the current group, and allows you to edit some of those details.</p><p><strong>Group Details</strong> - Change a group\'s title or description.</p><p><strong>Site Access</strong> - This option is visible if you have Site Protection enabled. Set to "Allowed" if you would like users in this group to be able to access your website. All content-specific restrictions still apply.</p><p><strong>Group Members</strong> - A list of users currently attached to the group. You also add users to a group if you know their username (users can also be added to groups from their profile pages).</p><p><strong>Associated Content</strong> - A list of all the pages and posts this group is attached to.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl;
             add_contextual_help( 'dashboard_page_ps_groups_edit', $ps_groups_edit );
             add_contextual_help( 'users_page_ps_groups_edit', $ps_groups_edit );
             $ps_groups_delete = __('<p>This screen allows you to delete the selected group. Once you click "Confirm Deletion", the group will be permanently deleted, and all users will be removed from the group.</p><p>Also note that if this is the only group attached to any "restricted" pages, those pages will not longer be accessible to anyone but administrators.</p><p><strong>For more information:</strong></p>','contexture-page-security').$supporturl;
@@ -160,9 +160,9 @@ class CTXPS_Security{
         
         //Various conditions that should automatically let a user through
         if(
-            $plugin_opts['ad_page_anon_id']==$post->ID //page is an ad page
-        ||  $plugin_opts['ad_page_auth_id']==$post->ID //page is an ad page
-        ||  current_user_can('edit_others_posts')      //user is an admin
+            $plugin_opts['ad_page_anon_id']==$post->ID || //page is an ad page
+            $plugin_opts['ad_page_auth_id']==$post->ID || //page is an ad page
+            current_user_can('edit_others_posts')         //user is an admin
         ){
             return;//Exit the function, no further checks are needed
         }
@@ -171,15 +171,13 @@ class CTXPS_Security{
         if($plugin_opts['ad_opt_protect_site']==='true'){
             
             /**Groups that this user is a member of*/
-            $useraccess = CTXPS_Queries::get_user_groups($current_user->ID,true);
+            $siteaccess = CTXPS_Queries::get_user_groups($current_user->ID,true);
             //User isnt in any groups, no more checking necessary
-            if(empty($useraccess)){
+            if(empty($siteaccess)){
                 self::deny_access($plugin_opts);
             }
-            wp_die($useraccess);
-            /*foreach($useraccess as $group){
-                $newvar = CTXPS_Queries::get_group_info($group_id);
-            }*/
+            //If $siteaccess returned anything, we can safely assume user has "Limited"
+            //Since "Full" isn't implemented yet, we don't have to make that check or change the way get_user_groups works
         }
 
         //CONTENT-SPECIFIC PROTECTION

@@ -14,7 +14,7 @@ $actionmessage = '';
 if(!empty($_GET['action'])){
     switch($_GET['action']){
         case 'updtgrp':
-            if(CTXPS_Queries::update_group($_GET['groupid'], $_GET['group_name'], $_GET['group_description']) === false){
+            if(CTXPS_Queries::update_group($_GET['groupid'], $_GET['group_name'], $_GET['group_description'],$_GET['group_site_access']) === false){
                 $actionmessage = '<div class="error below-h2"><p>'.__('An error occurred. Group Details could not be updated.','contexture-page-security').'</p></div>';
             } else {
                 $linkBack = admin_url();
