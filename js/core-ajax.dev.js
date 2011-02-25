@@ -26,6 +26,18 @@ jQuery(function(){
         }
         return true;
     });
+    //Toggle visibility of page options (options.php)
+    jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
+        if(jQuery(this).filter(':checked').length>0){
+            jQuery('.toggle-opts-ad-msg').fadeOut(250,function(){
+                jQuery('.toggle-opts-ad-page').fadeIn(250);
+            });
+        }else{
+            jQuery('.toggle-opts-ad-page').fadeOut(250,function(){
+                jQuery('.toggle-opts-ad-msg').fadeIn(250);
+            });
+        }
+    });
 });
 
 /**

@@ -32,6 +32,7 @@ class CTXPS_Queries{
             `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
             `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
             `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
+            `group_site_access` varchar(20) default 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full',
             PRIMARY KEY (`ID`)
         )",$ctxpsdb->groups);
 
@@ -64,8 +65,8 @@ class CTXPS_Queries{
         $wpdb->query($sql_create_group_relationships);
         $wpdb->query($sql_create_security);
 
-        //Record what version of the db we're using (only works if option not already set)
-        add_option("contexture_ps_db_version", "1.2");
+        //Record what version of the db we're using (only works if option not already set - handy for ensuring upgrade path works as planned)
+        add_option("contexture_ps_db_version", "1.4");
 
         //Set plugin options (not db version)
         CTXPS_Queries::set_options();
@@ -85,6 +86,16 @@ class CTXPS_Queries{
             update_option("contexture_ps_db_version", "1.2");
         }
         /******** END UPGRADE PATH < 1.2 **************/
+        
+        //Skip 1.3 - DB versions will now match major PSC releases
+        
+        /********* START UPGRADE PATH < 1.4 ***********/
+        $dbver = get_option("contexture_ps_db_version");
+        if($dbver == "" || (float)$dbver < 1.4){
+            $wpdb->query("ALTER TABLE `".$ctxpsdb->groups."` ADD COLUMN `group_site_access` varchar(20) default 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full'");
+            update_option("contexture_ps_db_version", "1.4");
+        }
+        /******** END UPGRADE PATH < 1.4 **************/
 
         //Check if our "Registered Users" group already exists
         $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `".$ctxpsdb->groups."` WHERE `group_system_id` = 'CPS01' LIMIT 1");
@@ -405,15 +416,16 @@ class CTXPS_Queries{
 
         //Set defaults
         $defaultOpts = array(
-            'ad_msg_usepages'       =>'false',
-            'ad_msg_anon'           =>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url( get_permalink() )),
+            'ad_msg_usepages'       =>'false', //Whether to use pages as access denied
+            'ad_msg_anon'           =>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url((empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'])),
             'ad_msg_auth'           =>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
-            'ad_page_anon_id'       =>'',
-            'ad_page_auth_id'       =>'',
-            'ad_msg_usefilter_menus'=>'true',
-            'ad_msg_usefilter_rss'  =>'true',
-            'ad_msg_protect_site'   =>'false',
-            'ad_msg_page_replace'   =>'false'
+            'ad_page_anon_id'       =>'',      //Id of the page to use for default anonymous denied users
+            'ad_page_auth_id'       =>'',      //Id of the page to use for default authorized denied users
+            'ad_msg_usefilter_menus'=>'true',  //Filter menu content
+            'ad_msg_usefilter_rss'  =>'true',  //Filter RSS feed content
+            'ad_opt_protect_site'   =>'false', //Enable sitewide protection options
+            'ad_opt_page_replace'   =>'false', //Use replacement method instead of redirect
+            'ad_opt_login_anon'     =>'false'  //Automatically redirect unauthenticated, denied users to login page
         );
 
         //Let's see if the options already exist...
@@ -499,7 +511,7 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns an array containing the groups attached to the specified page. This can be used
+     * Returns an array containing the groups attached to the specified content. This can be used
      * to either return a "simple" group list (used in tables) or a "security" group list (which
      * includes security info necessary to check permissions). Default is "simple" style list.
      *
@@ -552,7 +564,7 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns a list of pages that are attached to the specified group.
+     * Returns a list of content that are attached to the specified group.
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
@@ -615,9 +627,9 @@ class CTXPS_Queries{
         global $wpdb,$ctxpsdb;
 
         //Get rid of extra whitespace
-        $group_title = trim($group_title);
+        $group_name = trim($group_name);
         //DB column requires names < 40 char
-        $group_name = substr($group_title, 0, 40);
+        $group_name = substr($group_name, 0, 40);
 
         //Check for a match
         $check = $wpdb->get_var($wpdb->prepare(
@@ -704,9 +716,11 @@ class CTXPS_Queries{
      * @global CTXPSC_Tables $ctxpsdb
      *
      * @param int $user_id The user id of the user to check
-     * @return array Returns an array with all the groups that the specified user is currently a member of.
+     * @param boolean $site_only Optional. If true, array will only include groups with site access.
+     * 
+     * @return array Returns a flat array with all the groups that the specified user is currently a member of.
      */
-    public static function get_user_groups($user_id){
+    public static function get_user_groups($user_id,$site_only=false){
         global $wpdb, $ctxpsdb;
 
         /**Empty array to be used for building output*/
@@ -716,8 +730,7 @@ class CTXPS_Queries{
         $today = date('Y-m-d');
         /**Assume user is multi-site user*/
         $multisitemember = true;
-
-        $groups = $wpdb->get_results($wpdb->prepare(
+        $query = $wpdb->prepare(
             'SELECT * FROM `'.$ctxpsdb->group_rels.'`
             JOIN `'.$ctxpsdb->groups.'`
                 ON `'.$ctxpsdb->group_rels.'`.grel_group_id = `'.$ctxpsdb->groups.'`.ID
@@ -725,7 +738,14 @@ class CTXPS_Queries{
             AND grel_expires IS NULL OR grel_expires > %s',
                 $user_id,
                 $today
-        ));
+        );
+
+        //If $site_only is true, append extra restriction to query
+        if($site_only){
+            $query .= ' AND (group_site_access = "limited" OR group_site_access = "full")';
+        }
+        
+        $groups = $wpdb->get_results($query);
 
         //We only need an ID and a name as a key/value...
         foreach($groups as $group){

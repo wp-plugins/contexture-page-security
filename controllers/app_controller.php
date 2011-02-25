@@ -77,8 +77,8 @@ class CTXPS_App{
                 YearRequired : '<?php _e('You must specify an expiration year.','contexture-page-security') ?>',
                 GeneralError : '<?php _e('An error occurred: ','contexture-page-security') ?>',
                 NoGroupSel : '<?php _e('You must select a group to add.','contexture-page-security') ?>',
-                SiteProtectAdd : '<?php _e('This adds protection at a site level. Until you add groups to the site, non-admin users will be unable to access the website.','contexture-page-security') ?>',
-                SiteProtectDel : "<?php _e("This will completely erase the websites security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>"
+                SiteProtectAdd : '<?php _e('This adds protection at a site level. Until you select site options for each group, your users will be unable to access the website.','contexture-page-security') ?>',
+                SiteProtectDel : '<?php _e('This will completely erase site-level security settings and make it accessible to the public. Continue?','contexture-page-security') ?>'
             };
         </script>
         <script type="text/javascript" src="<?php echo CTXPSURL.'/js/core-ajax.dev.js' ?>"></script>
@@ -157,18 +157,33 @@ class CTXPS_Security{
         $secureallowed = true;
         /**Get plugin options*/
         $plugin_opts = get_option('contexture_ps_options');
+        
+        //Various conditions that should automatically let a user through
+        if(
+            $plugin_opts['ad_page_anon_id']==$post->ID //page is an ad page
+        ||  $plugin_opts['ad_page_auth_id']==$post->ID //page is an ad page
+        ||  current_user_can('edit_others_posts')      //user is an admin
+        ){
+            return;//Exit the function, no further checks are needed
+        }
 
         //SITE-WIDE PROTECTION
-        if($plugin_opts['ad_msg_protect_site']=='true'){
+        if($plugin_opts['ad_opt_protect_site']==='true'){
+            
             /**Groups that this user is a member of*/
-            $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
-            foreach($useraccess as $group){
-                ///////////////////////////////////////////////////////////////////////
+            $useraccess = CTXPS_Queries::get_user_groups($current_user->ID,true);
+            //User isnt in any groups, no more checking necessary
+            if(empty($useraccess)){
+                self::deny_access($plugin_opts);
             }
+            wp_die($useraccess);
+            /*foreach($useraccess as $group){
+                $newvar = CTXPS_Queries::get_group_info($group_id);
+            }*/
         }
 
         //CONTENT-SPECIFIC PROTECTION
-        if(!current_user_can('edit_others_posts') && !is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
+        if(!is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
             if(empty($useraccess)){
                 /**Groups that this user is a member of*/
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
@@ -470,9 +485,17 @@ class CTXPS_Security{
         if(empty($plugin_opts)){
             $plugin_opts = get_option('contexture_ps_options');
         }
+        $blogurl = get_bloginfo('url');
         
         //If user is NOT logged in...
-        if($current_user->ID == 0 && !is_user_logged_in()){
+        if($current_user->ID == 0 || !is_user_logged_in()){
+            
+            //If set, redirect anonymous users to the login page
+            if($plugin_opts['ad_opt_login_anon']==='true'){
+                wp_safe_redirect(wp_login_url((empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
+                die();
+            }
+            
             //Check options to determine if we're using a PAGE or a MESSAGE
             if($plugin_opts['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
                 //Send user to the new page
@@ -486,7 +509,6 @@ class CTXPS_Security{
                 }
             }else{
                 //If user is anonymous, show this message
-                $blogurl = get_bloginfo('url');
                 wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
             }
         }else{

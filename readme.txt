@@ -106,10 +106,11 @@ This function can be used to determine if a specific page or post is protected (
 = 1.4.0 =
 * COMPLETE CODE REWRITE! Code base is now now MUCH more flexible and updates should come much more quickly.
 * New feature: You can now protect custom post types!
-* New feature: Bulk actions are now available from Users and Groups pages!
 * New feature: You can now protect content by redirect (old method) OR replacement!
+* New feature: You can now protect an ENTIRE SITE with one click. Useful for intranet implementations.
 * Updated permissions for all actions to be much more common sense.
-* MORE FEATURES COMING SOON.
+* Lots and lots and lots of minor usability improvements.
+* MORE FEATURES COMING SOON!
 
 = 1.3.4 =
 * Fixed a bug that could cause query strings to become too long when adding users from the Group Edit screen

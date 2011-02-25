@@ -56,6 +56,11 @@ if(!empty($_GET['action'])){
 
 $groupInfo = CTXPS_Queries::get_group_info($_GET['groupid']);
 
+if(empty($groupInfo->group_site_access)){
+    $groupInfo->group_site_access = 'none';
+}
+
+$dbopts = get_option('contexture_ps_options');
 
 //  if($_GET['page']==='ps_groups_edit') //What was this supposed to do?
 ?>

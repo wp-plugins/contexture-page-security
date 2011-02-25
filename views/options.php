@@ -1,31 +1,6 @@
 <style type="text/css">
-    #ad-msg-auth, #ad-msg-anon { width:500px; }
-    .toggle-opts-ad { } /*Hide this until "custom ad pages" feature is implemented */
-    .toggle-opts-ad-page {display:none; }
-    #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:25px;margin-right:20px;margin-left:10px;}
-    #ctx-about a.img-block {display:block;text-align:center;}
-    #ctx-about p, #ctx-about div {padding-left:10px;color:#9c9c9c;}
-    #ctx-about p a { color:gray; }
-    #ctx-ps-opts-form {float:left;width:765px;padding-top:20px;}
-    .ctx-footnote { color:#9C9C9C; font-style:italic; }
+
 </style>
-<script type="text/javascript">
-    jQuery(function(){
-        //OFFLINE until "custom ad pages" feature is implemented
-        jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
-            if(jQuery(this).filter(':checked').length>0){
-                jQuery('.toggle-opts-ad-msg').fadeOut(250,function(){
-                    jQuery('.toggle-opts-ad-page').fadeIn(250);
-                });
-            }else{
-                jQuery('.toggle-opts-ad-page').fadeOut(250,function(){
-                    jQuery('.toggle-opts-ad-msg').fadeIn(250);
-                });
-            }
-        });
-        //jQuery('#message.fade').delay(10000).fadeOut(1000);
-    });
-</script>
 <table cellpadding="0" cellspacing="0" style="border:none;width:100%;margin-top:-20px;">
     <tr>
         <td id="ctx-ps-opts-form">
@@ -85,10 +60,10 @@
                             </th>
                             <td>
                                 <label>
-                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="redirect" <?php echo ($ADMsg['ad_msg_page_replace']!=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Redirect','contexture-page-security') ?>
+                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="redirect" <?php echo ($ADMsg['ad_opt_page_replace']!=='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Redirect','contexture-page-security') ?>
                                 </label>
                                 <label style="margin-left:15px;">
-                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="replace" <?php echo ($ADMsg['ad_msg_page_replace']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Replace','contexture-page-security') ?>
+                                    <input type="radio" name="ad-page-replace" id="ad-page-replace" value="replace" <?php echo ($ADMsg['ad_opt_page_replace']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Replace','contexture-page-security') ?>
                                 </label><br/>
                                 <div class="ctx-footnote"><?php _e('This dictates <strong>how</strong> users are shown the Access Denied page. They can either be redirected to a different page, or the content of the restricted page can be replaced.','contexture-page-security') ?></span>
                             </td>
@@ -115,6 +90,19 @@
                                 <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are <strong><em>not</em></strong> logged in (HTML OK).','contexture-page-security') ?></div>
                             </td>
                         </tr>
+                        
+                        <!-- LOGIN REDIRECT -->
+                        <tr valign="top">
+                            <th scope="row">
+                                <label for="ad-msg-forcelogin"><?php _e('Force Login:','contexture-page-security') ?></label>
+                            </th>
+                            <td>
+                                <label>
+                                    <input type="checkbox" name="ad-msg-forcelogin" id="ad-msg-forcelogin" <?php echo ($ADMsg['ad_opt_login_anon']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Send anonymous users to login screen','contexture-page-security'); ?><br/>
+                                    <div class="ctx-footnote"><?php _e('If an anonymous user tries to access restricted content, send them to the login page.<br/>Notice: If enabled, the "Anonymous Users" setting will be ignored.','contexture-page-security') ?></div>
+                                </label>
+                            </td>
+                        </tr>
                     </table>
                     
                     <!-- GLOBAL SECURITY -->
@@ -129,8 +117,8 @@
                             </th>
                             <td>
                                 <label>
-                                    <input type="checkbox" name="ad-protect-site" id="ad-protect-site" <?php echo ($ADMsg['ad_msg_protect_site']!='false') ? 'checked="checked"' : ''; ?> /> <?php _e('Protect the entire website','contexture-page-security') ?><br/>
-                                    <div class="ctx-footnote"><?php _e('Enable protection for the entire site (useful for intranet implementations).<br/>Warning: This will prevent all unathenticated users from accessing the site.','contexture-page-security') ?></div>
+                                    <input type="checkbox" name="ad-protect-site" id="ad-protect-site" <?php echo ($ADMsg['ad_opt_protect_site']==='true') ? 'checked="checked"' : ''; ?> /> <?php _e('Protect the entire website','contexture-page-security'); echo $GroupEditLink; ?><br/>
+                                    <div class="ctx-footnote"><?php _e('Enable protection for the entire site (useful for intranet implementations).<br/>Notice: You must set access for each group or users will be unable to view the site.','contexture-page-security') ?></div>
                                 </label>
                             </td>
                         </tr>

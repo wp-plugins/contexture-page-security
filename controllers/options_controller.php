@@ -49,9 +49,11 @@ if(empty($_POST['action'])){
     $newopts['ad_msg_usefilter_menus'] = (isset($_POST['filter-menus'])) ? 'true' : 'false';
     $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
     //Set option for AD replacement
-    $newopts['ad_msg_page_replace'] = ($_POST['ad-page-replace']==='replace') ? 'true' : 'false';
+    $newopts['ad_opt_page_replace'] = ($_POST['ad-page-replace']==='replace') ? 'true' : 'false';
     //Set option for sitewide lockdown
-    $newopts['ad_msg_protect_site'] = (isset($_POST['ad-protect-site'])) ? 'true' : 'false';
+    $newopts['ad_opt_protect_site'] = (isset($_POST['ad-protect-site'])) ? 'true' : 'false';
+    //Set option for redirecting anonymous users to login if accessing restricted content
+    $newopts['ad_opt_login_anon'] = (isset($_POST['ad-msg-forcelogin'])) ? 'true' : 'false';
 
     //Update the options array
     $saveStatus = CTXPS_Queries::set_options($newopts);
@@ -103,6 +105,14 @@ if(empty($pageDDLAnon)){
     $pageDDLAnon .= sprintf('<a href="%s">%s</a>',
             admin_url('post-new.php?post_type=page'),
             __('Add Page')
+    );
+}
+
+$GroupEditLink = '';
+if($ADMsg['ad_opt_protect_site']==='true'){
+    $GroupEditLink = sprintf(' <a href="%s">%s</a>',
+        admin_url('users.php?page=ps_groups'),
+        __('Edit Groups','contexture-page-security')
     );
 }
 
