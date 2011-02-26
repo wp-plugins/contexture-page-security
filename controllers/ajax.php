@@ -299,11 +299,20 @@ class CTXPS_Ajax {
     }
     
     public static function add_bulk_users_to_group(){
+        
+        //Get group id
+        //Add each user to group
+        //Return result
+        
+        foreach($_GET['users'] as $user){
+            $str .= $user['value'].',';
+        }
+        
         $response = new WP_Ajax_Response(array(
             'what'=>    'bulk_enroll',
             'action'=>  'add_bulk_users_to_group',
             'id'=>      1,
-            'data'=>    print_r($_GET,true)
+            'data'=>    $str//print_r($_GET,true)
         ));
         $response->send();
     }
