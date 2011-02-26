@@ -615,6 +615,19 @@ class CTXPS_Queries{
     }
 
     /**
+     * Determines if the current or specified page is set as an Access Denied page.
+     * 
+     * @param int $post_id
+     * @return boolean Returns true if the current page is an access denied page 
+     */
+    public static function check_ad_status($post_id=null){
+        global $post;
+        $post_id = (empty($post_id)) ? $post->ID : $post_id;
+        $plugin_opts = get_option('contexture_ps_options');
+        return ($plugin_opts['ad_page_anon_id']==$post_id || $plugin_opts['ad_page_auth_id']==$post_id);
+    }
+    
+    /**
      * Checks if a group with the provided name already exists. This is used to validate
      * in self::create_group() to ensure duplicate group names don't crop up.
      *
@@ -788,8 +801,8 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns a list of groups. If $user_id is provided, the list only includes
-     * groups that the specified user to attached to.
+     * Returns a list of all groups (incl system groups). If $user_id is provided, 
+     * the list only includes groups that the specified user to attached to.
      *
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb

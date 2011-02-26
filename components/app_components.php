@@ -370,6 +370,35 @@ class CTXPS_Components{
         return $return;
     }
 
+    /**
+     * Creates an "Add to Group" drop-down list to do bulk actions on the users page
+     * @return string HTML 
+     */
+    public static function render_bulk_add_to_group(){
+        $addtogrp = __('Add to group','contexture-page-security').'&hellip;';
+        $groups = CTXPS_Queries::get_groups();
+        
+        //First, add our default option...
+        $html = sprintf('<option value="">%s</option>',$addtogrp);
+        //Then, add the rest of our groups as options
+        foreach($groups as $group){
+            if($group->group_system_id!=='CPS01'){ //Dont include Registered Users group
+                $html .= CTX_Helper::gen('option', array('value'=>$group->ID), $group->group_title);
+            }
+        }
+        
+        //Now, lets wrap that in a select list
+        $html = CTX_Helper::gen('select', array('name'=>'psc_group_add','id'=>'psc_group_add','style'=>'margin-left:5px;margin-right:5px;'), $html);
+        
+        //Add a label before the select
+        $html = sprintf('<label class="screen-reader-text" for="psc_group_add">%s</label>',$addtogrp).$html;
+        
+        //Add a button after the select
+        $html .= sprintf('<input type="button" name="enrollit" id="enrollit" class="button-secondary" value="%s"/>',__('Add','contexture-page-security'));
+        
+        //Finally, wrap all that in a div and return
+        return CTX_Helper::gen('div', array('class'=>'alignleft actions'), $html);
+    }
 
 }}
 ?>

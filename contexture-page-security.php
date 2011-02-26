@@ -46,6 +46,7 @@ require_once 'components/table_components.php';        //Table generator
 require_once 'components/table-packages.php';//Table generator packages
 /**************************** LOAD CONTROLLERS ********************************/
 require_once 'controllers/app_controller.php';//Common, reusable classes, methods, functions
+require_once 'controllers/app_security_controller.php';//Most of the permissions-checking code is here
 require_once 'controllers/ajax.php';          //AJAX-specific methods
 require_once 'core/routing.php';              //All requests for views are sent through here
 
