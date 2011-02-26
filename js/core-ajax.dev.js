@@ -363,10 +363,10 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
 }
 
 /**
- * SECURE CONTENT TABLE. Removes a page from a group via the group screen
+ * GROUP EDIT > ASSOCIATED CONTENT TABLE. Removes a page from a group via the group screen
  */
 CTXPS_Ajax.removePageFromGroup = function(post_id,me){
-    if(confirm( msgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
+    if(confirm( ctxpsmsg.RemovePage.replace( /%s/,me.parents('td:first').find('strong>a:first').text() ) )){
         //Get the id of the current group
         var group_id = parseInt(jQuery('#groupid').val());
 

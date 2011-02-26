@@ -2,6 +2,12 @@
 if(!class_exists('CTX_Tables')){
 /**
  * STATIC. Contains methods for generating WP-style table lists.
+ * 
+ * Usage:
+ * Create a "packages" class that extends this one. In that class, create public
+ * methods that start with the name "package_". You may want to copy the package_demo
+ * class from here and use that as a template for your own
+ * 
  * TODO: Add pagination support.
  */
 class CTX_Tables {
@@ -49,7 +55,7 @@ class CTX_Tables {
      * An array of configuration packages we've included in this class.
      * @var array
      */
-    private $lists          = array('demo','forms');
+    private $lists          = array('demo');
     /**
      * Store final, processed query data here. This is passed directly to $this->create
      * @var array
@@ -60,8 +66,8 @@ class CTX_Tables {
      * Routes request to correct configuration package then runs the create function
      * @param string $list The name of the list to generate (if using packaged ;ist table)
      */
-    public function __construct($list,$echo=true){
-        if( in_array(strtolower($list),$this->lists) ){
+    public function __construct($list='demo',$echo=true){
+        if( method_exists($this,sprintf('package_%s',$list)) ){
             //Run configuration package for specified list (if list exists)
             eval(sprintf('$this->package_%s();',$list));
         }else{
@@ -232,17 +238,28 @@ class CTX_Tables {
                             $count_acts = 0;
                             foreach($action_conf as $action){
                                 ++$count_acts;
-                                $colhtml .= sprintf('<span class="il-action %1$s"><a href="%3$s" title="%4$s">%2$s</a></span>',
+                                //Determine if we need to add attributes other than href (such as onclick)
+                                if(is_array($record['actions'][$action['slug']])){
+                                    $actatts='';
+                                    foreach($record['actions'][$action['slug']] as $attkey=>$attval){
+                                        $actatts .= sprintf('%s="%s" ',$attkey,$attval);
+                                    }
+                                }else{
+                                    //Not an array, use as href value
+                                    $actatts = sprintf('href="%s"',$record['actions'][$action['slug']]);
+                                }
+                                //Build the action
+                                $colhtml .= sprintf('<span class="il-action %1$s"><a %3$s title="%4$s">%2$s</a></span>',
                                         /*1*/$action['slug'],
                                         /*2*/$action['title'],
-                                        /*3*/$record['actions'][$action['slug']],
+                                        /*3*/$actatts,
                                         /*4*/$action['tip']
                                 );
                                 if($count_acts!==$action_count){
                                     $colhtml .= ' | ';
                                 }
                             }
-                            $colhtml .= '</div>';
+                            $colhtml .= '</div>'; //Close out .row-actions
                         }
                     }
                     ++$count_cols;
@@ -305,5 +322,131 @@ class CTX_Tables {
                 /*3*/$html);
     }
 
+    /**
+     * Default demo package. usually, packages are places in a separate, inherrited class.
+     */
+    public function package_demo(){
+        
+        $this->table_conf = array(
+            'form_id'=>'new_table', //id value for the form (css-friendly id)
+            'form_method'=>'get',   //how to submit the form get/post
+            'list_id'=>'new-list',  //id value for the table (css-friendly id)
+            'record_slug'=>'record',//css-class-friendly slug for uniquely referring to records
+            'bulk'=>'true',       //set to true to include checkboxes (if false, bulk options will be disabled)
+            'no_records'=>__('There are no records to show... yet!','ctxfp') //HTML to show if no records are provided
+        );
+        $this->bulk_conf = array(
+            'Delete'=>'delete',
+            'Duplicate'=>'duplicate'
+        );
+
+        // Indexed array. Each entry is an assoc array. All values required.
+        $this->column_conf = array(
+            /**
+             * title: The visible title of the column
+             * slug: The common slug to use in css classes etc
+             * class: Any additional classes you want to add
+             * width: Leave empty for auto. Specify a css width value to force
+             */
+            array(
+                'title'=>'Column 1',
+                'slug'=>'col1',
+                'class'=>'col-first',
+                'width'=>'200px'
+            ),
+            array(
+                'title'=>'Column 2',
+                'slug'=>'col2',
+                'class'=>'',
+                'width'=>''
+            ),
+            array(
+                'title'=>'Column 3',
+                'slug'=>'col3',
+                'class'=>'col-last',
+                'width'=>''
+            )
+        );
+
+        // Indexed array. Each entry is an associative array. All values required.
+        $this->actions_conf = array(
+            /**
+             * title: The visible text for the action
+             * slug: The slug to be used in css classes and querystring requests
+             * color: Set to any css color value to override default color
+             */
+            array(
+                'title'=>'View',
+                'tip'=>'',
+                'slug'=>'view',
+                'color'=>''
+            ),
+            array(
+                'title'=>'Edit',
+                'tip'=>'',
+                'slug'=>'edit',
+                'color'=>''
+            ),
+            array(
+                'title'=>'Delete',
+                'tip'=>'',
+                'slug'=>'delete',
+                'color'=>'red'
+                )
+        );
+        // Indexed array. Each entry is an associative array. All values required.
+        $this->list_data = array(
+            array(
+                /** Association, must assign record a unique id (usually from db) */
+                'id'=>'1',
+                /**
+                 * Associate array. Each key MUST correspond to a column slug. Value can be any HTML.
+                 */
+                'columns'=>array(
+                    'col1'=>'<strong><a href="#a">Hello world!</a></strong>',
+                    'col2'=>'testing',
+                    'col3'=>'first row'
+                ),
+                /**
+                 * Associative array. Each key MUST correspond to an action slug. If value is a string, 
+                 * it will be automatically turned into an href value. If value is an array, it will be
+                 * parsed into link attributes (useful for adding ajax).
+                 */
+                'actions'=>array(
+                    'view'=>'/wp-admin/post.php?post=1&action=edit',
+                    'edit'=>'/wp-admin/edit.php',
+                    'delete'=>array('onclick'=>'delete(this);return false;','href'=>'#')
+                )
+            ),
+            array(
+                'id'=>'2',
+                'columns'=>array(
+                    'col1'=>'Hello world 2!',
+                    'col2'=>'testing 2',
+                    'col3'=>'middle row'
+                ),
+                'actions'=>array(
+                    'view'=>'/wp-admin/post.php?post=1&action=edit',
+                    'edit'=>'/wp-admin/edit.php',
+                    'delete'=>array('onclick'=>'delete(this);return false;','href'=>'#')
+                )
+            ),
+            array(
+                'id'=>'3',
+                'columns'=>array(
+                    'col1'=>'<a href="#a">Hello world 3!</a>',
+                    'col2'=>'testing 3',
+                    'col3'=>'last row'
+                ),
+                'actions'=>array(
+                    'view'=>'/wp-admin/post.php?post=1&action=edit',
+                    'edit'=>'/wp-admin/edit.php',
+                    'delete'=>array('onclick'=>'delete(this);return false;','href'=>'#')
+                )
+            )
+        );
+
+    }
+    
 }}
 ?>

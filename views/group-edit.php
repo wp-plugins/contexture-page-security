@@ -95,25 +95,8 @@
         </table>
     </form>
     <?php _e('<h3>Associated Content</h3>','contexture-page-security'); ?>
-    <?php //new CTXPS_Table_Packages('associated_content'); ?>
-    <table id="pagetable" class="widefat fixed" cellspacing="0">
-        <thead>
-            <tr class="thead">
-                <th class="title"><?php _e('Title','contexture-page-security') ?></th>
-                <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png" /></div>'?></th>
-                <th class="type"><?php _e('Type','contexture-page-security') ?></th>
-            </tr>
-        </thead>
-        <tfoot>
-            <tr class="thead">
-                <th class="title"><?php _e('Title','contexture-page-security') ?></th>
-                <th class="protected"><?php //echo '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png" /></div>'?></th>
-                <th class="type"><?php _e('Type','contexture-page-security') ?></th>
-            </tr>
-        </tfoot>
-        <tbody id="users" class="list:content content-list">
-            <?php echo CTXPS_Components::render_content_by_group_list($_GET['groupid']); ?>
-        </tbody>
-    </table>
+    <?php new CTXPS_Table_Packages('associated_content'); ?>
+
     <?php } //ENDS : if (empty($groupInfo->group_title)) ?>
+    
 </div>
