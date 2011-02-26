@@ -1,6 +1,7 @@
 <?php
 if(!class_exists('CTXPS_Components')){
 class CTXPS_Components{
+        
     /**
      * Adds a "Protection" column to content lists.
      *
@@ -400,5 +401,20 @@ class CTXPS_Components{
         return CTX_Helper::gen('div', array('class'=>'alignleft actions'), $html);
     }
 
+    /**
+     * Takes a string and returns a wordpress-ready message. This should be 
+     * inserted immediately after the .wrap h2:first-child
+     * 
+     * @param string $message The localized string to pass to the renderer
+     * @param string $type Optional. The message class. possible values: 'updated','updated fade','error'
+     * @return string HTML 
+     */
+    public static function render_wp_message($message,$type='updated'){
+        //Other types include:
+        //  error
+        //  updated fade
+        return sprintf('<div id="message" class="%s"><p>%s</p></div>',$type,$message);
+    }
+    
 }}
 ?>

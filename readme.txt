@@ -113,9 +113,10 @@ This function can be used to determine if a specific page or post is protected (
 
 = 1.4.0 =
 * COMPLETE CODE REWRITE! Code base is now now MUCH more flexible so new features should come more quickly.
-* New feature: You can now protect custom post types!
-* New feature: You can now display access denied messages without a redirect (content replacement)!
-* New feature: You can now protect an ENTIRE SITE with one click. Useful for intranet implementations.
+* New feature: Full custom post type support!
+* New feature: New "content replacement" option for those who want to protect content without a redirect.
+* New feature: Protect an ENTIRE SITE with one click. Useful for intranet implementations.
+* New feature: Use bulk actions to add users to groups!
 * Updated permissions for all actions to be much more common sense.
 * Lots and lots and lots of minor usability improvements.
 * MORE FEATURES COMING SOON!

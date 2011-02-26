@@ -299,20 +299,48 @@ class CTXPS_Ajax {
     }
     
     public static function add_bulk_users_to_group(){
+        $added_users = 0;
         
-        //Get group id
-        //Add each user to group
-        //Return result
+        //ERROR - No users selected!
+        if(empty($_GET['users'])){
+            $response = new WP_Ajax_Response(array(
+                'what'=>    'bulk_enroll',
+                'action'=>  'add_bulk_users_to_group',
+                'id'=>      new WP_Error('error',__('No users were selected.','contexture-page-security')),
+                'supplemental'=>array('html'=>  CTXPS_Components::render_wp_message(__('No users were selected.','contexture-page-security'), 'error'))
+            ));
+            $response->send();
+        }
         
+        //ERROR - No group selected
+        if(empty($_GET['group_id'])){
+            $response = new WP_Ajax_Response(array(
+                'what'=>    'bulk_enroll',
+                'action'=>  'add_bulk_users_to_group',
+                'id'=>      new WP_Error('error',__('No group was selected.','contexture-page-security')),
+                'supplemental'=>array('html'=>  CTXPS_Components::render_wp_message(__('No group was selected.','contexture-page-security'), 'error'))
+            ));
+            $response->send();
+        }
+        
+        //Loop through all selected users...
         foreach($_GET['users'] as $user){
-            $str .= $user['value'].',';
+            //Ensure users exists and is isnt already in group
+            if(CTXPS_Queries::check_user_exists($user['value']) && !CTXPS_Queries::check_membership($user['value'], $_GET['group_id'])){
+                //Try to add user
+                if(CTXPS_Queries::add_membership($user['value'], $_GET['group_id'])){
+                    //increment for added users
+                    $added_users++;
+                }
+            }
         }
         
         $response = new WP_Ajax_Response(array(
             'what'=>    'bulk_enroll',
             'action'=>  'add_bulk_users_to_group',
             'id'=>      1,
-            'data'=>    $str//print_r($_GET,true)
+            'data'=>    '',
+            'supplemental'=>array( 'html'=>CTXPS_Components::render_wp_message(sprintf(__('%d users were enrolled.','contexture-page-security'),$added_users), 'updated fade') )
         ));
         $response->send();
     }

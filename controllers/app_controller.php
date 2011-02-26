@@ -149,23 +149,6 @@ class CTXPS_App{
         <script type="text/javascript">
             jQuery(function(){
                 jQuery('.tablenav.top .alignleft.actions:last').after('<?php echo CTXPS_Components::render_bulk_add_to_group(); ?>');
-                
-                jQuery('#enrollit').click(function(){
-                    var checkedArray = jQuery('#the-list input:checkbox:checked').serializeArray();
-                    alert(checkedArray);
-                    jQuery.get(
-                        'admin-ajax.php',
-                        {
-                            action: 'ctxps_user_bulk_add',
-                            users:  checkedArray
-                        },
-                        function(response){ 
-                            response = jQuery(response);
-                        },
-                        'xml'
-                    );
-                });
-                
             });
         </script>
         <?php

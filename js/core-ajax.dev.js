@@ -5,10 +5,10 @@ jQuery(function(){
         .children('.detach')
             .remove();
     jQuery('#add_group_page').click(function(){
-        CTXPS.addGroupToPage()
+        CTXPS_Ajax.addGroupToPage()
     });
     jQuery('#ctx_ps_protectmy').click(function(){
-        CTXPS.toggleSecurity()
+        CTXPS_Ajax.toggleSecurity()
     });
     jQuery('label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
@@ -17,7 +17,7 @@ jQuery(function(){
         }
     });
     jQuery('#btn-add-grp-2-user').click(function(){
-        CTXPS.addGroupToUser()
+        CTXPS_Ajax.addGroupToUser()
     });
     //Notify users if they are trying to remove site security (options.php)
     jQuery('#ad-protect-site:checked').click(function(){
@@ -83,19 +83,56 @@ jQuery(function(){
         }
     });
     
+    jQuery('#enrollit').click(function(){
+        CTXPS_Ajax.addBulkUsersToGroup();
+    });
+    
 });
 
 /**
  * Let's define the custom static class
  */
-function CTXPS(){
+function CTXPS_Ajax(){
     //Constructor
+}
+
+/**
+ * USERS.PHP. Will bulk-add users to groups.
+ */
+CTXPS_Ajax.addBulkUsersToGroup = function(){
+    var checkedArray = jQuery('#the-list input:checkbox:checked');
+    jQuery.get(
+        'admin-ajax.php',
+        {
+            action: 'ctxps_user_bulk_add',
+            users:  checkedArray.serializeArray(),
+            group_id:jQuery('#psc_group_add').val()
+        },
+        function(response){ 
+            response = jQuery(response);
+            var cmsg = jQuery('#message'),
+                emsg = response.find('supplemental html').text();
+
+            //Put a new bulk message on the page (replace current or add new)
+            if(cmsg.length){
+                cmsg.replaceWith(emsg);
+            }else{
+                jQuery('#wpbody-content h2:first').after(emsg);
+            }
+
+            //If this was a success, uncheck all selected users
+            if(response.find('bulk_enroll').attr('id') == '1'){
+                checkedArray.removeAttr('checked');
+            }
+        },
+        'xml'
+    );
 }
 
 /**
  * GENERAL. Will display a "Security Updated" message in the sidebar when successful change to security
  */
-CTXPS.showSaveMsg = function(selector){
+CTXPS_Ajax.showSaveMsg = function(selector){
     if(jQuery(selector+' .ctx-ajax-status').length==0){
         jQuery(selector)
             .append('<span class="ctx-ajax-status">Saved</span>')
@@ -112,7 +149,7 @@ CTXPS.showSaveMsg = function(selector){
 /**
  * SIDEBAR. Updates the security status of the page
  */
-CTXPS.toggleSecurity = function(){
+CTXPS_Ajax.toggleSecurity = function(){
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
 
     if(jQuery('#ctx_ps_protectmy:checked').length !== 0){
@@ -126,7 +163,7 @@ CTXPS.toggleSecurity = function(){
             function(response){ response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
-                    CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -145,7 +182,7 @@ CTXPS.toggleSecurity = function(){
                     response = jQuery(response);
                     if(response.find('update_sec').attr('id') == '1'){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
-                        CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                        CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
                     }else{
                         alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                     }
@@ -161,7 +198,7 @@ CTXPS.toggleSecurity = function(){
 /**
  * USER PROFILE MEMBERSHIP TABLE. Adds a group to a user
  */
-CTXPS.addGroupToUser = function(){
+CTXPS_Ajax.addGroupToUser = function(){
     var group_id = parseInt(jQuery('#groups-available').val());
     var user_id = parseInt(jQuery('#ctx-group-user-id').val());
     if(group_id!=0){
@@ -192,7 +229,7 @@ CTXPS.addGroupToUser = function(){
                             .remove(); //Remove them
 
                     jQuery('#btn-add-grp-2-user').removeAttr('disabled');
-                    CTXPS.showSaveMsg('.ctx-ps-tablenav');
+                    CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
                 }else{
                     alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
                 }
@@ -206,7 +243,7 @@ CTXPS.addGroupToUser = function(){
 /**
  * USER PROFILE MEMBERSHIP TABLE. Removes a group from a user
  */
-CTXPS.removeGroupFromUser = function(group_id,user_id,me,action){
+CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
     jQuery.get('admin-ajax.php',
         {
             action:     'ctxps_remove_group_from_user',
@@ -234,7 +271,7 @@ CTXPS.removeGroupFromUser = function(group_id,user_id,me,action){
                     me.parents('tbody:first').html(response.find('supplemental html').text());
                 });
 
-                CTXPS.showSaveMsg('.ctx-ps-tablenav');
+                CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
             }else{
                 alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
             }
@@ -245,7 +282,7 @@ CTXPS.removeGroupFromUser = function(group_id,user_id,me,action){
 /**
  * SIDEBAR. Adds a group to a page with security
  */
-CTXPS.addGroupToPage = function(){
+CTXPS_Ajax.addGroupToPage = function(){
     var group_id = parseInt(jQuery('#groups-available').val());
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
     if(group_id!=0){
@@ -273,7 +310,7 @@ CTXPS.addGroupToPage = function(){
                         .children('.detach')
                             .remove();
 
-                    CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
                 }
             },'xml'
         );
@@ -285,7 +322,7 @@ CTXPS.addGroupToPage = function(){
 /**
  * SIDEBAR. Removes a group from a page with security
  */
-CTXPS.removeGroupFromPage = function(group_id,me){
+CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
     if(confirm(ctxpsmsg.RemoveGroup.replace(/%s/,me.parents('.ctx-ps-sidebar-group:first').children('.ctx-ps-sidebar-group-title').text()))){
         //Get the post id from the form field
         var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
@@ -316,7 +353,7 @@ CTXPS.removeGroupFromPage = function(group_id,me){
                         jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
                     });
 
-                    CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -328,7 +365,7 @@ CTXPS.removeGroupFromPage = function(group_id,me){
 /**
  * SECURE CONTENT TABLE. Removes a page from a group via the group screen
  */
-CTXPS.removePageFromGroup = function(post_id,me){
+CTXPS_Ajax.removePageFromGroup = function(post_id,me){
     if(confirm( msgRemovePage.replace( /%s/,me.parents('td:first').children('strong:first').text() ) )){
         //Get the id of the current group
         var group_id = parseInt(jQuery('#groupid').val());
