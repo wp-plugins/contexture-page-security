@@ -1,4 +1,4 @@
-<script type="text/javascript" src="<?php echo CTXPSURL.'/js/inline-edit-membership.dev.js' ?>"></script>
+<script type="text/javascript" src="<?php echo CTXPSURL.'js/inline-edit-membership.dev.js' ?>"></script>
 <div class="wrap">
     <div class="icon32" id="icon-users"><br/></div>
     <h2>Editing a Group</h2>

@@ -112,9 +112,9 @@ This function can be used to determine if a specific page or post is protected (
 == Changelog ==
 
 = 1.4.0 =
-* COMPLETE CODE REWRITE! Code base is now now MUCH more flexible and updates should come much more quickly.
+* COMPLETE CODE REWRITE! Code base is now now MUCH more flexible so new features should come more quickly.
 * New feature: You can now protect custom post types!
-* New feature: You can now protect content by redirect (old method) OR replacement!
+* New feature: You can now display access denied messages without a redirect (content replacement)!
 * New feature: You can now protect an ENTIRE SITE with one click. Useful for intranet implementations.
 * Updated permissions for all actions to be much more common sense.
 * Lots and lots and lots of minor usability improvements.

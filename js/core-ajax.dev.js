@@ -28,16 +28,61 @@ jQuery(function(){
     });
     //Toggle visibility of page options (options.php)
     jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
-        if(jQuery(this).filter(':checked').length>0){
-            jQuery('.toggle-opts-ad-msg').fadeOut(250,function(){
-                jQuery('.toggle-opts-ad-page').fadeIn(250);
-            });
+            
+        var optmsg = jQuery('.toggle-opts-ad-msg'),
+            optpg = jQuery('.toggle-opts-ad-page'),
+            forcelog = jQuery('#ad-msg-forcelogin:checked').length;
+                
+        //If checking...
+        if(jQuery(this).filter(':checked').length){
+            
+            //If force login is enabled...
+            if(forcelog){
+                //Exclude anon opts
+                optmsg.not('.ad-opt-anon').fadeOut(250,function(){
+                    optpg.not('.ad-opt-anon').fadeIn(250);
+                });
+            //If force login is NOT enabled
+            }else{
+                optmsg.fadeOut(250,function(){
+                    jQuery('.toggle-opts-ad-page').fadeIn(250);
+                });
+            }
+            
+        //If UNchecking
         }else{
-            jQuery('.toggle-opts-ad-page').fadeOut(250,function(){
-                jQuery('.toggle-opts-ad-msg').fadeIn(250);
-            });
+            //If force login is enabled...
+            if(forcelog){
+               optpg.not('.ad-opt-anon').fadeOut(250,function(){
+                    optmsg.not('.ad-opt-anon').fadeIn(250);
+                });
+            //If force login is NOT enabled
+            }else{
+                optpg.fadeOut(250,function(){
+                    optmsg.fadeIn(250);
+                });
+            }
         }
     });
+    
+    //Toggle visibility of anon boxes with force redirect
+    jQuery('#ad-msg-forcelogin, label[for="ad-msg-forcelogin"]').click(function(){
+        var anon = jQuery('.ad-opt-anon'),
+            pages = jQuery('#ad-msg-enable:checked').length;
+        //This is being checked
+        if(jQuery(this).filter(':checked').length){
+            anon.filter(':visible').fadeOut(250);
+        //This is being UNchecked
+        }else{
+            //Check if we need to show pages or messages
+            if(pages){
+                jQuery('.toggle-opts-ad-page').fadeIn(250);
+            }else{
+                jQuery('.toggle-opts-ad-msg').fadeIn(250);
+            }
+        }
+    });
+    
 });
 
 /**

@@ -23,12 +23,15 @@ if(empty($_POST['action'])){
     //Add page selections if the checkbox is checked
     if(isset($_POST['ad-msg-enable'])){
         //So long as valid pages are set for both AD types, successfully set usepages to true
-        if(is_numeric($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-anon'])){
+        if(
+            (is_numeric($_POST['ad-page-auth']) && is_numeric($_POST['ad-page-anon'])) || //Either both pages have to be set....
+            (is_numeric($_POST['ad-page-auth']) && isset($_POST['ad-msg-forcelogin']))    //OR auth page must be set AND anon box must be checked
+        ){
             $newopts['ad_msg_usepages'] = 'true';
         }else{
             //User didn't select both AD pages, disable usepages
             $newopts['ad_msg_usepages'] = 'false';
-            $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.','contexture-page-security').'</strong></p></div>';
+            $InvADPagesMsg = '<div class="updated" style="clear:both;"><p><strong>'.__('Custom pages were deactivated. You must select a valid page from each list.','contexture-page-security').'</strong></p></div>';          
         }
 
         //Set new AD page ids
@@ -110,10 +113,10 @@ if(empty($pageDDLAnon)){
 
 $GroupEditLink = '';
 if($ADMsg['ad_opt_protect_site']==='true'){
-    $GroupEditLink = sprintf(' <a href="%s">%s</a>',
+    /*$GroupEditLink = sprintf('&nbsp;&nbsp; <a href="%s">%s</a>',
         admin_url('users.php?page=ps_groups'),
         __('Edit Groups','contexture-page-security')
-    );
+    );*/
 }
 
 

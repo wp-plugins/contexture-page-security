@@ -1,6 +1,3 @@
-<style type="text/css">
-
-</style>
 <table cellpadding="0" cellspacing="0" style="border:none;width:100%;margin-top:-20px;">
     <tr>
         <td id="ctx-ps-opts-form">
@@ -42,7 +39,7 @@
                         </tr>
                         
                         <!-- AD PAGE ANONYMOUS SELECT -->
-                        <tr valign="top" class="toggle-opts-ad-page" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:table-row;' : ''; ?>">
+                        <tr valign="top" class="toggle-opts-ad-page ad-opt-anon" style="<?php echo ($ADMsg['ad_msg_usepages']==='true' && $ADMsg['ad_opt_login_anon']!=='true') ? 'display:table-row;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-page-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
                             </th>
@@ -81,7 +78,7 @@
                         </tr>
                         
                         <!-- MESSAGE ANONYMOUS -->
-                        <tr valign="top" class="toggle-opts-ad-msg" style="<?php echo ($ADMsg['ad_msg_usepages']==='true') ? 'display:none;' : ''; ?>">
+                        <tr valign="top" class="toggle-opts-ad-msg ad-opt-anon" style="<?php echo ($ADMsg['ad_msg_usepages']==='true' || $ADMsg['ad_opt_login_anon']==='true') ? 'display:none;' : ''; ?>">
                             <th scope="row">
                                 <label for="ad-msg-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
                             </th>
