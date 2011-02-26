@@ -297,5 +297,15 @@ class CTXPS_Ajax {
         $response = new WP_Ajax_Response($response);
         $response->send();
     }
+    
+    public static function add_bulk_users_to_group(){
+        $response = new WP_Ajax_Response(array(
+            'what'=>    'bulk_enroll',
+            'action'=>  'add_bulk_users_to_group',
+            'id'=>      1,
+            'data'=>    print_r($_GET,true)
+        ));
+        $response->send();
+    }
 }}
 ?>

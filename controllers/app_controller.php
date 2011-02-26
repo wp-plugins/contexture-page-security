@@ -31,7 +31,7 @@ class CTXPS_App{
      */
     public static function help_init(){
         //We bring in the global help array so we can modify it
-        global $_wp_contextual_help,$parent_file;
+        global $_wp_contextual_help,$pagenow;
 
         $supporturl = /*'<p><strong>'.__('For more information:','contexture-page-security').'</strong></p>'.*/'<p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">'.__('Official Page Security Support','contexture-page-security').'</a></p>';
 
@@ -63,8 +63,8 @@ class CTXPS_App{
 
         }
         
-        //If this is the users page, use javascript to inject another bulk options box (damn you, WP core team for pulling my 3.1 hooks!)
-        if($parent_file==='users.php' && current_user_can( 'promote_users' )){
+        //If this is the users page, use javascript to inject another bulk options box (damn you, WP core team for pulling my 3.1 bulk hooks!)
+        if($pagenow==='users.php' && empty($_GET['page']) && current_user_can( 'promote_users' )){
             self::js_userbulk_init();
         }
     }
@@ -149,6 +149,23 @@ class CTXPS_App{
         <script type="text/javascript">
             jQuery(function(){
                 jQuery('.tablenav.top .alignleft.actions:last').after('<?php echo CTXPS_Components::render_bulk_add_to_group(); ?>');
+                
+                jQuery('#enrollit').click(function(){
+                    var checkedArray = jQuery('#the-list input:checkbox:checked').serializeArray();
+                    alert(checkedArray);
+                    jQuery.get(
+                        'admin-ajax.php',
+                        {
+                            action: 'ctxps_user_bulk_add',
+                            users:  checkedArray
+                        },
+                        function(response){ 
+                            response = jQuery(response);
+                        },
+                        'xml'
+                    );
+                });
+                
             });
         </script>
         <?php

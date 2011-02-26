@@ -79,6 +79,9 @@ add_action('wp_ajax_ctxps_add_group_to_user','CTXPS_Ajax::add_group_to_user');
 add_action('wp_ajax_ctxps_remove_group_from_user','CTXPS_Ajax::remove_group_from_user');
 add_action('wp_ajax_ctxps_update_member','CTXPS_Ajax::update_membership');
 
+//handle Ajax for bulk add
+add_action('wp_ajax_ctxps_user_bulk_add','CTXPS_Ajax::add_bulk_users_to_group');
+
 //Add basic security to all public "static" pages and posts [highest priority]
 add_action('wp','CTXPS_Security::protect_content',1);
 
@@ -107,5 +110,8 @@ add_action('admin_head', 'CTXPS_App::help_init');
 
 //Load theme functions
 require_once 'controllers/theme-functions.php';
+
+//Super-handy tool for taking a peek at ALL available variables in the plugin scope
+//wp_die(var_dump(get_defined_vars()));
 
 ?>
