@@ -43,7 +43,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 'title'=>'Type',
                 'slug'=>'type',
                 'class'=>'col-last',
-                'width'=>'80px'
+                'width'=>'100px'
             )
         );
 
