@@ -60,29 +60,56 @@ class CTX_Tables {
      * Store final, processed query data here. This is passed directly to $this->create
      * @var array
      */
-    public $list_data      = array();
+    public $list_data       = array();
+    /**
+     * If true, output will only include list-table content (useful for ajax)
+     * @var boolean 
+     */
+    public $content_only    = false;
+    
+    /**
+     * Stores the completed list table
+     * @var string 
+     */
+    public $rendered_table      = '';
 
     /**
      * Routes request to correct configuration package then runs the create function
      * @param string $list The name of the list to generate (if using packaged ;ist table)
      */
-    public function __construct($list='demo',$echo=true){
+    public function __construct($list='demo',$echo=true,$content_only=false){
+        
+        //STORE VALUE IN PROPERTY
+        $this->content_only = $content_only;
+        
+        //USE EXISTING PACKAGE, IF EXISTS....
         if( method_exists($this,sprintf('package_%s',$list)) ){
-            //Run configuration package for specified list (if list exists)
             eval(sprintf('$this->package_%s();',$list));
+            
+        //PACKAGE NOT FOUND, TRY LOADING VIA HOOK...
         }else{
-            //If list isn't a package, try using hooked package
             do_action('ctx_list_table_prepare-'.$list,$this);
         }
-        if($echo){
-            //Spit the created table onto the page
-            $this->render();
-        }
+        
+        //RENDER THE TABLE...
+        $this->render($echo);
+    }
+    
+    /**
+     * If class is called like a string ($echo is false), be sure to return a string.
+     * 
+     * @return string The rendered table as a string 
+     */
+    public function __toString() {
+        return $this->rendered_table;
     }
 
     /** Immediately renders/echos the table in it's current state. */
-    public function render(){
-        echo $this->create($this->table_conf, $this->column_conf, $this->actions_conf, $this->bulk_conf, $this->list_data);
+    public function render($echo=true){
+        $this->rendered_table = $this->create($this->table_conf, $this->column_conf, $this->actions_conf, $this->bulk_conf, $this->list_data, $this->content_only);
+        
+        //ECHO IF SET
+        if($echo){ echo $this->rendered_table; }
     }
 
     /** Procedural setter for $this->table_conf */
@@ -117,7 +144,7 @@ class CTX_Tables {
      * @param array $actions An associative array of $acts['slug']=>$link_url
      * @return array Returns a self::create($records) compatible array entry.
      */
-    static function prepare_row($id,$columns,$actions=null){
+    public static function prepare_row($id,$columns,$actions=null){
         //Check for errors
         if(empty($id)) trigger_error (__('Parameter $id must be set to a unique record id or guid.','contexture-page-security'), E_USER_WARNING);
         if(!is_array($columns)) trigger_error (__('Parameter $columns is not an array.','contexture-page-security'), E_USER_WARNING);
@@ -138,7 +165,7 @@ class CTX_Tables {
      * @param type $rowinfo
      * @param type $demo If true, a demo table will be generated, regardless of settings
      */
-    static function create($table_conf=array(),$column_conf=array(),$action_conf=array(),$bulk_conf=array(),$records=array()){
+    public static function create($table_conf=array(),$column_conf=array(),$action_conf=array(),$bulk_conf=array(),$records=array(),$content_only=false){
 
         /** Stores output HTML */
         $html ='';
@@ -180,7 +207,7 @@ class CTX_Tables {
 
         //TODO: Run checks to ensure array formatting is correct and required data is available. Output error message if any test fails.
 
-        if ($column_count===0) return __('<h3>No columns were specified!</h3><p>See demo arrays for correct configurations.</p>','contexture-page-security');
+        if ($column_count===0) return __('<h3>Can\'t Render Table!</h3><p>Either your package could not be loaded or there is a problem with your columns array. See the demo package in CTX_Table for an example configuration.</p>','contexture-page-security');
 
         /****** BULK OPTIONS **************************************************/
 
@@ -286,6 +313,9 @@ class CTX_Tables {
         //Wrap the rows in tbody
         $table = sprintf('<tbody id="the-list-%1$s" class="list:%1$s">%2$s</tbody>',$table_conf['list_id'],$table);
 
+        if($content_only){
+            return $table;
+        }
 
         /****** BUILD THEAD & TFOOT *******************************************/
         $column_heads='';

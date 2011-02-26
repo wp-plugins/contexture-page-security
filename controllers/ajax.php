@@ -69,7 +69,7 @@ class CTXPS_Ajax {
             if(isset($_GET['requester']) && $_GET['requester']=='sidebar'){
                 $supplemental = array('html'=>CTXPS_Components::render_sidebar_attached_groups($_GET['postid']));//We need to regenerate sidebar content
             }else{
-                $supplemental = array('html'=>CTXPS_Components::render_content_by_group_list($_GET['groupid']));//We need to regenerate list-table content
+                $supplemental = array('html'=>new CTXPS_Table_Packages('associated_content',false,true)/*CTXPS_Components::render_content_by_group_list($_GET['groupid'])*/);//We need to regenerate list-table content
             }
 
             //SUCCESS!

@@ -96,7 +96,5 @@
     </form>
     <?php _e('<h3>Associated Content</h3>','contexture-page-security'); ?>
     <?php new CTXPS_Table_Packages('associated_content'); ?>
-
     <?php } //ENDS : if (empty($groupInfo->group_title)) ?>
-    
 </div>
