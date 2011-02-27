@@ -15,11 +15,11 @@ class CTXPS_Queries{
         $linkBack = admin_url();
 
         //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
-        if (version_compare(PHP_VERSION, '5', '<')) {
+        if (version_compare(PHP_VERSION, '5.2', '<')) {
             deactivate_plugins($ctxpsdb->pluginbase);
             wp_die(
                 "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:','contexture-page-security')."</span> "
-                .sprintf(__('Page Security requires PHP 5 or higher. Your server is running %s. Please contact your hosting service about enabling PHP 5 support.','contexture-page-security'),PHP_VERSION)
+                .sprintf(__('Page Security requires PHP 5.2.0 or higher. Your server is running PHP %s. Please contact your hosting service about enabling PHP 5.2 support.','contexture-page-security'),PHP_VERSION)
                 ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page','contexture-page-security')." &gt;&gt;</a>"
             );
         }

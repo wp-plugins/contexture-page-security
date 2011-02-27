@@ -117,7 +117,7 @@ This function can be used to determine if a specific page or post is protected (
 * New feature: New "content replacement" option for those who want to protect content without a redirect.
 * New feature: Protect an ENTIRE SITE with one click. Useful for intranet implementations.
 * New feature: Use bulk actions to add users to groups!
-* Updated permissions to be much more common sense (editors can now update content permissions, but only admins can add/remove users from groups).
+* Updated permissions to more common-sense (editors can now update content permissions, but only admins can add/remove users from groups).
 * Lots and lots and lots of minor usability improvements.
 * MORE FEATURES COMING SOON!
 
