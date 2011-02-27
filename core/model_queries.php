@@ -622,6 +622,12 @@ class CTXPS_Queries{
      */
     public static function check_ad_status($post_id=null){
         global $post;
+        
+        //If we're checking against double null (shouldn't happen, but just-in-case)
+        if(empty($post) && empty($post_id)){
+            return false;
+        }
+        
         $post_id = (empty($post_id)) ? $post->ID : $post_id;
         $plugin_opts = get_option('contexture_ps_options');
         return ($plugin_opts['ad_page_anon_id']==$post_id || $plugin_opts['ad_page_auth_id']==$post_id);

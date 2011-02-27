@@ -13,7 +13,7 @@ class CTXPS_Ajax {
         global $wpdb, $ctxpsdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
+        if(!current_user_can('edit_others_posts')){
             //ERROR! If user isn't authorized, stop and return error
             $response = new WP_Ajax_Response(array(
                 'what'=>    'add_group',
@@ -53,7 +53,7 @@ class CTXPS_Ajax {
         $supplemental=array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_users') || !current_user_can('edit_pages')){
+        if(!current_user_can('edit_others_posts')){
             //ERROR! If user isn't authorized
             $response = array(
                 'what'=>    'remove_group',
@@ -102,7 +102,7 @@ class CTXPS_Ajax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_users')){
+        if(!current_user_can('promote_users')){
             //ERROR! If user isn't authorized
             $response = new WP_Ajax_Response(array(
                 'what'=>    'enroll',
@@ -168,7 +168,7 @@ class CTXPS_Ajax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_users')){
+        if(!current_user_can('promote_users')){
             //ERROR! If user isn't authorized, stop and return error
             $response = new WP_Ajax_Response(array(
                 'what'=>    'update',
@@ -210,7 +210,7 @@ class CTXPS_Ajax {
         $response = array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_users')){
+        if(!current_user_can('promote_users')){
             //ERROR! - membership not found.
             $response = new WP_Ajax_Response(array(
                 'what'=>    'unenroll',
@@ -234,7 +234,7 @@ class CTXPS_Ajax {
                 'action'=>  'remove_group_from_user',
                 'id'=>      1,
                 'data'=>    __('User removed from group.','contexture-page-security'),
-                'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_GET['user_id'],'users',current_user_can('edit_users'),($_GET['user_id']==$current_user->ID)))//We need to regenerate table content
+                'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_GET['user_id'],'users',current_user_can('promote_users'),($_GET['user_id']==$current_user->ID)))//We need to regenerate table content
             );
         }
         $response = new WP_Ajax_Response($response);
@@ -250,7 +250,7 @@ class CTXPS_Ajax {
         global $wpdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_pages')){
+        if(!current_user_can('edit_others_posts')){
             //ERROR! - membership not found.
             $response = new WP_Ajax_Response(array(
                 'what'=>    'update_sec',

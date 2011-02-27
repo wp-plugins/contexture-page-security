@@ -31,7 +31,7 @@ class CTXPS_Shortcodes{
         if($output['public']==='true'){
             return $return;
         }else{
-            return (current_user_can('manage_options')) ? $return : '';
+            return (current_user_can('edit_others_posts')) ? $return : '';
         }
     }
 
@@ -88,7 +88,7 @@ class CTXPS_Shortcodes{
         if($output['public']==='true'){
             return $return;
         }else{
-            return (current_user_can('manage_options')) ? $return : '';
+            return (current_user_can('edit_others_posts')) ? $return : '';
         }
     }
 

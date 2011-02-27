@@ -8,6 +8,10 @@ if(!class_exists('CTX_Tables')){
  * methods that start with the name "package_". You may want to copy the package_demo
  * class from here and use that as a template for your own
  * 
+ * If you're a developer reading this. Yes, you can steal this class wholesale. It should
+ * be very portable. Take a look in table-packages.php too, as it shows this class being
+ * used in a practical application.
+ * 
  * TODO: Add pagination support.
  */
 class CTX_Tables {

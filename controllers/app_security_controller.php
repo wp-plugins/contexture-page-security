@@ -21,7 +21,7 @@ class CTXPS_Security{
         $plugin_opts = get_option('contexture_ps_options');
         
         //SET 401 CODE IF ON AD PAGE (AND NEVER BLOCK)
-        if(CTXPS_Queries::check_ad_status()){
+        if(!is_admin() && CTXPS_Queries::check_ad_status()){
             if ( !$is_IIS && php_sapi_name() != 'cgi-fcgi' ){
                 status_header(401); // This causes problems on IIS and some FastCGI setups
             }
@@ -93,7 +93,7 @@ class CTXPS_Security{
             return $content;
         }else{
             //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-            if( !current_user_can('edit_others_posts') /*&& ( is_home() || is_category() || is_tag() || is_feed() || is_search() )*/  && !is_admin()) {
+            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_feed() || is_search() )  && !is_admin()) {
                 foreach($content as $post->key => $post->value){
 
                     /**Groups that this user is a member of*/

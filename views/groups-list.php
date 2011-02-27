@@ -19,7 +19,7 @@
     </script>
     <div class="wrap">
         <div class="icon32" id="icon-users"><br/></div>
-        <h2><?php _e('Groups','contexture-page-security'); ?> <?php if (current_user_can('create_users')){ ?><a href="<?php echo admin_url(); ?>users.php?page=ps_groups_add" class="button add-new-h2"><?php _e('Add New'); ?></a><?php } ?></h2>
+        <h2><?php _e('Groups','contexture-page-security'); ?> <?php if (current_user_can('edit_users')){ ?><a href="<?php echo admin_url(); ?>users.php?page=ps_groups_add" class="button add-new-h2"><?php _e('Add New'); ?></a><?php } ?></h2>
         <?php echo $creategroup_message; ?>
         <p></p>
         <table id="grouptable" class="widefat fixed" cellspacing="0">

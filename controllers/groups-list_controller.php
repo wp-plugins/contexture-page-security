@@ -1,7 +1,7 @@
 <?php
 /**Creates the "Add/View Groups" page**/
 
-if ( ! current_user_can( 'manage_options' ) )
+if ( ! current_user_can( 'edit_users' ) )
 	wp_die( __( 'You do not have sufficient permissions to manage options for this site.' ) );
 
 $creategroup_message = '';

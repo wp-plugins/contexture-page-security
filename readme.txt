@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.1
-Stable tag: 1.3.4
+Stable tag: 1.4
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -117,7 +117,7 @@ This function can be used to determine if a specific page or post is protected (
 * New feature: New "content replacement" option for those who want to protect content without a redirect.
 * New feature: Protect an ENTIRE SITE with one click. Useful for intranet implementations.
 * New feature: Use bulk actions to add users to groups!
-* Updated permissions for all actions to be much more common sense.
+* Updated permissions to be much more common sense (editors can now update content permissions, but only admins can add/remove users from groups).
 * Lots and lots and lots of minor usability improvements.
 * MORE FEATURES COMING SOON!
 

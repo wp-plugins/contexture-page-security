@@ -18,7 +18,7 @@
     </script>
     <div class="wrap">
         <h3>Group Membership</h3>
-        <?php if ( current_user_can('add_users') ) { ?>
+        <?php if ( current_user_can('promote_users') ) { ?>
         <div class="tablenav ctx-ps-tablenav">
             <select id="groups-available">
                 <option value="0">-- Select -- </option>
