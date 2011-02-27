@@ -20,11 +20,12 @@ PSC is created to be simple, yet powerful - and is designed to integrate seamles
 
 Features:
 
+1. NEW IN 1.4! Restrict your ENTIRE website (use WordPress as an intranet)!
 1. Subscription support! Assign an expiration date to any membership!
 1. Custom "Access Denied" pages!
 1. Fully AJAX-loaded! Any changes you make to security are saved immediately!
 1. Use the "Registered Users" smart group to create special "registered users only" sections!
-1. Contextual help is available for every PSC feature (via WordPress's 'Help' tab)!
+1. Contextual help is available for every PSC feature (via WordPress' 'Help' tab)!
 1. Use simple, well-documented theme functions to easily automate your group memberships (You could even create an automatic subscription system)!
 1. Frequent updates and improvements!
 
@@ -51,6 +52,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 1. screenshot-1.png
 1. screenshot-2.png
 1. screenshot-3.png
+1. screenshot-4.png
 
 == Frequently Asked Questions ==
 
@@ -118,7 +120,8 @@ This function can be used to determine if a specific page or post is protected (
 * New feature: Protect an ENTIRE SITE with one click. Useful for intranet implementations.
 * New feature: Use bulk actions to add users to groups!
 * Updated permissions to more common-sense (editors can now update content permissions, but only admins can add/remove users from groups).
-* Lots and lots and lots of minor usability improvements.
+* Fixed a bug with membership expirations.
+* Lots and lots and lots of usability improvements.
 * MORE FEATURES COMING SOON!
 
 = 1.3.4 =

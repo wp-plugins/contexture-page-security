@@ -749,12 +749,13 @@ class CTXPS_Queries{
         $today = date('Y-m-d');
         /**Assume user is multi-site user*/
         $multisitemember = true;
+        //Get membership only if it's not expired
         $query = $wpdb->prepare(
             'SELECT * FROM `'.$ctxpsdb->group_rels.'`
             JOIN `'.$ctxpsdb->groups.'`
                 ON `'.$ctxpsdb->group_rels.'`.grel_group_id = `'.$ctxpsdb->groups.'`.ID
             WHERE `'.$ctxpsdb->group_rels.'`.grel_user_id = %s
-            AND grel_expires IS NULL OR grel_expires > %s',
+            AND (grel_expires IS NULL OR grel_expires > %s)',
                 $user_id,
                 $today
         );

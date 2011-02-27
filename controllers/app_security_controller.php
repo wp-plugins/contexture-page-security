@@ -63,10 +63,8 @@ class CTXPS_Security{
 
                 //wp_die(print_r($secureallowed,true));
 
-                if($secureallowed){
-                    //If we're allowed to access this page (do nothing)
-                }else{
-                    //If we're NOT allowed to access this page
+                //NOT ALLOWED TO ACCESS!
+                if(!$secureallowed){
                     self::deny_access($plugin_opts);
                 }
             }
@@ -257,7 +255,7 @@ class CTXPS_Security{
         //Used to count each page that has at least one group
         $loopswithgroups = 0;
 
-        //Loop through each page's permissions, starting with current page and going up the heirarchy...
+        //Loop through each page's permissions, starting with current page and travelling UP the heirarchy...
         foreach($PageSecurityArray as $security->page => $security->secarray){
             //If the current page has group settings attached...
             if(count($security->secarray) != 0){
@@ -268,6 +266,7 @@ class CTXPS_Security{
                     //We return false as the user does not have access
                     return false;
                 }
+                /**TODO: Ensure user isnt expired?*/
             }
         }
 
