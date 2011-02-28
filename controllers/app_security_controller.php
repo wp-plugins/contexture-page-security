@@ -19,7 +19,7 @@ class CTXPS_Security{
         global $post,$page,$id,$current_user,$is_IIS;
         $secureallowed = true;
         $plugin_opts = get_option('contexture_ps_options');
-        
+
         //SET 401 CODE IF ON AD PAGE (AND NEVER BLOCK)
         if(!is_admin() && CTXPS_Queries::check_ad_status()){
             if ( !$is_IIS && php_sapi_name() != 'cgi-fcgi' ){
@@ -27,15 +27,15 @@ class CTXPS_Security{
             }
             return;//Exit the function, no further checks are needed
         }
-        
+
         //CONDITIONS WHERE USER SHOULD BE LET THROUGH
         if(current_user_can('edit_others_posts')){
             return;//Exit the function, no further checks are needed
         }
-                
+
         //SITE-WIDE PROTECTION
         if($plugin_opts['ad_opt_protect_site']==='true'){
-            
+
             /**Groups that this user is a member of*/
             $siteaccess = CTXPS_Queries::get_user_groups($current_user->ID,true);
             //User isnt in any groups, no more checking necessary
@@ -47,7 +47,7 @@ class CTXPS_Security{
         }
 
         //CONTENT-SPECIFIC PROTECTION
-        if(!is_home() && !is_category() && !is_tag() && !is_feed() && !is_admin() && !is_404() && !is_search()) {
+        if(!is_home() && !is_category() && !is_tag() && !is_feed() && !is_tax() && !is_admin() && !is_404() && !is_search()) {
             if(empty($useraccess)){
                 /**Groups that this user is a member of*/
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
@@ -91,7 +91,7 @@ class CTXPS_Security{
             return $content;
         }else{
             //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_feed() || is_search() )  && !is_admin()) {
+            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_search() )  && !is_admin()) {
                 foreach($content as $post->key => $post->value){
 
                     /**Groups that this user is a member of*/
@@ -132,7 +132,7 @@ class CTXPS_Security{
         global $current_user;
 
         $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
-        
+
         //Do this filtering only if the user isn't an admin (and isn't in admin section)... and provided the user hasn't explicitly set menu filtering to false
         if( !current_user_can('edit_others_posts')  && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false') {
 
@@ -141,7 +141,7 @@ class CTXPS_Security{
                (!is_user_logged_in() || $current_user->ID==0)){
                 return array();
             }
-            
+
             //Loop through the content array
             foreach($content as $post->key => $post->value){
 
@@ -190,7 +190,7 @@ class CTXPS_Security{
 
         $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
-        
+
         //Do this filtering only if user isn't an admin, in admin section... and provided the user hasn't explicitly set menu filtering to false
         if( !current_user_can('edit_others_posts') && !is_admin() && $dbOpts['ad_msg_usefilter_menus']!='false' ) {
 
@@ -199,7 +199,7 @@ class CTXPS_Security{
                (!is_user_logged_in() || $current_user->ID==0)){
                 return array();
             }
-            
+
             //Get options (in case we need to strip access denied pages)
             $dbOpts = get_option('contexture_ps_options');
 
@@ -346,15 +346,15 @@ class CTXPS_Security{
     public static function check_protection($post_id){
         return CTXPS_Queries::check_protection($post_id);
     }
-    
+
     /**
      * When called, will determined which AD message or page to show, then show it
-     * 
+     *
      * @param array $plugin_opts If db options are provided, we won't have to query this again
      */
     public static function deny_access($plugin_opts=array()){
         global $current_user,$post,$is_IIS;
-        
+
         if(empty($plugin_opts)){
             $plugin_opts = get_option('contexture_ps_options');
         }
@@ -362,19 +362,19 @@ class CTXPS_Security{
 
         //HANDLE UNAUTHENTICATED USERS.....
         if($current_user->ID == 0 || !is_user_logged_in()){
-            
+
             //IF FORCE LOGIN....
             if($plugin_opts['ad_opt_login_anon']==='true'){
                 wp_safe_redirect(wp_login_url((empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
                 die();
             }
-            
+
             //SHOW AD *PAGE*
             if($plugin_opts['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
- 
+
                 //IF USING PAGE...
                 if(is_numeric($plugin_opts['ad_page_anon_id'])){
-                    
+
                     //IF USING REPLACEMENT...
                     if($plugin_opts['ad_opt_page_replace']==='true'){
                         $new_content = get_post($plugin_opts['ad_page_anon_id']);
@@ -387,31 +387,31 @@ class CTXPS_Security{
                     //ELSE USE REDIRECT...
                     }else{
                         $redir_anon_link = get_permalink($plugin_opts['ad_page_anon_id']);
-                        wp_redirect($redir_anon_link); 
+                        wp_redirect($redir_anon_link);
                         exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                     }
-                    
+
                 //INVALID PAGE, USE MSG
                 }else{
                     wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                 }
-            
+
             //SHOW AD *MSG*
             }else{
                 //If user is anonymous, show this message
                 wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
             }
-            
-            
+
+
         //HANDLE AUTHENTICATED USERS....
         }else{
-            
+
             //SHOW AD *PAGE*
             if($plugin_opts['ad_msg_usepages']==='true'){
-                
+
                 //IF USING PAGE...
                 if(is_numeric($plugin_opts['ad_page_auth_id'])){
-                    
+
                     //IF USING REPLACEMENT...
                     if($plugin_opts['ad_opt_page_replace']==='true'){
                         $new_content = get_post($plugin_opts['ad_page_auth_id']);
@@ -421,19 +421,19 @@ class CTXPS_Security{
                             status_header(401); // This causes problems on IIS and some FastCGI setups
                         }
                         return;
-                        
+
                     //ELSE USE REDIRECT...
                     }else{
                         $redir_auth_link = get_permalink($plugin_opts['ad_page_auth_id']);
                         wp_redirect($redir_auth_link);
                         exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                     }
-                    
+
                 //INVALID PAGE, USE MSG
                 }else{
                     wp_die($plugin_opts['ad_msg_auth'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
                 }
-                
+
             //SHOW AD *MSG*
             }else{
                 //If user is authenticated, show this message
@@ -442,7 +442,7 @@ class CTXPS_Security{
         }
         exit(); //Useless
     }
-    
+
 }
 }
 ?>
