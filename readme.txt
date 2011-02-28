@@ -10,11 +10,11 @@ Allows admins to create user groups and set access restrictions for any post, pa
 
 == Description ==
 
-Page Security by Contexture International (PSC) lets YOU decide which users can access which content. PSC adds much-needed user groups and permissions features to WordPress!
+Page Security by Contexture International (PSC) lets YOU decide which users can access which content. Add users to groups, set granular permissions for content, and finally take control of your website!
 
-Create groups to organize your users how YOU see fit. Use groups to easily limit access to posts, pages, or entire sections of your website. Create an intranet or a members-only
-area with just a few clicks - or build a subscription based system with automatically expiring memberships. You can even create multiple levels of security for granualar protection
-of any sub-section on your site.
+Groups allow you to organize your users how YOU see fit, then use your groups to choose who can access posts, pages, custom content, or entire sections of your website.
+Create an intranet or a members-only area with just a few clicks, or build a subscription based system with automatically expiring memberships. You can even create multiple levels
+of security for powerful, granular protection of any sub-section on your site.
 
 PSC is created to be simple, yet powerful - and is designed to integrate seamlessly and intuitively with WordPress. If you know how to use WordPress, you know how to use PSC.
 
@@ -22,12 +22,12 @@ Features:
 
 1. NEW IN 1.4! Restrict your ENTIRE website (use WordPress as an intranet)!
 1. Subscription support! Assign an expiration date to any membership!
-1. Custom "Access Denied" pages!
-1. Fully AJAX-loaded! Any changes you make to security are saved immediately!
+1. Create your own "Access Denied" pages!
+1. Fully AJAX-loaded! Any changes you make are saved immediately!
 1. Use the "Registered Users" smart group to create special "registered users only" sections!
-1. Contextual help is available for every PSC feature (via WordPress' 'Help' tab)!
+1. Contextual help is provided for every PSC feature (via WordPress' 'Help' tab)!
 1. Use simple, well-documented theme functions to easily automate your group memberships (You could even create an automatic subscription system)!
-1. Frequent updates and improvements!
+1. Professionally maintained with frequent updates and improvements based on YOUR feedback!
 
 Notice:
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
@@ -68,7 +68,7 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 
 = How does "Protect Entire Site" Work? =
 
-We added this option specifically for those who want to create private, intranet-like sites. When this option is enabled, only groups that you approve will be able to access any part of the website. Anonymous users are automatically denied access, while users who are logged in have their group permissions checked. 
+We added this option specifically for those who want to create private, intranet-like sites. When this option is enabled, only groups that you approve will be able to access any part of the website. Anonymous users are automatically denied access, while users who are logged in have their group permissions checked.
 
 It's important to remember that ALL OTHER SECURITY RESTRICTIONS are still applied. For instance, if I am in a group with site access, but try to access protected content that isn't attached to my group, I will STILL be denied access.
 
