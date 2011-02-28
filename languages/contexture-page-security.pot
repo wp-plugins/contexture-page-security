@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the Page Security by Contexture package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Page Security by Contexture 1.3.3\n"
+"Project-Id-Version: Page Security by Contexture 1.4.0\n"
 "Report-Msgid-Bugs-To: http://wordpress.org/tag/contexture-page-security\n"
-"POT-Creation-Date: 2011-01-04 19:07:42+00:00\n"
+"POT-Creation-Date: 2011-02-28 19:55:31+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -12,391 +12,514 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: views/group-delete.php:4 views/options.php:6 views/group-new.php:3
-#: views/group-edit.php:4 views/groups.php:5
-msgid "You do not have sufficient permissions to manage options for this site."
+#: views/user-groups.php:45 views/user-groups.php:53 views/group-edit.php:79
+#: views/group-edit.php:87
+msgid "Name"
 msgstr ""
 
-#: views/group-delete.php:26
-msgid "An error occurred. The group was not fully deleted."
+#: views/user-groups.php:46 views/user-groups.php:54 views/group-edit.php:34
+#: views/group-add.php:21
+msgid "Description"
 msgstr ""
 
-#: views/group-delete.php:28
-msgid "group was deleted."
+#: views/user-groups.php:47 views/user-groups.php:55
+msgid "Users"
 msgstr ""
 
-#: views/group-delete.php:28 views/group-delete.php:40 views/group-delete.php:42
-#: views/group-edit.php:98 views/group-edit.php:100
-msgid "View all groups"
-msgstr ""
-
-#: views/group-delete.php:40 views/group-edit.php:98
+#: views/group-edit.php:8 views/group-delete.php:8
 msgid "A group with that id does not exist."
 msgstr ""
 
-#: views/group-delete.php:42
+#: views/group-edit.php:8 views/group-edit.php:10 views/group-delete.php:8
+#: views/group-delete.php:10 controllers/group-delete_controller.php:20
+msgid "View all groups"
+msgstr ""
+
+#: views/group-edit.php:10
+msgid "System groups cannot be edited."
+msgstr ""
+
+#: views/group-edit.php:15
+msgid "<h3>Group Details</h3>"
+msgstr ""
+
+#: views/group-edit.php:24 views/group-add.php:11
+msgid "Group Name <span class=\"description\">(required)</span>"
+msgstr ""
+
+#: views/group-edit.php:44
+msgid "Site Access:"
+msgstr ""
+
+#: views/group-edit.php:48
+msgid "This group has no access to the website."
+msgstr ""
+
+#: views/group-edit.php:49
+msgid "None"
+msgstr ""
+
+#: views/group-edit.php:51
+msgid "This group can access the site. All other security restrictions apply."
+msgstr ""
+
+#: views/group-edit.php:52
+msgid "Allowed"
+msgstr ""
+
+#: views/group-edit.php:54
+msgid ""
+"This group can access any and all site content. This overrides any other "
+"restrictions."
+msgstr ""
+
+#: views/group-edit.php:55
+msgid "Unrestricted"
+msgstr ""
+
+#: views/group-edit.php:57
+msgid ""
+"Site protection is enabled. You can choose what level of site access this "
+"group is allowed.<br/>Notice: Setting this to &quot;Unrestricted&quot; will "
+"give this group access to <em>all</em> site content."
+msgstr ""
+
+#: views/group-edit.php:67
+msgid "<h3>Group Members</h3>"
+msgstr ""
+
+#: views/group-edit.php:72
+msgid "Add User"
+msgstr ""
+
+#: views/group-edit.php:78 views/group-edit.php:86
+msgid "Username"
+msgstr ""
+
+#: views/group-edit.php:80 views/group-edit.php:88
+msgid "Email"
+msgstr ""
+
+#: views/group-edit.php:81 views/group-edit.php:89
+#: components/app_components.php:225
+msgid "Expires"
+msgstr ""
+
+#: views/group-edit.php:97
+msgid "<h3>Associated Content</h3>"
+msgstr ""
+
+#: views/group-delete.php:10
 msgid "System groups cannot be deleted."
 msgstr ""
 
-#: views/group-delete.php:53
+#: views/group-delete.php:21
 msgid "Confirm Deletion"
 msgstr ""
 
-#: views/options.php:30
-msgid ""
-"Custom pages were deactivated. You must select a valid page from each list."
-msgstr ""
-
-#: views/options.php:56
-msgid "Page Security settings saved."
-msgstr ""
-
-#: views/options.php:65 views/options.php:66
-msgid "-- Choose AD Message Page --"
-msgstr ""
-
-#: views/options.php:122
+#: views/options.php:13
 msgid "Access Denied Messages"
 msgstr ""
 
-#: views/options.php:123
+#: views/options.php:14
 msgid ""
 "Use these settings to determine what your users will see when accessing "
 "content they are not allowed to view."
 msgstr ""
 
-#: views/options.php:127
+#: views/options.php:20
 msgid "Use Custom Pages:"
 msgstr ""
 
-#: views/options.php:131
+#: views/options.php:24
 msgid "Use <strong>pages</strong> for default access denied screens"
 msgstr ""
 
-#: views/options.php:137 views/options.php:157
+#: views/options.php:32 views/options.php:72
 msgid "Authenticated Users:"
 msgstr ""
 
-#: views/options.php:142
+#: views/options.php:37
 msgid ""
 "The \"access denied\" page to show users who <strong><em>are logged in</em></"
 "strong>."
 msgstr ""
 
-#: views/options.php:147 views/options.php:166
+#: views/options.php:44 views/options.php:83
 msgid "Anonymous Users:"
 msgstr ""
 
-#: views/options.php:152
+#: views/options.php:49
 msgid ""
 "The \"access denied\" page to show users who are <strong><em>not</em></"
 "strong> logged in."
 msgstr ""
 
-#: views/options.php:161
+#: views/options.php:56
+msgid "Protection Type:"
+msgstr ""
+
+#: views/options.php:60
+msgid "Redirect"
+msgstr ""
+
+#: views/options.php:63
+msgid "Replace"
+msgstr ""
+
+#: views/options.php:65
+msgid ""
+"This dictates <strong>how</strong> users are shown the Access Denied page. "
+"They can either be redirected to a different page, or the content of the "
+"restricted page can be replaced."
+msgstr ""
+
+#: views/options.php:76
 msgid ""
 "The \"access denied\" message to show users who are logged in (HTML OK)."
 msgstr ""
 
-#: views/options.php:170
+#: views/options.php:87
 msgid ""
 "The \"access denied\" message to show users who are <strong><em>not</em></"
 "strong> logged in (HTML OK)."
 msgstr ""
 
-#: views/options.php:174
+#: views/options.php:94
+msgid "Force Login:"
+msgstr ""
+
+#: views/options.php:98
+msgid "Send anonymous users to login screen"
+msgstr ""
+
+#: views/options.php:99
+msgid ""
+"If an anonymous user tries to access restricted content, send them to the "
+"login page.<br/>Notice: If enabled, the \"Anonymous Users\" setting will be "
+"ignored."
+msgstr ""
+
+#: views/options.php:106
 msgid "Global Security Features"
 msgstr ""
 
-#: views/options.php:175
+#: views/options.php:107
 msgid "These options selectively enable/disable Page Security features."
 msgstr ""
 
-#: views/options.php:179
+#: views/options.php:113
+msgid "Protect Entire Site:"
+msgstr ""
+
+#: views/options.php:117
+msgid "Protect the entire website"
+msgstr ""
+
+#: views/options.php:118
+msgid ""
+"Enable protection for the entire site (useful for intranet implementations)."
+"<br/>Notice: You must set access for each group or users will be unable to "
+"view the site."
+msgstr ""
+
+#: views/options.php:126
 msgid "Enable Menu Filtering:"
 msgstr ""
 
-#: views/options.php:183
-msgid "Use permissions to filter menu items*"
+#: views/options.php:130
+msgid "Use permissions to filter menu items"
 msgstr ""
 
-#: views/options.php:184
-msgid ""
-"*Restricted content will be removed from menus unless user is authenticated"
+#: views/options.php:131
+msgid "Remove restricted content from menus unless user is authenticated."
 msgstr ""
 
-#: views/options.php:190
+#: views/options.php:139
 msgid "Enable RSS Filtering:"
 msgstr ""
 
-#: views/options.php:194
-msgid "Use permissions to filter RSS content*"
+#: views/options.php:143
+msgid "Use permissions to filter RSS content"
 msgstr ""
 
-#: views/options.php:195
+#: views/options.php:144
 msgid ""
-"*Feed content for restricted posts will be removed unless user is "
-"authenticated<br/> Warning: This will hide protected content from most RSS "
-"readers."
+"Remove restricted posts from RSS unless user is authenticated<br/> Warning: "
+"This will hide protected content from most RSS readers."
 msgstr ""
 
-#: views/options.php:200
+#: views/options.php:149
 msgid "Save Changes"
 msgstr ""
 
-#: views/group-new.php:15 views/group-edit.php:114
-msgid "Group Name <span class=\"description\">(required)</span>"
-msgstr ""
-
-#: views/group-new.php:25 views/group-edit.php:124 views/user-edit-groups.php:69
-#: views/user-edit-groups.php:77
-msgid "Description"
-msgstr ""
-
-#: views/group-edit.php:19
-msgid "An error occurred. Group Details could not be updated."
-msgstr ""
-
-#: views/group-edit.php:22
-msgid "Group details have been saved."
-msgstr ""
-
-#: views/group-edit.php:22
-msgid "Return to group list"
-msgstr ""
-
-#: views/group-edit.php:30
-msgid "User &quot;%s&quot; does not exist."
-msgstr ""
-
-#: views/group-edit.php:41
-msgid "User is already in this group."
-msgstr ""
-
-#: views/group-edit.php:46
-msgid "An error occurred. User could not be added to the group."
-msgstr ""
-
-#: views/group-edit.php:48
-msgid "User &quot;%s&quot; has been added to the group."
-msgstr ""
-
-#: views/group-edit.php:56
-msgid "An error occurred. User could not be removed from group."
-msgstr ""
-
-#: views/group-edit.php:58
-msgid "User &quot;%s&quot; was removed from the group."
-msgstr ""
-
-#: views/group-edit.php:100
-msgid "System groups cannot be edited."
-msgstr ""
-
-#: views/group-edit.php:105
-msgid "<h3>Group Details</h3>"
-msgstr ""
-
-#: views/group-edit.php:138
-msgid "<h3>Group Members</h3>"
-msgstr ""
-
-#: views/group-edit.php:143
-msgid "Add User"
-msgstr ""
-
-#: views/group-edit.php:149 views/group-edit.php:157
-msgid "Username"
-msgstr ""
-
-#: views/group-edit.php:150 views/group-edit.php:158 views/user-edit-groups.php:68
-#: views/user-edit-groups.php:76
-msgid "Name"
-msgstr ""
-
-#: views/group-edit.php:151 views/group-edit.php:159
-msgid "Email"
-msgstr ""
-
-#: views/group-edit.php:152 views/group-edit.php:160 views/group-edit.php:181
-msgid "Expires"
-msgstr ""
-
-#: views/group-edit.php:166
-msgid "No users have been added to this group."
-msgstr ""
-
-#: views/group-edit.php:172
-msgid "User"
-msgstr ""
-
-#: views/group-edit.php:187
-msgid "End Date"
-msgstr ""
-
-#: views/group-edit.php:211
-msgid "Cancel"
-msgstr ""
-
-#: views/group-edit.php:212
-msgid "Update"
-msgstr ""
-
-#: views/group-edit.php:222
-msgid "<h3>Associated Content</h3>"
-msgstr ""
-
-#: views/group-edit.php:226 views/group-edit.php:233
-msgid "Title"
-msgstr ""
-
-#: views/group-edit.php:228 views/group-edit.php:235
-msgid "Type"
-msgstr ""
-
-#: views/group-edit.php:241
-msgid "No content is attached to this group."
-msgstr ""
-
-#: views/user-edit-groups.php:70 views/user-edit-groups.php:78
-msgid "Users"
-msgstr ""
-
-#: views/user-edit-groups.php:86
-msgid "You are not currently a member of any groups."
-msgstr ""
-
-#: views/user-edit-groups.php:93
-msgid ""
-"This user has not been added to any custom groups. Select a group above or "
-"visit any <a href=\"%s\">group detail page</a>."
-msgstr ""
-
-#: views/groups.php:43 contexture-page-security.php:890
+#: views/groups-list.php:22 controllers/app_controller.php:102
 msgid "Groups"
 msgstr ""
 
-#: views/groups.php:43
+#: views/groups-list.php:22
 msgid "Add New"
 msgstr ""
 
-#: views/groups.php:67
+#: views/groups-list.php:46
 msgid "You have not created any groups. Please <a href=\"%s\">add a group</a>."
 msgstr ""
 
-#: contexture-page-security.php:94
+#: core/model_queries.php:21
 msgid "Missing Requirement:"
 msgstr ""
 
-#: contexture-page-security.php:95
+#: core/model_queries.php:22
 msgid ""
-"Page Security requires PHP5 or higher. Your server is running %s. Please "
-"contact your hosting service about enabling PHP5 support."
+"Page Security requires PHP 5.2.0 or higher. Your server is running PHP %s. "
+"Please contact your hosting service about enabling PHP 5.2 support."
 msgstr ""
 
-#: contexture-page-security.php:96
+#: core/model_queries.php:23
 msgid "Return to plugin page"
 msgstr ""
 
-#: contexture-page-security.php:167
+#: core/model_queries.php:105
 msgid "Registered Users"
 msgstr ""
 
-#: contexture-page-security.php:167
+#: core/model_queries.php:106
 msgid "This group automatically applies to all authenticated users."
 msgstr ""
 
-#: contexture-page-security.php:181 contexture-page-security.php:254
-#: contexture-page-security.php:282 contexture-page-security.php:327
-#: contexture-page-security.php:356 contexture-page-security.php:403
-msgid "Admin user is unauthorized."
-msgstr ""
-
-#: contexture-page-security.php:221 contexture-page-security.php:1524
-msgid "No groups have been added yet."
-msgstr ""
-
-#: contexture-page-security.php:229 contexture-page-security.php:1529
-msgid "remove"
-msgstr ""
-
-#: contexture-page-security.php:234 contexture-page-security.php:1533
-msgid "ancestor"
-msgstr ""
-
-#: contexture-page-security.php:258
-msgid "Group removed"
-msgstr ""
-
-#: contexture-page-security.php:260 contexture-page-security.php:308
-msgid "Query failed"
-msgstr ""
-
-#: contexture-page-security.php:300
-msgid "Already in group"
-msgstr ""
-
-#: contexture-page-security.php:310
-msgid "User enrolled in group"
-msgstr ""
-
-#: contexture-page-security.php:338
-msgid "Query failed!"
-msgstr ""
-
-#: contexture-page-security.php:340
-msgid "User membership updated"
-msgstr ""
-
-#: contexture-page-security.php:363
-msgid "User not found"
-msgstr ""
-
-#: contexture-page-security.php:367
-msgid ""
-"This user has not been added to any static groups. Select a group above or "
-"visit any <a href=\"users.php?page=ps_groups\">group detail page</a>.</td>"
-msgstr ""
-
-#: contexture-page-security.php:369
-msgid "User unenrolled from group"
-msgstr ""
-
-#: contexture-page-security.php:442
+#: core/model_queries.php:420
 msgid ""
 "You do not have the appropriate group permissions to access this page. "
 "Please try <a href=\"%s\">logging in</a> or contact an administrator for "
 "assistance."
 msgstr ""
 
-#: contexture-page-security.php:443
+#: core/model_queries.php:421
 msgid ""
 "You do not have the appropriate group permissions to access this page. If "
 "you believe you <em>should</em> have access to this page, please contact an "
 "administrator for assistance."
 msgstr ""
 
-#: contexture-page-security.php:518 contexture-page-security.php:535
+#: core/helpers.php:61
+msgid "Invalid html was passed to CTX_Helper:wrap"
+msgstr ""
+
+#: controllers/ajax.php:21 controllers/ajax.php:61 controllers/ajax.php:110
+#: controllers/ajax.php:176 controllers/ajax.php:218 controllers/ajax.php:258
+msgid "User is not authorized."
+msgstr ""
+
+#: controllers/ajax.php:39
+msgid "Group added to content"
+msgstr ""
+
+#: controllers/ajax.php:80
+msgid "Group removed from content"
+msgstr ""
+
+#: controllers/ajax.php:89
+msgid "Query failed or content not in group."
+msgstr ""
+
+#: controllers/ajax.php:121
+msgid "User not found"
+msgstr ""
+
+#: controllers/ajax.php:132
+msgid "User already in group"
+msgstr ""
+
+#: controllers/ajax.php:143
+msgid "Query failed"
+msgstr ""
+
+#: controllers/ajax.php:152
+msgid "User enrolled in group"
+msgstr ""
+
+#: controllers/ajax.php:189 controllers/ajax.php:285
+msgid "Query failed."
+msgstr ""
+
+#: controllers/ajax.php:196
+msgid "User membership updated"
+msgstr ""
+
+#: controllers/ajax.php:228
+msgid "User not found in group."
+msgstr ""
+
+#: controllers/ajax.php:236
+msgid "User removed from group."
+msgstr ""
+
+#: controllers/ajax.php:270
+msgid "Security enabled."
+msgstr ""
+
+#: controllers/ajax.php:279
+msgid "Security disabled."
+msgstr ""
+
+#: controllers/ajax.php:293
+msgid "Unrecognized request."
+msgstr ""
+
+#: controllers/ajax.php:309 controllers/ajax.php:310
+msgid "No users were selected."
+msgstr ""
+
+#: controllers/ajax.php:320 controllers/ajax.php:321
+msgid "No group was selected."
+msgstr ""
+
+#: controllers/ajax.php:343
+msgid "%d users were enrolled."
+msgstr ""
+
+#: controllers/group-add_controller.php:3
+#: controllers/group-delete_controller.php:4
+#: controllers/groups-list_controller.php:5
+#: controllers/options_controller.php:6
+#: controllers/group-edit_controller.php:8
+msgid "You do not have sufficient permissions to manage options for this site."
+msgstr ""
+
+#: controllers/group-delete_controller.php:18
+msgid "An error occurred. The group was not fully deleted."
+msgstr ""
+
+#: controllers/group-delete_controller.php:20
+msgid "group was deleted."
+msgstr ""
+
+#: controllers/app_security_controller.php:391
+#: controllers/app_security_controller.php:429
 msgid "Access Denied. Redirecting to %s"
 msgstr ""
 
-#: contexture-page-security.php:521 contexture-page-security.php:526
-#: contexture-page-security.php:538 contexture-page-security.php:542
+#: controllers/app_security_controller.php:396
+#: controllers/app_security_controller.php:402
+#: controllers/app_security_controller.php:434
+#: controllers/app_security_controller.php:440
 msgid "Go to home page"
 msgstr ""
 
-#: contexture-page-security.php:724
+#: controllers/options_controller.php:34
+msgid ""
+"Custom pages were deactivated. You must select a valid page from each list."
+msgstr ""
+
+#: controllers/options_controller.php:66
+msgid "Page Security settings saved."
+msgstr ""
+
+#: controllers/options_controller.php:77 controllers/options_controller.php:78
+msgid "-- Choose Access Denied Page --"
+msgstr ""
+
+#: controllers/options_controller.php:82 controllers/options_controller.php:98
+msgid "No available pages were found. <a href=\"%s\">Add Page</a>"
+msgstr ""
+
+#: controllers/options_controller.php:88
+#: controllers/options_controller.php:104
+msgid "Edit Page"
+msgstr ""
+
+#: controllers/options_controller.php:94
+#: controllers/options_controller.php:110
+msgid "Add Page"
+msgstr ""
+
+#: controllers/group-edit_controller.php:18
+msgid "An error occurred. Group Details could not be updated."
+msgstr ""
+
+#: controllers/group-edit_controller.php:21
+msgid "Group details have been saved."
+msgstr ""
+
+#: controllers/group-edit_controller.php:21
+msgid "Return to group list"
+msgstr ""
+
+#: controllers/group-edit_controller.php:27
+msgid "User &quot;%s&quot; does not exist."
+msgstr ""
+
+#: controllers/group-edit_controller.php:34
+msgid "User is already in this group."
+msgstr ""
+
+#: controllers/group-edit_controller.php:38
+msgid "An error occurred. User could not be added to the group."
+msgstr ""
+
+#: controllers/group-edit_controller.php:40
+msgid "User &quot;%s&quot; has been added to the group."
+msgstr ""
+
+#: controllers/group-edit_controller.php:48
+msgid "An error occurred. User could not be removed from group."
+msgstr ""
+
+#: controllers/group-edit_controller.php:50
+msgid "User &quot;%s&quot; was removed from the group."
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:36
+msgid " Protect this page and it's descendants"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:45
+msgid "Edit Parent"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:54
+msgid "Available Groups"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:54
+msgid "New Group"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:56
+msgid "Select"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:72
+#: components/app_components.php:398
+msgid "Add"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:73
+msgid "Allowed Groups"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:85
+msgid ""
+"<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a "
+"href=\"%s\">View Security Settings</a></p>"
+msgstr ""
+
+#: controllers/sidebar-security_controller.php:88
+msgid "<p>You need to publish before you can update security settings.</p>"
+msgstr ""
+
+#: controllers/app_controller.php:36
 msgid "Official Page Security Support"
 msgstr ""
 
-#: contexture-page-security.php:728
+#: controllers/app_controller.php:40
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To add a user to a group, check "
 "the users to add, and select a group from the \"Add to group...\" drop down. "
 "Click \"Add\" to save the changes.</p>"
 msgstr ""
 
-#: contexture-page-security.php:730
+#: controllers/app_controller.php:42
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To restrict access to this page, "
 "find the \"Restrict Access\" sidebar and check the box next to \"Protect "
@@ -412,7 +535,7 @@ msgid ""
 "</p>"
 msgstr ""
 
-#: contexture-page-security.php:732
+#: controllers/app_controller.php:44
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>To restrict access to this post, "
 "find the \"Restrict Access\" sidebar and check the box next to \"Protect "
@@ -428,7 +551,7 @@ msgid ""
 "</p>"
 msgstr ""
 
-#: contexture-page-security.php:734
+#: controllers/app_controller.php:46
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>The lock icon shows which pages "
 "currently have restrictions. The lighter icons show which pages are simply "
@@ -436,13 +559,13 @@ msgid ""
 "pages that have their own restrictions.</p>"
 msgstr ""
 
-#: contexture-page-security.php:736
+#: controllers/app_controller.php:48
 msgid ""
 "<h4><strong>Page Security:</strong></h4><p>The lock icon shows which posts "
 "currently have restrictions.</p>"
 msgstr ""
 
-#: contexture-page-security.php:741
+#: controllers/app_controller.php:53
 msgid ""
 "<p>This screen shows a list of all the groups currently available. Groups "
 "are used to arbitrarily \"group\" users together for permissions purposes. "
@@ -454,26 +577,29 @@ msgid ""
 "automatically.</p><p><strong>For more information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:742
+#: controllers/app_controller.php:54
 msgid ""
 "<p>This screen allows you to add a new group. Simply enter a new, unique "
 "name for your group, and an optional description.</p><p><strong>For more "
 "information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:743
+#: controllers/app_controller.php:55
 msgid ""
 "<p>This screen shows you all the details about the current group, and allows "
 "you to edit some of those details.</p><p><strong>Group Details</strong> - "
-"Change a group's title or description.</p><p><strong>Group Members</strong> "
-"- A list of users currently attached to the group. You also add users to a "
-"group if you know their username (users can also be added to groups from "
-"their profile pages).</p><p><strong>Associated Content</strong> - A list of "
-"all the pages and posts this group is attached to.</p><p><strong>For more "
-"information:</strong></p>"
+"Change a group's title or description.</p><p><strong>Site Access</strong> - "
+"This option is visible if you have Site Protection enabled. Set to \"Allowed"
+"\" if you would like users in this group to be able to access your website. "
+"All content-specific restrictions still apply.</p><p><strong>Group Members</"
+"strong> - A list of users currently attached to the group. You also add "
+"users to a group if you know their username (users can also be added to "
+"groups from their profile pages).</p><p><strong>Associated Content</strong> "
+"- A list of all the pages and posts this group is attached to.</"
+"p><p><strong>For more information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:746
+#: controllers/app_controller.php:58
 msgid ""
 "<p>This screen allows you to delete the selected group. Once you click "
 "\"Confirm Deletion\", the group will be permanently deleted, and all users "
@@ -483,125 +609,224 @@ msgid ""
 "</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:749
+#: controllers/app_controller.php:61
 msgid ""
 "<p>This screen contains general settings for Page Security.</"
 "p><p><strong>For more information:</strong></p>"
 msgstr ""
 
-#: contexture-page-security.php:761
+#: controllers/app_controller.php:79
 msgid ""
 "You cannot unprotect this page. It is protected by a parent or ancestor."
 msgstr ""
 
-#: contexture-page-security.php:762
+#: controllers/app_controller.php:80
 msgid ""
 "This will completely erase this page's security settings and make it "
 "accessible to the public. Continue?"
 msgstr ""
 
-#: contexture-page-security.php:763
+#: controllers/app_controller.php:81
 msgid "Are you sure you want to remove group \"%s\" from this page?"
 msgstr ""
 
-#: contexture-page-security.php:764
+#: controllers/app_controller.php:82
 msgid "Are you sure you want to remove this group from %s ?"
 msgstr ""
 
-#: contexture-page-security.php:765
+#: controllers/app_controller.php:83
 msgid "Remove this user from the group?"
 msgstr ""
 
-#: contexture-page-security.php:890
+#: controllers/app_controller.php:84
+msgid "You must specify an expiration year."
+msgstr ""
+
+#: controllers/app_controller.php:85
+msgid "An error occurred: "
+msgstr ""
+
+#: controllers/app_controller.php:86
+msgid "You must select a group to add."
+msgstr ""
+
+#: controllers/app_controller.php:87
+msgid ""
+"This adds protection at a site level. Until you select site options for each "
+"group, your users will be unable to access the website."
+msgstr ""
+
+#: controllers/app_controller.php:88
+msgid ""
+"This will completely erase site-level security settings and make it "
+"accessible to the public. Continue?"
+msgstr ""
+
+#: controllers/app_controller.php:102
 msgid "Group Management"
 msgstr ""
 
-#: contexture-page-security.php:891
+#: controllers/app_controller.php:103
 msgid "Add a Group"
 msgstr ""
 
-#: contexture-page-security.php:891
+#: controllers/app_controller.php:103
 msgid "Add Group"
 msgstr ""
 
-#: contexture-page-security.php:1082
-msgid "Membership"
+#: controllers/app_controller.php:104
+msgid "Edit Group"
 msgstr ""
 
-#: contexture-page-security.php:1083
-msgid "Unenroll"
+#: controllers/app_controller.php:105
+msgid "Delete Group"
 msgstr ""
 
-#: contexture-page-security.php:1084 contexture-page-security.php:1150
-msgid "View"
+#: controllers/app_controller.php:135
+msgid "New group created"
 msgstr ""
 
-#: contexture-page-security.php:1148
-msgid "Edit"
+#: controllers/app_controller.php:137
+msgid "Unable to create group. There was an unspecified system error."
 msgstr ""
 
-#: contexture-page-security.php:1149
-msgid "Remove"
+#: controllers/app_controller.php:140
+msgid "Unable to create group. A group with that name already exists."
 msgstr ""
 
-#: contexture-page-security.php:1491
-msgid " Protect this page and it's descendants"
-msgstr ""
-
-#: contexture-page-security.php:1497
-msgid "Edit Parent"
-msgstr ""
-
-#: contexture-page-security.php:1504
-msgid "Available Groups"
-msgstr ""
-
-#: contexture-page-security.php:1504
-msgid "New Group"
-msgstr ""
-
-#: contexture-page-security.php:1506
-msgid "Select"
-msgstr ""
-
-#: contexture-page-security.php:1513
-msgid "Add"
-msgstr ""
-
-#: contexture-page-security.php:1514
-msgid "Allowed Groups"
-msgstr ""
-
-#: contexture-page-security.php:1541
-msgid ""
-"<p>This is currently an Access Denied page. You cannot restrict it.</p><p><a "
-"href=\"%s\">View Security Settings</a></p>"
-msgstr ""
-
-#: contexture-page-security.php:1547
-msgid "<p>You need to publish before you can update security settings.</p>"
-msgstr ""
-
-#: contexture-page-security.php:1567
+#: components/shortcode_components.php:21
 msgid "Groups attached to this page:"
 msgstr ""
 
-#: contexture-page-security.php:1575
+#: components/shortcode_components.php:29
 msgid "No groups attached."
 msgstr ""
 
-#: contexture-page-security.php:1599
+#: components/shortcode_components.php:53
 msgid "Groups Required:"
 msgstr ""
 
-#: contexture-page-security.php:1600
+#: components/shortcode_components.php:54
 msgid ""
 "To access this page, users must be a member of at least one group from each "
 "set of groups."
 msgstr ""
 
-#: contexture-page-security.php:1623
+#: components/shortcode_components.php:77
 msgid "No groups attached"
+msgstr ""
+
+#: components/app_components.php:40 components/app_components.php:41
+msgid "Protected"
+msgstr ""
+
+#: components/app_components.php:48
+msgid "Protected (inherited)"
+msgstr ""
+
+#: components/app_components.php:49
+msgid "Inheriting an ancestors protection"
+msgstr ""
+
+#: components/app_components.php:74 components/table-packages.php:18
+msgid "No content is attached to this group."
+msgstr ""
+
+#: components/app_components.php:90
+msgid "Edit"
+msgstr ""
+
+#: components/app_components.php:91
+msgid "Remove"
+msgstr ""
+
+#: components/app_components.php:92 components/app_components.php:281
+msgid "View"
+msgstr ""
+
+#: components/app_components.php:136
+msgid "You are not currently a member of any groups."
+msgstr ""
+
+#: components/app_components.php:139
+msgid ""
+"This user has not been added to any custom groups. Select a group above or "
+"visit any <a href=\"%s\">group detail page</a>."
+msgstr ""
+
+#: components/app_components.php:207
+msgid "No users have been added to this group."
+msgstr ""
+
+#: components/app_components.php:213
+msgid "MEMBERSHIP DETAILS"
+msgstr ""
+
+#: components/app_components.php:216
+msgid "User"
+msgstr ""
+
+#: components/app_components.php:231
+msgid "End Date"
+msgstr ""
+
+#: components/app_components.php:255
+msgid "Cancel"
+msgstr ""
+
+#: components/app_components.php:256
+msgid "Update"
+msgstr ""
+
+#: components/app_components.php:279
+msgid "Membership"
+msgstr ""
+
+#: components/app_components.php:280
+msgid "Unenroll"
+msgstr ""
+
+#: components/app_components.php:357
+msgid "No groups have been added yet."
+msgstr ""
+
+#: components/app_components.php:362
+msgid "remove"
+msgstr ""
+
+#: components/app_components.php:366
+msgid "ancestor"
+msgstr ""
+
+#: components/app_components.php:379
+msgid "Add to group"
+msgstr ""
+
+#: components/table_components.php:153
+msgid "Parameter $id must be set to a unique record id or guid."
+msgstr ""
+
+#: components/table_components.php:154
+msgid "Parameter $columns is not an array."
+msgstr ""
+
+#: components/table_components.php:155
+msgid "Parameter $actions is not an array or empty value."
+msgstr ""
+
+#: components/table_components.php:214
+msgid ""
+"<h3>Can't Render Table!</h3><p>Either your package could not be loaded or "
+"there is a problem with your columns array. See the demo package in "
+"CTX_Table for an example configuration.</p>"
+msgstr ""
+
+#: components/table_components.php:227
+msgid "Bulk Actions"
+msgstr ""
+
+#: components/table_components.php:370
+msgid "There are no records to show... yet!"
 msgstr ""
 
 #. Plugin Name of the plugin/theme
