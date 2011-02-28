@@ -4,29 +4,30 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.1
-Stable tag: 1.3.4
+Stable tag: 1.4
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
 == Description ==
 
-Page Security by Contexture International (PSC) lets YOU decide which users can access which content. PSC adds much-needed user groups and permissions features to WordPress!
+Page Security by Contexture International (PSC) lets YOU decide which users can access which content. Add users to groups, set granular permissions for content, and finally take control of your website!
 
-Create groups to organize your users how YOU see fit. Use groups to easily limit access to posts, pages, or entire sections of your website. Create an intranet or a members-only
-area with just a few clicks - or build a subscription based system with automatically expiring memberships. You can even create multiple levels of security for granualar protection
-of any sub-section on your site.
+Groups allow you to organize your users how YOU see fit, then use your groups to choose who can access posts, pages, custom content, or entire sections of your website.
+Create an intranet or a members-only area with just a few clicks, or build a subscription based system with automatically expiring memberships. You can even create multiple levels
+of security for powerful, granular protection of any sub-section on your site.
 
 PSC is created to be simple, yet powerful - and is designed to integrate seamlessly and intuitively with WordPress. If you know how to use WordPress, you know how to use PSC.
 
 Features:
 
+1. NEW IN 1.4! Restrict your ENTIRE website (use WordPress as an intranet)!
 1. Subscription support! Assign an expiration date to any membership!
-1. Custom "Access Denied" pages!
-1. Fully AJAX-loaded! Any changes you make to security are saved immediately!
+1. Create your own "Access Denied" pages!
+1. Fully AJAX-loaded! Any changes you make are saved immediately!
 1. Use the "Registered Users" smart group to create special "registered users only" sections!
-1. Contextual help is available for every PSC feature (via WordPress's 'Help' tab)!
+1. Contextual help is provided for every PSC feature (via WordPress' 'Help' tab)!
 1. Use simple, well-documented theme functions to easily automate your group memberships (You could even create an automatic subscription system)!
-1. Frequent updates and improvements!
+1. Professionally maintained with frequent updates and improvements based on YOUR feedback!
 
 Notice:
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
@@ -51,6 +52,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 1. screenshot-1.png
 1. screenshot-2.png
 1. screenshot-3.png
+1. screenshot-4.png
 
 == Frequently Asked Questions ==
 
@@ -63,6 +65,14 @@ hosting dashboard).
 = Does Page Security work with WordPress 2.9 or earlier? =
 
 PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
+
+= How does "Protect Entire Site" Work? =
+
+We added this option specifically for those who want to create private, intranet-like sites. When this option is enabled, only groups that you approve will be able to access any part of the website. Anonymous users are automatically denied access, while users who are logged in have their group permissions checked.
+
+It's important to remember that ALL OTHER SECURITY RESTRICTIONS are still applied. For instance, if I am in a group with site access, but try to access protected content that isn't attached to my group, I will STILL be denied access.
+
+This allows you create an intranet-style site while keeping multiple levels of security for the site content.
 
 = Can I help translate PSC into my language? =
 
@@ -78,7 +88,7 @@ Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad t
 
 == Theme Functions ==
 
-Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's inc/theme-functions.php file)).
+Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's views/theme-functions.php file)).
 
 = psc_add_user_to_group($user_id, $group_id, $expires) =
 
@@ -102,6 +112,17 @@ This function can be used to determine if a specific page or post is protected (
 
 
 == Changelog ==
+
+= 1.4.0 =
+* COMPLETE CODE REWRITE! Code base is now now MUCH more flexible so new features should come more quickly.
+* New feature: Full custom post type support!
+* New feature: New "content replacement" option for those who want to protect content without a redirect.
+* New feature: Protect an ENTIRE SITE with one click. Useful for intranet implementations.
+* New feature: Use bulk actions to add users to groups!
+* Updated permissions to more common-sense (editors can now update content permissions, but only admins can add/remove users from groups).
+* Fixed a bug with membership expirations.
+* Lots and lots and lots of usability improvements.
+* MORE FEATURES COMING SOON!
 
 = 1.3.4 =
 * Fixed a bug that could cause query strings to become too long when adding users from the Group Edit screen

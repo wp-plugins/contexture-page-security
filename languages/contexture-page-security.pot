@@ -12,275 +12,275 @@ msgstr ""
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 
-#: inc/group-delete.php:4 inc/options.php:6 inc/group-new.php:3
-#: inc/group-edit.php:4 inc/groups.php:5
+#: views/group-delete.php:4 views/options.php:6 views/group-new.php:3
+#: views/group-edit.php:4 views/groups.php:5
 msgid "You do not have sufficient permissions to manage options for this site."
 msgstr ""
 
-#: inc/group-delete.php:26
+#: views/group-delete.php:26
 msgid "An error occurred. The group was not fully deleted."
 msgstr ""
 
-#: inc/group-delete.php:28
+#: views/group-delete.php:28
 msgid "group was deleted."
 msgstr ""
 
-#: inc/group-delete.php:28 inc/group-delete.php:40 inc/group-delete.php:42
-#: inc/group-edit.php:98 inc/group-edit.php:100
+#: views/group-delete.php:28 views/group-delete.php:40 views/group-delete.php:42
+#: views/group-edit.php:98 views/group-edit.php:100
 msgid "View all groups"
 msgstr ""
 
-#: inc/group-delete.php:40 inc/group-edit.php:98
+#: views/group-delete.php:40 views/group-edit.php:98
 msgid "A group with that id does not exist."
 msgstr ""
 
-#: inc/group-delete.php:42
+#: views/group-delete.php:42
 msgid "System groups cannot be deleted."
 msgstr ""
 
-#: inc/group-delete.php:53
+#: views/group-delete.php:53
 msgid "Confirm Deletion"
 msgstr ""
 
-#: inc/options.php:30
+#: views/options.php:30
 msgid ""
 "Custom pages were deactivated. You must select a valid page from each list."
 msgstr ""
 
-#: inc/options.php:56
+#: views/options.php:56
 msgid "Page Security settings saved."
 msgstr ""
 
-#: inc/options.php:65 inc/options.php:66
+#: views/options.php:65 views/options.php:66
 msgid "-- Choose AD Message Page --"
 msgstr ""
 
-#: inc/options.php:122
+#: views/options.php:122
 msgid "Access Denied Messages"
 msgstr ""
 
-#: inc/options.php:123
+#: views/options.php:123
 msgid ""
 "Use these settings to determine what your users will see when accessing "
 "content they are not allowed to view."
 msgstr ""
 
-#: inc/options.php:127
+#: views/options.php:127
 msgid "Use Custom Pages:"
 msgstr ""
 
-#: inc/options.php:131
+#: views/options.php:131
 msgid "Use <strong>pages</strong> for default access denied screens"
 msgstr ""
 
-#: inc/options.php:137 inc/options.php:157
+#: views/options.php:137 views/options.php:157
 msgid "Authenticated Users:"
 msgstr ""
 
-#: inc/options.php:142
+#: views/options.php:142
 msgid ""
 "The \"access denied\" page to show users who <strong><em>are logged in</em></"
 "strong>."
 msgstr ""
 
-#: inc/options.php:147 inc/options.php:166
+#: views/options.php:147 views/options.php:166
 msgid "Anonymous Users:"
 msgstr ""
 
-#: inc/options.php:152
+#: views/options.php:152
 msgid ""
 "The \"access denied\" page to show users who are <strong><em>not</em></"
 "strong> logged in."
 msgstr ""
 
-#: inc/options.php:161
+#: views/options.php:161
 msgid ""
 "The \"access denied\" message to show users who are logged in (HTML OK)."
 msgstr ""
 
-#: inc/options.php:170
+#: views/options.php:170
 msgid ""
 "The \"access denied\" message to show users who are <strong><em>not</em></"
 "strong> logged in (HTML OK)."
 msgstr ""
 
-#: inc/options.php:174
+#: views/options.php:174
 msgid "Global Security Features"
 msgstr ""
 
-#: inc/options.php:175
+#: views/options.php:175
 msgid "These options selectively enable/disable Page Security features."
 msgstr ""
 
-#: inc/options.php:179
+#: views/options.php:179
 msgid "Enable Menu Filtering:"
 msgstr ""
 
-#: inc/options.php:183
+#: views/options.php:183
 msgid "Use permissions to filter menu items*"
 msgstr ""
 
-#: inc/options.php:184
+#: views/options.php:184
 msgid ""
 "*Restricted content will be removed from menus unless user is authenticated"
 msgstr ""
 
-#: inc/options.php:190
+#: views/options.php:190
 msgid "Enable RSS Filtering:"
 msgstr ""
 
-#: inc/options.php:194
+#: views/options.php:194
 msgid "Use permissions to filter RSS content*"
 msgstr ""
 
-#: inc/options.php:195
+#: views/options.php:195
 msgid ""
 "*Feed content for restricted posts will be removed unless user is "
 "authenticated<br/> Warning: This will hide protected content from most RSS "
 "readers."
 msgstr ""
 
-#: inc/options.php:200
+#: views/options.php:200
 msgid "Save Changes"
 msgstr ""
 
-#: inc/group-new.php:15 inc/group-edit.php:114
+#: views/group-new.php:15 views/group-edit.php:114
 msgid "Group Name <span class=\"description\">(required)</span>"
 msgstr ""
 
-#: inc/group-new.php:25 inc/group-edit.php:124 inc/user-edit-groups.php:69
-#: inc/user-edit-groups.php:77
+#: views/group-new.php:25 views/group-edit.php:124 views/user-edit-groups.php:69
+#: views/user-edit-groups.php:77
 msgid "Description"
 msgstr ""
 
-#: inc/group-edit.php:19
+#: views/group-edit.php:19
 msgid "An error occurred. Group Details could not be updated."
 msgstr ""
 
-#: inc/group-edit.php:22
+#: views/group-edit.php:22
 msgid "Group details have been saved."
 msgstr ""
 
-#: inc/group-edit.php:22
+#: views/group-edit.php:22
 msgid "Return to group list"
 msgstr ""
 
-#: inc/group-edit.php:30
+#: views/group-edit.php:30
 msgid "User &quot;%s&quot; does not exist."
 msgstr ""
 
-#: inc/group-edit.php:41
+#: views/group-edit.php:41
 msgid "User is already in this group."
 msgstr ""
 
-#: inc/group-edit.php:46
+#: views/group-edit.php:46
 msgid "An error occurred. User could not be added to the group."
 msgstr ""
 
-#: inc/group-edit.php:48
+#: views/group-edit.php:48
 msgid "User &quot;%s&quot; has been added to the group."
 msgstr ""
 
-#: inc/group-edit.php:56
+#: views/group-edit.php:56
 msgid "An error occurred. User could not be removed from group."
 msgstr ""
 
-#: inc/group-edit.php:58
+#: views/group-edit.php:58
 msgid "User &quot;%s&quot; was removed from the group."
 msgstr ""
 
-#: inc/group-edit.php:100
+#: views/group-edit.php:100
 msgid "System groups cannot be edited."
 msgstr ""
 
-#: inc/group-edit.php:105
+#: views/group-edit.php:105
 msgid "<h3>Group Details</h3>"
 msgstr ""
 
-#: inc/group-edit.php:138
+#: views/group-edit.php:138
 msgid "<h3>Group Members</h3>"
 msgstr ""
 
-#: inc/group-edit.php:143
+#: views/group-edit.php:143
 msgid "Add User"
 msgstr ""
 
-#: inc/group-edit.php:149 inc/group-edit.php:157
+#: views/group-edit.php:149 views/group-edit.php:157
 msgid "Username"
 msgstr ""
 
-#: inc/group-edit.php:150 inc/group-edit.php:158 inc/user-edit-groups.php:68
-#: inc/user-edit-groups.php:76
+#: views/group-edit.php:150 views/group-edit.php:158 views/user-edit-groups.php:68
+#: views/user-edit-groups.php:76
 msgid "Name"
 msgstr ""
 
-#: inc/group-edit.php:151 inc/group-edit.php:159
+#: views/group-edit.php:151 views/group-edit.php:159
 msgid "Email"
 msgstr ""
 
-#: inc/group-edit.php:152 inc/group-edit.php:160 inc/group-edit.php:181
+#: views/group-edit.php:152 views/group-edit.php:160 views/group-edit.php:181
 msgid "Expires"
 msgstr ""
 
-#: inc/group-edit.php:166
+#: views/group-edit.php:166
 msgid "No users have been added to this group."
 msgstr ""
 
-#: inc/group-edit.php:172
+#: views/group-edit.php:172
 msgid "User"
 msgstr ""
 
-#: inc/group-edit.php:187
+#: views/group-edit.php:187
 msgid "End Date"
 msgstr ""
 
-#: inc/group-edit.php:211
+#: views/group-edit.php:211
 msgid "Cancel"
 msgstr ""
 
-#: inc/group-edit.php:212
+#: views/group-edit.php:212
 msgid "Update"
 msgstr ""
 
-#: inc/group-edit.php:222
+#: views/group-edit.php:222
 msgid "<h3>Associated Content</h3>"
 msgstr ""
 
-#: inc/group-edit.php:226 inc/group-edit.php:233
+#: views/group-edit.php:226 views/group-edit.php:233
 msgid "Title"
 msgstr ""
 
-#: inc/group-edit.php:228 inc/group-edit.php:235
+#: views/group-edit.php:228 views/group-edit.php:235
 msgid "Type"
 msgstr ""
 
-#: inc/group-edit.php:241
-msgid "No pages are attached to this group."
+#: views/group-edit.php:241
+msgid "No content is attached to this group."
 msgstr ""
 
-#: inc/user-edit-groups.php:70 inc/user-edit-groups.php:78
+#: views/user-edit-groups.php:70 views/user-edit-groups.php:78
 msgid "Users"
 msgstr ""
 
-#: inc/user-edit-groups.php:86
+#: views/user-edit-groups.php:86
 msgid "You are not currently a member of any groups."
 msgstr ""
 
-#: inc/user-edit-groups.php:93
+#: views/user-edit-groups.php:93
 msgid ""
 "This user has not been added to any custom groups. Select a group above or "
 "visit any <a href=\"%s\">group detail page</a>."
 msgstr ""
 
-#: inc/groups.php:43 contexture-page-security.php:890
+#: views/groups.php:43 contexture-page-security.php:890
 msgid "Groups"
 msgstr ""
 
-#: inc/groups.php:43
+#: views/groups.php:43
 msgid "Add New"
 msgstr ""
 
-#: inc/groups.php:67
+#: views/groups.php:67
 msgid "You have not created any groups. Please <a href=\"%s\">add a group</a>."
 msgstr ""
 

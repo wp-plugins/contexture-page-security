@@ -1,26 +1,3 @@
-<?php
-global $current_user, $wpdb;
-
-//Decide if we're displaying the current user, or a specified user
-$display_user = (!isset($_GET['user_id']) || IS_PROFILE_PAGE) ? $current_user->ID : $_GET['user_id'];
-
-//Create an array of groups that are already attached to this user
-$currGroups = array();
-$sqlCurrGroups = $wpdb->prepare("
-    SELECT 
-        {$wpdb->prefix}ps_groups.ID,
-        {$wpdb->prefix}ps_groups.group_title
-    FROM {$wpdb->prefix}ps_groups
-    JOIN {$wpdb->prefix}ps_group_relationships
-        ON {$wpdb->prefix}ps_group_relationships.grel_group_id = {$wpdb->prefix}ps_groups.ID
-    WHERE {$wpdb->prefix}ps_group_relationships.grel_user_id = '%s'
-",$display_user);
-foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
-    $currentGroups[$curGrp->ID] = $curGrp->group_title;
-}
-
-
-?>
     <style type="text/css">
         #grouptable { }
         #grouptable tbody tr:hover td { background:#fffce0; }
@@ -41,7 +18,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
     </script>
     <div class="wrap">
         <h3>Group Membership</h3>
-        <?php if ( current_user_can('add_users') ) { ?>
+        <?php if ( current_user_can('promote_users') ) { ?>
         <div class="tablenav ctx-ps-tablenav">
             <select id="groups-available">
                 <option value="0">-- Select -- </option>
@@ -56,7 +33,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
             <input type="hidden" id="ctx-group-user-id" value="<?php echo $display_user;  ?>" />
             <input type="button" class="button-secondary action" id="btn-add-grp-2-user" value="Add to Group" />
         </div>
-        <?php 
+        <?php
         }else{ //end check for admin priviledges
             //echo "<p>Group membership is managed by site administrators. To be added or removed from a group, please contact an administrator.</p>";
         } //end else
@@ -79,23 +56,7 @@ foreach($wpdb->get_results($sqlCurrGroups) as $curGrp){
                 </tr>
             </tfoot>
             <tbody>
-                <?php
-                    if ( IS_PROFILE_PAGE ) {
-                        //IF THIS IS A PROFILE PAGE (non-admin)
-                        if(ctx_ps_count_groups($display_user) == '0'){
-                            echo '<td colspan="4">',__('You are not currently a member of any groups.','contexture-page-security'),'</td>';
-                        } else {
-                            echo ctx_ps_display_group_list($display_user,'users',false);
-                        }
-                    }else{
-                        //IF THIS IS A USER-EDIT PAGE (admin version)
-                        if(ctx_ps_count_groups($display_user) == '0'){
-                            echo '<td colspan="4">',sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'),admin_url('users.php?page=ps_groups')),'</td>';
-                        } else {
-                            echo ctx_ps_display_group_list($display_user,'users',true);
-                        }
-                    }
-                ?>
+                <?php echo CTXPS_Components::render_group_list($display_user,'users',true,IS_PROFILE_PAGE); ?>
             </tbody>
         </table>
     </div>
