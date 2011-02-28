@@ -28,14 +28,14 @@ jQuery(function(){
     });
     //Toggle visibility of page options (options.php)
     jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
-            
+
         var optmsg = jQuery('.toggle-opts-ad-msg'),
             optpg = jQuery('.toggle-opts-ad-page'),
             forcelog = jQuery('#ad-msg-forcelogin:checked').length;
-                
+
         //If checking...
         if(jQuery(this).filter(':checked').length){
-            
+
             //If force login is enabled...
             if(forcelog){
                 //Exclude anon opts
@@ -48,7 +48,7 @@ jQuery(function(){
                     jQuery('.toggle-opts-ad-page').fadeIn(250);
                 });
             }
-            
+
         //If UNchecking
         }else{
             //If force login is enabled...
@@ -64,7 +64,7 @@ jQuery(function(){
             }
         }
     });
-    
+
     //Toggle visibility of anon boxes with force redirect
     jQuery('#ad-msg-forcelogin, label[for="ad-msg-forcelogin"]').click(function(){
         var anon = jQuery('.ad-opt-anon'),
@@ -82,11 +82,11 @@ jQuery(function(){
             }
         }
     });
-    
+
     jQuery('#enrollit').click(function(){
         CTXPS_Ajax.addBulkUsersToGroup();
     });
-    
+
 });
 
 /**
@@ -108,7 +108,7 @@ CTXPS_Ajax.addBulkUsersToGroup = function(){
             users:  checkedArray.serializeArray(),
             group_id:jQuery('#psc_group_add').val()
         },
-        function(response){ 
+        function(response){
             response = jQuery(response);
             var cmsg = jQuery('#message'),
                 emsg = response.find('supplemental html').text();
@@ -170,7 +170,7 @@ CTXPS_Ajax.toggleSecurity = function(){
             },'xml'
         );
     }else{
-        if(confirm(msgEraseSec)){
+        if(confirm(ctxpsmsg.EraseSec)){
             //Turn security OFF for this group
             jQuery.get('admin-ajax.php',
                 {

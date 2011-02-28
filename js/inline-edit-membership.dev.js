@@ -33,7 +33,7 @@
 
             //Confirm before removing a user
             $('#grouptable .row-actions .trash').click(function(){
-                    return confirm(msgRemoveUser);
+                    return confirm(ctxpsmsg.RemoveUser);
             });
 
         },
