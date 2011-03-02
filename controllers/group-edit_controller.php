@@ -27,7 +27,7 @@ if(!empty($_GET['action'])){
                 $actionmessage = sprintf('<div class="error below-h2"><p>'.__('User &quot;%s&quot; does not exist.','contexture-page-security').'</p></div>',$_GET['add-username']);
             } else {
                 //Get the user id from the username
-                $AddUserId = get_user_id_from_string($_GET['add-username']);
+                $AddUserId = CTXPS_Queries::get_user_id_by_username($_GET['add-username']);
 
                 //Make sure user isnt already in the group
                 if(CTXPS_Queries::check_membership($AddUserId, $_GET['groupid'])>0){

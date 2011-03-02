@@ -86,9 +86,9 @@ class CTXPS_Queries{
             update_option("contexture_ps_db_version", "1.2");
         }
         /******** END UPGRADE PATH < 1.2 **************/
-        
+
         //Skip 1.3 - DB versions will now match major PSC releases
-        
+
         /********* START UPGRADE PATH < 1.4 ***********/
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.4){
@@ -616,23 +616,23 @@ class CTXPS_Queries{
 
     /**
      * Determines if the current or specified page is set as an Access Denied page.
-     * 
+     *
      * @param int $post_id
-     * @return boolean Returns true if the current page is an access denied page 
+     * @return boolean Returns true if the current page is an access denied page
      */
     public static function check_ad_status($post_id=null){
         global $post;
-        
+
         //If we're checking against double null (shouldn't happen, but just-in-case)
         if(empty($post) && empty($post_id)){
             return false;
         }
-        
+
         $post_id = (empty($post_id)) ? $post->ID : $post_id;
         $plugin_opts = get_option('contexture_ps_options');
         return ($plugin_opts['ad_page_anon_id']==$post_id || $plugin_opts['ad_page_auth_id']==$post_id);
     }
-    
+
     /**
      * Checks if a group with the provided name already exists. This is used to validate
      * in self::create_group() to ensure duplicate group names don't crop up.
@@ -736,7 +736,7 @@ class CTXPS_Queries{
      *
      * @param int $user_id The user id of the user to check
      * @param boolean $site_only Optional. If true, array will only include groups with site access.
-     * 
+     *
      * @return array Returns a flat array with all the groups that the specified user is currently a member of.
      */
     public static function get_user_groups($user_id,$site_only=false){
@@ -764,7 +764,7 @@ class CTXPS_Queries{
         if($site_only){
             $query .= ' AND (group_site_access = "limited" OR group_site_access = "full")';
         }
-        
+
         $groups = $wpdb->get_results($query);
 
         //We only need an ID and a name as a key/value...
@@ -790,6 +790,23 @@ class CTXPS_Queries{
         return $array;
     }
 
+    /**
+     *
+     * @global wpdb $wpdb
+     * @param string $username
+     * @return int The user_id of the specified user. False if not found.
+     */
+    public static function get_user_id_by_username( $username ) {
+        global $wpdb;
+
+        //Lets convert the request to a nicename (should be more reliable)
+        $username = sanitize_title( $username );
+        $username = apply_filters('pre_user_nicename', $username);
+
+        //lets run this thing...
+        $query = $wpdb->prepare('SELECT `ID` FROM `'.$wpdb->users.'` WHERE `user_nicename`=%s LIMIT 1',$username);
+        return $wpdb->get_var($query,0,0);
+    }
 
     /**
      * Gets all the information about a single group.
@@ -808,7 +825,7 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns a list of all groups (incl system groups). If $user_id is provided, 
+     * Returns a list of all groups (incl system groups). If $user_id is provided,
      * the list only includes groups that the specified user to attached to.
      *
      * @global wpdb $wpdb

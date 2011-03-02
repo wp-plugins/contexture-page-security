@@ -113,6 +113,9 @@ This function can be used to determine if a specific page or post is protected (
 
 == Changelog ==
 
+= 1.4.1 =
+* Fixed a bug that caused site registration settings to be ignored for many users
+
 = 1.4.0 =
 * COMPLETE CODE REWRITE! Code base is now now MUCH more flexible so new features should come more quickly.
 * New feature: Full custom post type support!
