@@ -9,7 +9,6 @@ class CTXPS_App{
      * Adds the security box on the right side of the 'edit page' admin section
      */
     public static function admin_init(){
-        
         //Add our JS strings (using PHP allows us to localize JS strings)
         add_action('admin_head', 'CTXPS_App::js_strings_init');
 
@@ -21,7 +20,6 @@ class CTXPS_App{
 
         //Add our custom admin styles
         wp_enqueue_style('psc_admin',CTXPSURL.'views/admin.css');
-
     }
 
 
@@ -62,7 +60,7 @@ class CTXPS_App{
             //add_contextual_help( 'users_page', __('<p><strong>Page Security:</strong></p><p>To add multiple users to a group, check off the users you want to add, select the group from the "Add to group..." drop-down, and click "Add".</p><p><p><strong>For more information:</strong></p><a href="http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/">Official Page Security Support</a></p>','contexture-page-security') );
 
         }
-        
+
         //If this is the users page, use javascript to inject another bulk options box (damn you, WP core team for pulling my 3.1 bulk hooks!)
         if($pagenow==='users.php' && empty($_GET['page']) && current_user_can( 'promote_users' )){
             self::js_userbulk_init();
@@ -140,9 +138,9 @@ class CTXPS_App{
             return '<div id="message" class="error below-h2"><p>'.__('Unable to create group. A group with that name already exists.','contexture-page-security').'</p></div>';
         }
     }
-    
+
     /**
-     * 
+     *
      */
     public static function js_userbulk_init(){
         ?>
