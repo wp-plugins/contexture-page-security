@@ -1,7 +1,7 @@
 <?php
 if(!class_exists('CTXPS_Components')){
 class CTXPS_Components{
-        
+
     /**
      * Adds a "Protection" column to content lists.
      *
@@ -146,15 +146,19 @@ class CTXPS_Components{
         $alternatecss = ' class="alternate" ';
         $countusers = count_users();
 
+        if(empty($user_id) && !empty($_GET['user_id'])){
+            $user_id = $_GET['user_id'];
+        }
+
         foreach($groups as $group){
             $countmembers = (!isset($group->group_system_id)) ? CTXPS_Queries::count_members($group->ID) : $countusers['total_users'];
 
             //Only create the actions if $showactions is true
-            if($show_actions){
+            if($show_actions && current_user_can('promote_users')){
                 switch($view){
                     case 'users':
                         //Button for "Remove" takes user out of group (ajax)
-                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"CTXPS_Ajax.removeGroupFromUser({$group->ID},{$_GET['user_id']},jQuery(this))\">Unenroll</a></span></div>";
+                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"CTXPS_Ajax.removeGroupFromUser({$group->ID},{$user_id},jQuery(this))\">Unenroll</a></span></div>";
                         break;
                     case 'groups':
                         //Button for "Delete" removes group from db (postback)
@@ -357,6 +361,7 @@ class CTXPS_Components{
             $return .= '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
         }else{
             foreach($security as $sec_array->pageid => $sec_array->grouparray){
+                //If this is the current page (and not an ancestor)
                 if($sec_array->pageid == $cur_page_id){
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
                         $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
@@ -373,12 +378,12 @@ class CTXPS_Components{
 
     /**
      * Creates an "Add to Group" drop-down list to do bulk actions on the users page
-     * @return string HTML 
+     * @return string HTML
      */
     public static function render_bulk_add_to_group(){
         $addtogrp = __('Add to group','contexture-page-security').'&hellip;';
         $groups = CTXPS_Queries::get_groups();
-        
+
         //First, add our default option...
         $html = sprintf('<option value="">%s</option>',$addtogrp);
         //Then, add the rest of our groups as options
@@ -387,27 +392,27 @@ class CTXPS_Components{
                 $html .= CTX_Helper::gen('option', array('value'=>$group->ID), $group->group_title);
             }
         }
-        
+
         //Now, lets wrap that in a select list
         $html = CTX_Helper::gen('select', array('name'=>'psc_group_add','id'=>'psc_group_add','style'=>'margin-left:5px;margin-right:5px;'), $html);
-        
+
         //Add a label before the select
         $html = sprintf('<label class="screen-reader-text" for="psc_group_add">%s</label>',$addtogrp).$html;
-        
+
         //Add a button after the select
         $html .= sprintf('<input type="button" name="enrollit" id="enrollit" class="button-secondary" value="%s"/>',__('Add','contexture-page-security'));
-        
+
         //Finally, wrap all that in a div and return
         return CTX_Helper::gen('div', array('class'=>'alignleft actions'), $html);
     }
 
     /**
-     * Takes a string and returns a wordpress-ready message. This should be 
+     * Takes a string and returns a wordpress-ready message. This should be
      * inserted immediately after the .wrap h2:first-child
-     * 
+     *
      * @param string $message The localized string to pass to the renderer
      * @param string $type Optional. The message class. possible values: 'updated','updated fade','error'
-     * @return string HTML 
+     * @return string HTML
      */
     public static function render_wp_message($message,$type='updated'){
         //Other types include:
@@ -415,6 +420,6 @@ class CTXPS_Components{
         //  updated fade
         return sprintf('<div id="message" class="%s"><p>%s</p></div>',$type,$message);
     }
-    
+
 }}
 ?>
