@@ -58,7 +58,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 
 = I get an error about PHP5 when I activate your plugin. What gives? =
 
-Page Security requires PHP5 to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
+Page Security requires PHP 5.2 or higher to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
 If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
 hosting dashboard).
 
@@ -74,6 +74,8 @@ It's important to remember that ALL OTHER SECURITY RESTRICTIONS are still applie
 
 This allows you create an intranet-style site while keeping multiple levels of security for the site content.
 
+Note: Site-settings are currently unavailable for the "Registered Users" special group. We'll be adding this functionality very, very soon.
+
 = Can I help translate PSC into my language? =
 
 Absolutely! PO files are now included with each PSC download. You can use a WordPress plugin like "CodeStyling Localization" or a program like "Poedit" to easily create language-specific translations. If you'd like us to include your translation in the official release, simply email it to opensource@contextureintl.com!
@@ -88,33 +90,31 @@ Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad t
 
 == Theme Functions ==
 
-Some developers may find it useful to perform programmatic group-management tasks. For instance, have your website automatically add a user to a group under some circumstances. The following functions and documentation should help (for more detail, see PSC's views/theme-functions.php file)).
+As of 1.4.x, Page Security is organized in a way that roughly corresponds to MVC guidelines. If you are a developer and want to take to extend any of PSC's features, it's usually as easily as calling any of the included static classes.
 
-= psc_add_user_to_group($user_id, $group_id, $expires) =
+Most database-interaction functions can be found in /wp-content/plugins/contexture-page-security/core/model_queries.php - these are the same ones used by every facet of PSC and should be conveniently exposed to any other plugins or themes.
 
-This can be used to add a specified user to a specified group. It requires two parameters, a user id and a group id (The current users id can be acquired by declaring the $current_user global, then $current_user->ID). You can use psc_get_groups() or your blog's Admin > Users > Groups screen to determine an appropriate group id. $expires is optional, but takes either a date string (formatted YYYY-MM-DD) or NULL. If left empty, users membership will never expire.
+Here are just a few examples:
 
-= psc_update_user_membership($user_id,$group_id,$expires) =
+= Add a User to a Group =
 
-This function can be used to update a users membership details (usually expiration date). $expires is optional and can be either NULL or a string-formatted date (YYYY-MM-DD).
+$result = CTXPS_Queries::add_membership_with_expiration($user_id,$group_id,$expiration_date);
 
-= psc_remove_user_from_group($user_id, $group_id) =
+= Get a List of Groups =
 
-Use this function to remove a user from a group. Both parameters are required.
+$result = CTXPS_Queries::get_groups();
 
-= psc_get_groups($user_id) =
+= Get Protection Status of Current Page/Post/etc =
 
-This function can be used to generate an associative array of groups (group id=>name). If you specify a user id, only groups that a user is a member of will be returned. If no parameter is provided, it will return all groups.
-
-= psc_has_protection($post_id) =
-
-This function can be used to determine if a specific page or post is protected (including any inherited restrictions). $post_id is optional - if left blank, the function will try to automatically use the post id from the current loop, if available. This function returns true if protected, false if not.
-
+$result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.4.2 =
+* Fixed a bug that caused the "Registered Users" group to misbehave (thanks Avotos & Gaurav!).
+
 = 1.4.1 =
-* Fixed a bug that caused site registration settings to be ignored for many users
+* Fixed a bug that caused site registration settings to be ignored for many users.
 
 = 1.4.0 =
 * COMPLETE CODE REWRITE! Code base is now now MUCH more flexible so new features should come more quickly.

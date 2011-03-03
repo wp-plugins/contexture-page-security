@@ -316,8 +316,15 @@ class CTXPS_Queries{
      * @param int $group_id
      * @return bool Returns 1 if success, false if failed.
      */
-    public static function add_membership($user_id,$group_id){
+    public static function add_membership($user_id,$group_id,$expiration=null){
         global $wpdb,$ctxpsdb;
+
+        //If we're trying to use this method with an expiration, forward to add_membership_with_expiration()
+        if(!empty($expiration)){
+            return self::add_membership_with_expiration($user_id,$group_id,$expiration);
+        }
+
+        //Otherwise, use the simple insert
         return $wpdb->insert($ctxpsdb->group_rels,
                 array(
                     'grel_group_id'=>$group_id,
@@ -325,6 +332,47 @@ class CTXPS_Queries{
                 )
         );
 
+    }
+
+    /**
+     * Serves the same general purpose of add_membership, but performs some additional validation
+     * and can also add a member with an expiration.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param int $user_id The users id. Can be used with ::get_user_id_by_username() if unsure.
+     * @param int $group_id The id of the group to add the user to.
+     * @param mixed $expiration Can be null or 'null' or a valid mysql-formatted date
+     * @return boolean True if successfully registered, false if not.
+     */
+    public static function add_membership_with_expiration($user_id,$group_id,$expiration=null){
+        global $wpdb,$ctxpsdb;
+
+        //If either value isnt an int, fail
+        if(!is_numeric($user_id) || !is_numeric($group_id)){
+            return false;
+        }
+
+        //if user is already in a group, return false immediately
+        if(self::check_membership($user_id, $group_id)){ return false; }
+
+        //If this user doesn't exist
+        if(!self::check_user_exists($user_id)){
+            return false;
+        } else {
+            //Add user to group (can't use $wpdb->insert because of the NULL possibility)
+            $sqlUpdateGroup = sprintf("INSERT INTO `%s` (grel_group_id, grel_user_id, grel_expires) VALUES ('%s','%s',%s);",
+                $ctxpsdb->group_relss,
+                $group_id,
+                $user_id,
+                (empty($expiration) || strtolower($expiration)==='null') ? 'NULL' : "'".$expiration."'"
+            );
+            if($wpdb->query($sqlUpdateGroup) === false){
+                return false;
+            } else {
+                return true;
+            }
+        }
     }
 
     /**
@@ -889,7 +937,7 @@ class CTXPS_Queries{
     public static function get_system_group($group_system_id){
         global $wpdb,$ctxpsdb;
 
-        $array = $wpdb->get_row($ctxpsdb->prepare(
+        $array = $wpdb->get_row($wpdb->prepare(
             'SELECT * FROM `'.$ctxpsdb->groups.'`
             WHERE group_system_id = %s
             LIMIT 1',
@@ -930,7 +978,15 @@ class CTXPS_Queries{
      *
      * @return bool Whether this page has the "protected page" flag
      */
-    public static function check_protection($post_id){
+    public static function check_protection($post_id=null){
+        global $post;
+
+        //If $post_id isnt set, try to set with current global post id
+        if(empty($post_id) && isset($post->ID)){ $post_id=$post->ID; }
+
+        //Fail if the post id isn't numeric at this point
+        if(!is_numeric($post_id)){ return false; }
+
         return (bool)get_post_meta($post_id,'ctx_ps_security');
     }
 
