@@ -10,12 +10,12 @@ class CTXPS_App{
      */
     public static function admin_init(){
         //Add our JS strings (using PHP allows us to localize JS strings)
-        add_action('admin_head', 'CTXPS_App::js_strings_init');
+        add_action('admin_head', array('CTXPS_App','js_strings_init'));
 
         //Enable Restrict Access sidebar for ALL post types (will also automatically enable support for any custom types)
         $post_types = get_post_types();
         foreach($post_types as $type){
-            add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', 'CTXPS_Router::sidebar_security', $type, 'side', 'low');
+            add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
         }
 
         //Add our custom admin styles
@@ -97,12 +97,12 @@ class CTXPS_App{
      */
     public static function admin_screens_init(){
         //Add Groups option to the WP admin menu under Users (these also return hook names, which are needed for contextual help)
-        add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', 'CTXPS_Router::groups_list');
-        add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', 'CTXPS_Router::group_add');
-        add_submenu_page('', __('Edit Group','contexture-page-security'), __('Edit Group','contexture-page-security'), 'manage_options', 'ps_groups_edit', 'CTXPS_Router::group_edit');
-        add_submenu_page('', __('Delete Group','contexture-page-security'), __('Delete Group','contexture-page-security'), 'manage_options', 'ps_groups_delete', 'CTXPS_Router::group_delete');
+        add_submenu_page('users.php', __('Group Management','contexture-page-security'), __('Groups','contexture-page-security'), 'manage_options', 'ps_groups', array('CTXPS_Router','groups_list'));
+        add_submenu_page('users.php', __('Add a Group','contexture-page-security'), __('Add Group','contexture-page-security'), 'manage_options', 'ps_groups_add', array('CTXPS_Router','group_add'));
+        add_submenu_page('', __('Edit Group','contexture-page-security'), __('Edit Group','contexture-page-security'), 'manage_options', 'ps_groups_edit', array('CTXPS_Router','group_edit'));
+        add_submenu_page('', __('Delete Group','contexture-page-security'), __('Delete Group','contexture-page-security'), 'manage_options', 'ps_groups_delete', array('CTXPS_Router','group_delete'));
 
-        add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', 'CTXPS_Router::options');
+        add_options_page('Page Security by Contexture', 'Page Security', 'manage_options', 'ps_manage_opts', array('CTXPS_Router','options'));
         //add_submenu_page('options-general.php', 'Page Security', 'Page Security', 'manage_options', 'ps_manage_opts', 'ctx_ps_page_options');
     }
 

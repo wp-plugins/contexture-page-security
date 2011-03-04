@@ -51,59 +51,59 @@ require_once 'core/routing.php';              //All requests for views are sent 
 
 /******************************** HOOKS ***************************************/
 // Install new tables (on activate)
-register_activation_hook(__FILE__,'CTXPS_Queries::plugin_install');
+register_activation_hook(__FILE__,array('CTXPS_Queries','plugin_install'));
 // Remove tables from db (on delete)
-register_uninstall_hook(__FILE__,'CTXPS_Queries::plugin_delete');
+register_uninstall_hook(__FILE__,array('CTXPS_Queries','plugin_delete'));
 
 
 // Add "Groups" option to "Users" in admin
-add_action('admin_menu', 'CTXPS_App::admin_screens_init');
+add_action('admin_menu', array('CTXPS_App','admin_screens_init'));
 // Add a "Groups" view to a user's user-edit.php page
-add_action('edit_user_profile', 'CTXPS_Router::user_groups');
-add_action('show_user_profile', 'CTXPS_Router::user_groups');
+add_action('edit_user_profile', array('CTXPS_Router','user_groups'));
+add_action('show_user_profile', array('CTXPS_Router','user_groups'));
 
 //Add the security box sidebar to the pages section
-add_action('admin_init', 'CTXPS_App::admin_init');
+add_action('admin_init', array('CTXPS_App','admin_init'));
 
 //Load localized language files
-add_action('init','CTXPS_App::localize_init');
+add_action('init', array('CTXPS_App','localize_init'));
 
 //Handle Ajax for Edit Page/Post page
-add_action('wp_ajax_ctxps_add_group_to_page','CTXPS_Ajax::add_group_to_page');
-add_action('wp_ajax_ctxps_remove_group_from_page','CTXPS_Ajax::remove_group_from_page');
-add_action('wp_ajax_ctxps_security_update','CTXPS_Ajax::update_security');
+add_action('wp_ajax_ctxps_add_group_to_page', array('CTXPS_Ajax','add_group_to_page'));
+add_action('wp_ajax_ctxps_remove_group_from_page', array('CTXPS_Ajax','remove_group_from_page'));
+add_action('wp_ajax_ctxps_security_update', array('CTXPS_Ajax','update_security'));
 
 //Handle Ajax for Edit User page
-add_action('wp_ajax_ctxps_add_group_to_user','CTXPS_Ajax::add_group_to_user');
-add_action('wp_ajax_ctxps_remove_group_from_user','CTXPS_Ajax::remove_group_from_user');
-add_action('wp_ajax_ctxps_update_member','CTXPS_Ajax::update_membership');
+add_action('wp_ajax_ctxps_add_group_to_user', array('CTXPS_Ajax','add_group_to_user'));
+add_action('wp_ajax_ctxps_remove_group_from_user', array('CTXPS_Ajax','remove_group_from_user'));
+add_action('wp_ajax_ctxps_update_member', array('CTXPS_Ajax','update_membership'));
 
 //handle Ajax for bulk add
-add_action('wp_ajax_ctxps_user_bulk_add','CTXPS_Ajax::add_bulk_users_to_group');
+add_action('wp_ajax_ctxps_user_bulk_add', array('CTXPS_Ajax','add_bulk_users_to_group'));
 
 //Add basic security to all public "static" pages and posts [highest priority]
-add_action('wp','CTXPS_Security::protect_content',1);
+add_action('wp', array('CTXPS_Security','protect_content',1));
 
 //Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home) [highest priority]
-add_filter( 'the_posts','CTXPS_Security::filter_loops',1);
+add_filter( 'the_posts', array('CTXPS_Security','filter_loops',1));
 
 //Ensure that menus do not display protected pages (when using default menus only) [highest priority]
-add_filter('get_pages','CTXPS_Security::filter_auto_menus',1);
+add_filter('get_pages', array('CTXPS_Security','filter_auto_menus',1));
 //Ensure that menus do not display protected pages (when using WP3 custom menus only) [highest priority]
-add_filter('wp_get_nav_menu_items','CTXPS_Security::filter_custom_menus',1);
+add_filter('wp_get_nav_menu_items', array('CTXPS_Security','filter_custom_menus',1));
 
 //Add shortcodes!
-add_shortcode('groups_attached', 'CTXPS_Shortcodes::groups_attached'); //Current page permissions only
-add_shortcode('groups_required', 'CTXPS_Shortcodes::groups_required'); //Complete permissions for current page
+add_shortcode('groups_attached', array('CTXPS_Shortcodes','groups_attached')); //Current page permissions only
+add_shortcode('groups_required', array('CTXPS_Shortcodes','groups_required')); //Complete permissions for current page
 
 //Update the edit.php pages & posts lists to include a "Protected" column
-add_filter('manage_pages_columns','CTXPS_Components::add_list_protection_column');
-add_filter('manage_posts_columns','CTXPS_Components::add_list_protection_column');
-add_action('manage_pages_custom_column','CTXPS_Components::render_list_protection_column',10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
-add_action('manage_posts_custom_column','CTXPS_Components::render_list_protection_column',10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+add_filter('manage_pages_columns', array('CTXPS_Components','add_list_protection_column'));
+add_filter('manage_posts_columns', array('CTXPS_Components','add_list_protection_column'));
+add_action('manage_pages_custom_column', array('CTXPS_Components','render_list_protection_column',10,2)); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_protection_column',10,2)); //Priority 10, Takes 2 args (use default priority only so we can specify args)
 
 //Modify the global help array so we can add extra help text to default WP pages
-add_action('admin_head', 'CTXPS_App::help_init');
+add_action('admin_head', array('CTXPS_App','help_init'));
 
 /*********************** FUNCTIONS **********************************/
 
