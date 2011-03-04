@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.4.2
+Version: 1.4.3
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -66,7 +66,7 @@ add_action('show_user_profile', array('CTXPS_Router','user_groups'));
 add_action('admin_init', array('CTXPS_App','admin_init'));
 
 //Load localized language files
-add_action('init', array('CTXPS_App','localize_init'));
+add_action('init',array('CTXPS_App','localize_init'));
 
 //Handle Ajax for Edit Page/Post page
 add_action('wp_ajax_ctxps_add_group_to_page', array('CTXPS_Ajax','add_group_to_page'));
@@ -82,15 +82,15 @@ add_action('wp_ajax_ctxps_update_member', array('CTXPS_Ajax','update_membership'
 add_action('wp_ajax_ctxps_user_bulk_add', array('CTXPS_Ajax','add_bulk_users_to_group'));
 
 //Add basic security to all public "static" pages and posts [highest priority]
-add_action('wp', array('CTXPS_Security','protect_content',1));
+add_action('wp', array('CTXPS_Security','protect_content'),1);
 
 //Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home) [highest priority]
-add_filter( 'the_posts', array('CTXPS_Security','filter_loops',1));
+add_filter( 'the_posts', array('CTXPS_Security','filter_loops'),1);
 
 //Ensure that menus do not display protected pages (when using default menus only) [highest priority]
-add_filter('get_pages', array('CTXPS_Security','filter_auto_menus',1));
+add_filter('get_pages', array('CTXPS_Security','filter_auto_menus'),1);
 //Ensure that menus do not display protected pages (when using WP3 custom menus only) [highest priority]
-add_filter('wp_get_nav_menu_items', array('CTXPS_Security','filter_custom_menus',1));
+add_filter('wp_get_nav_menu_items', array('CTXPS_Security','filter_custom_menus'),1);
 
 //Add shortcodes!
 add_shortcode('groups_attached', array('CTXPS_Shortcodes','groups_attached')); //Current page permissions only
@@ -99,8 +99,8 @@ add_shortcode('groups_required', array('CTXPS_Shortcodes','groups_required')); /
 //Update the edit.php pages & posts lists to include a "Protected" column
 add_filter('manage_pages_columns', array('CTXPS_Components','add_list_protection_column'));
 add_filter('manage_posts_columns', array('CTXPS_Components','add_list_protection_column'));
-add_action('manage_pages_custom_column', array('CTXPS_Components','render_list_protection_column',10,2)); //Priority 10, Takes 2 args (use default priority only so we can specify args)
-add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_protection_column',10,2)); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+add_action('manage_pages_custom_column', array('CTXPS_Components','render_list_protection_column'),10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_protection_column'),10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
 
 //Modify the global help array so we can add extra help text to default WP pages
 add_action('admin_head', array('CTXPS_App','help_init'));
