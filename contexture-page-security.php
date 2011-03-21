@@ -60,6 +60,7 @@ register_uninstall_hook(__FILE__,array('CTXPS_Queries','plugin_delete'));
 add_action('admin_menu', array('CTXPS_App','admin_screens_init'));
 // Add a "Groups" view to a user's user-edit.php page
 add_action('edit_user_profile', array('CTXPS_Router','user_groups'));
+// Add a "Groups" view to a user's profile.php page
 add_action('show_user_profile', array('CTXPS_Router','user_groups'));
 
 //Add the security box sidebar to the pages section
