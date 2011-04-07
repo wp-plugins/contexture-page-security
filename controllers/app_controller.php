@@ -111,7 +111,7 @@ class CTXPS_App{
      */
     public static function localize_init(){
        if (function_exists('load_plugin_textdomain')) {
-          load_plugin_textdomain('contexture-page-security', false, dirname(plugin_basename(__FILE__)).'/languages' );
+          load_plugin_textdomain('contexture-page-security', false, CTXPSPATH.'/languages' );
        }
     }
 
