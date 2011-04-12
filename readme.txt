@@ -110,8 +110,9 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
-= 1.4.2b =
-* Changed callback style for expanded PHP version support.
+= 1.4.3 =
+* Changed callback style for expanded PHP version support (5.1+).
+* Added Italian translation (by Tristano Ajmone)
 
 = 1.4.2 =
 * Fixed a bug that caused the "Registered Users" group to misbehave (thanks Avotos & Gaurav!).
