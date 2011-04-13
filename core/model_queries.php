@@ -343,7 +343,7 @@ class CTXPS_Queries{
      * @global CTXPSC_Tables $ctxpsdb
      * @param int $user_id The users id. Can be used with ::get_user_id_by_username() if unsure.
      * @param int $group_id The id of the group to add the user to.
-     * @param mixed $expiration Can be null or 'null' or a valid mysql-formatted date
+     * @param mixed $expiration Can be null or 'null' or a valid mysql-formatted date string (Y-m-d)
      * @return boolean True if successfully registered, false if not.
      */
     public static function add_membership_with_expiration($user_id,$group_id,$expiration=null){
