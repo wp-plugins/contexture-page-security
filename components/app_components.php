@@ -21,6 +21,7 @@ class CTXPS_Components{
         return $columns;
     }
 
+
     /**
      * Generates a "lock" symbol for the "Protected" column, if the current content
      * is protected. See WP's template.php -> display_page_row() for  more.

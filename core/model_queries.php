@@ -12,18 +12,9 @@ class CTXPS_Queries{
     public static function plugin_install(){
         global $wpdb, $ctxpsdb;
 
-        $linkBack = admin_url();
+        self::check_php_version();
 
-        //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
-        $reqphp = '5.1';
-        if (version_compare(PHP_VERSION, $reqphp, '<')) {
-            deactivate_plugins($ctxpsdb->pluginbase);
-            wp_die(
-                "<span style=\"color:red;font-weight:bold;\">".__('Missing Requirement:','contexture-page-security')."</span> "
-                .sprintf(__('Page Security requires PHP %1$s or higher. Your server is running PHP %2$s. Please contact your hosting service about enabling PHP %1$s support.','contexture-page-security'),$reqphp,PHP_VERSION)
-                ."<a href=\"{$linkBack}plugins.php\"> ".__('Return to plugin page','contexture-page-security')." &gt;&gt;</a>"
-            );
-        }
+        $linkBack = admin_url();
 
         //Build our SQL scripts to create the new db tables
         $sql_create_groups = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
@@ -108,6 +99,38 @@ class CTXPS_Queries{
                     'group_creator'=>'0',
                     'group_system_id'=>'CPS01'
             ));
+        }
+    }
+
+
+    /**
+     * Check whether the required version of PHP is present and disable the plugin if it's not.
+     *
+     * @global CTXPS_Tables $ctxpsdb
+     * @param decimal $version Which version of PHP is required?
+     * @param boolean $die If true, wp_die() is called, else returns string.
+     */
+    public static function check_php_version($version='5.1',$die=true){
+        global $ctxpsdb;
+
+        //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
+        if (version_compare(PHP_VERSION, $version, '<')) {
+
+            //Ensure deactivate_plugins is loaded
+            if(!function_exists('deactivate_plugins')){
+                //If not, we need to include plugin.php
+                require_once ABSPATH.'\wp-admin\includes\plugin.php';
+            }
+            //Now we can deactivate the plugin
+            deactivate_plugins($ctxpsdb->pluginbase);
+
+            //Build the error message
+            $return = '<span style="color:red;font-weight:bold;">'.__('Missing Requirement:','contexture-page-security').'</span> '
+                .sprintf(__('Page Security requires PHP %1$s or higher. Your server is running PHP %2$s. Please contact your hosting service about enabling PHP %1$s support.','contexture-page-security'),$version,PHP_VERSION)
+                .'<a href="'.admin_url('plugins.php').'"> '.__('Return to plugin page','contexture-page-security').' &gt;&gt;</a>';
+
+            //wp_die and show error message
+            wp_die($return);
         }
     }
 
