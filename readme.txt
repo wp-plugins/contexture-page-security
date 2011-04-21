@@ -18,16 +18,20 @@ of security for powerful, granular protection of any sub-section on your site.
 
 PSC is created to be simple, yet powerful - and is designed to integrate seamlessly and intuitively with WordPress. If you know how to use WordPress, you know how to use PSC.
 
-Features:
-
-1. NEW IN 1.4! Restrict your ENTIRE website (use WordPress as an intranet)!
-1. Subscription support! Assign an expiration date to any membership!
-1. Create your own "Access Denied" pages!
-1. Fully AJAX-loaded! Any changes you make are saved immediately!
-1. Use the "Registered Users" smart group to create special "registered users only" sections!
-1. Contextual help is provided for every PSC feature (via WordPress' 'Help' tab)!
+= Features =
+1. Easy to use and integrates seamlessly with WordPress.
+1. Restrict your ENTIRE website (use WordPress as an intranet)!
+1. Subscription support! Set expiration dates for memberships.
+1. Create customized "Access Denied" pages!
+1. Fully Ajax-loaded! All your security updates are saved in real time!
+1. A built-in "Registered Users" group allows you to quickly create "registered users only" sections.
+1. Fully-documented, contextual help is provided for every PSC feature (via the WordPress 'Help' tab)!
 1. Use simple, well-documented theme functions to easily automate your group memberships (You could even create an automatic subscription system)!
 1. Professionally maintained with frequent updates and improvements based on YOUR feedback!
+
+= Languages =
+1. English
+1. Italian (by Tristano Ajmone)
 
 Notice:
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
@@ -58,7 +62,7 @@ While we believe this plugin is secure, we make no warranty about it's effective
 
 = I get an error about PHP5 when I activate your plugin. What gives? =
 
-Page Security requires PHP 5.2 or higher to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
+As of version 1.4.3, Page Security requires PHP 5.1 or higher to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
 If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
 hosting dashboard).
 
@@ -83,6 +87,10 @@ Absolutely! PO files are now included with each PSC download. You can use a Word
 = Is there an easy way to make some sections admin-only? =
 
 Yes! This is particularly handy if you're working on a new section of your website but you aren't quite ready to share it with the world. From the page's edit screen, simply find the "Restrict Access" sidebar and check "Protect this page and it's descendants". That's it! Even if you don't assign any groups, anyone who's logged in as an admin will still have full access to that page.
+
+= Is there a way to give new users temporary group membership? =
+
+Yes, although it involves a little bit of coding. Please see this thread on the WordPress Support Forum for details: http://goo.gl/oXDyh
 
 = I found a bug or need a feature, what do I do? =
 
@@ -111,7 +119,9 @@ $result = CTXPS_Queries::check_protection();
 == Changelog ==
 
 = 1.4.3 =
-* Changed callback style for expanded PHP version support (5.1+).
+* Improved support for older PHP versions (5.1+)
+* Improved PHP requirement checks
+* Minor bug fixes and usability enhancements
 * Added Italian translation (by Tristano Ajmone)
 
 = 1.4.2 =

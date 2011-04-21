@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.5.x
+Version: 1.4.3
 Author: Contexture Intl, Matt VanAndel, Jerrol Krause
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -39,20 +39,20 @@ require_once 'core/model.php';          //Model instance ($ctxpsdb)
 require_once 'core/model_queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
 /**************************** LOAD COMPONENTS *********************************/
-require_once 'components/app_components.php';           //Plugin-wide components
+require_once 'components/app_components.php';          //Plugin-wide components
 require_once 'components/shortcode_components.php';    //Short-codes
 require_once 'components/table_components.php';        //Table generator
-require_once 'components/table-packages.php';//Table generator packages
+require_once 'components/table-packages.php';          //Table generator packages
 /**************************** LOAD CONTROLLERS ********************************/
-require_once 'controllers/app_controller.php';//Common, reusable classes, methods, functions
+require_once 'controllers/app_controller.php';         //Common, reusable classes, methods, functions
 require_once 'controllers/app_security_controller.php';//Most of the permissions-checking code is here
-require_once 'controllers/ajax.php';          //AJAX-specific methods
-require_once 'core/routing.php';              //All requests for views are sent through here
+require_once 'controllers/ajax.php';                   //AJAX-specific methods
+require_once 'core/routing.php';                       //All requests for views are sent through here
 
 
 /********************** SPARTAN REQUIREMENT CHECK *****************************/
 if(is_admin()){
-    //Only run this check
+    //If we're accessing a WP admin page, check PHP requirements
     CTXPS_Queries::check_php_version();
 }
 

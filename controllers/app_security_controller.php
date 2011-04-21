@@ -369,6 +369,12 @@ class CTXPS_Security{
                 die();
             }
 
+            //If site restriction is enabled and user isnt logged in, don't bother linking to the homepage
+            $homepage_link = '';
+            if( $plugin_opts['ad_opt_protect_site']!=='true' ){
+                $homepage_link = '<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>';
+            }
+
             //SHOW AD *PAGE*
             if($plugin_opts['ad_msg_usepages']==='true'){ //Have to exempt feed else it interupts feed render
 
@@ -393,13 +399,13 @@ class CTXPS_Security{
 
                 //INVALID PAGE, USE MSG
                 }else{
-                    wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+                    wp_die($plugin_opts['ad_msg_anon'].$homepage_link);
                 }
 
             //SHOW AD *MSG*
             }else{
                 //If user is anonymous, show this message
-                wp_die($plugin_opts['ad_msg_anon'].'<a style="display:block;font-size:0.7em;" href="'.$blogurl.'">&lt;&lt; '.__('Go to home page','contexture-page-security').'</a>');
+                wp_die($plugin_opts['ad_msg_anon'].$homepage_link);
             }
 
 

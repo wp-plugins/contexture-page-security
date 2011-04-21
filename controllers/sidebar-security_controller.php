@@ -33,7 +33,7 @@
                 sprintf('<input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy" %s %s />',
                     (!!$securityStatus)? 'checked="checked"' : '',
                     ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ) ? 'disabled="disabled"' : '')
-                .__(" Protect this page and it's descendants",'contexture-page-security')
+                .__(' Protect this page and its descendants','contexture-page-security')
             );
 
             /** TODO: Add "Use as Access Denied page" option */

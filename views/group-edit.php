@@ -38,7 +38,7 @@
                     <input id="group_description" name="group_description" type="text" aria-required="false" class="regular-text" value="<?php echo $groupInfo->group_description; ?>" maxlength="400" />
                 </td>
             </tr>
-            <tr class="form-field" class="site-options" style="<?php echo ($dbopts['ad_opt_protect_site']==='true') ? '' : 'display:none;'; ?>">
+            <tr class="form-field" class="site-options" style="<?php echo ($dbopts['ad_opt_protect_site']==='true' && false) ? '' : 'display:none;'; ?>">
                 <th scope="row">
                     <label for="group_description">
                         <?php _e('Site Access:','contexture-page-security'); ?>

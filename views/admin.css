@@ -21,18 +21,25 @@ option.cts-ps-system-group { font-weight:bold; }
 .ctx-footnote { color:#9C9C9C; font-style:italic; }
 
 /** PSC OPTIONS **/
+#ctx-ps-opts-container { border-collapse:collapse;padding:0 !important;margin:0 !important; border:none;width:100%; }
+#ctx-ps-opts-form,
+#ctx-ps-opts-form + td{ padding:0 !important; }
     #ad-msg-auth, #ad-msg-anon { width:500px; }
     .toggle-opts-ad { } /*Hide this until "custom ad pages" feature is implemented */
     .toggle-opts-ad-page {display:none; }
-    #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:25px;margin-right:20px;margin-left:10px;}
+    #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:1px;margin-right:10px;margin-left:10px;}
     #ctx-about a.img-block {display:block;text-align:center;}
     #ctx-about p, #ctx-about div {padding-left:10px;color:#9c9c9c;}
     #ctx-about p a { color:gray; }
-    #ctx-ps-opts-form {float:left;width:765px;padding-top:20px;}
-    
+    #ctx-ps-opts-form {float:left;min-width:765px;padding-top:20px;}
+    #ctx-ps-opts-form+td { width:370px !important; }
+
+    #ctx-ps-opts-container .ctx-footnote,
+    #ctx-ps-opts-container .ctx-footnote a { color:#9C9C9C; }
+
 /** GROUP EDIT PAGE **/
     #editgroup .form-field input[type="radio"],
-    #editgroup .form-field input[type="checkbox"]{ width:auto; } 
+    #editgroup .form-field input[type="checkbox"]{ width:auto; }
 
     .group-actions { text-align:right; }
     .group-actions a { color:red; font-weight:bold; }
