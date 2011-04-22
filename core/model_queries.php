@@ -409,7 +409,7 @@ class CTXPS_Queries{
      * @param string $expiration_date A MySQL-friendly, string-formatted DateTime. yyyy-mm-dd hh:mm:ss
      * @return type
      */
-    public static function grel_enrollment_update($grel_id,$expiration_date){
+    public static function update_enrollment_grel($grel_id,$expiration_date){
         global $wpdb,$ctxpsdb;
 
         //Return false if this is empty

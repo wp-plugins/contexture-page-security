@@ -422,5 +422,18 @@ class CTXPS_Components{
         return sprintf('<div id="message" class="%s"><p>%s</p></div>',$type,$message);
     }
 
+    /**
+     * Renders the security options for a specific taxonomy term
+     *
+     * @param object $tag
+     */
+    public static function render_taxonomy_protection_panel($tag){
+        global $taxonomy;
+        $html = '<td>hi</td>';
+
+        $html = CTX_Helper::tr(array('class'=>'form-field'), $html, false);
+        CTX_Helper::table(array('class'=>'form-table'), $html);
+    }
+
 }}
 ?>

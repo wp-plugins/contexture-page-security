@@ -5,6 +5,19 @@
  * functions that theme designers can use to more easily customize PSC.
  *************************************************************************/
 
+function psc_deprecated($replacement='') {
+  $stack = debug_backtrace();
+  assert($stack[0]['function'] == __FUNCTION__);
+
+  // Get name of function that called deprecated() function.
+  $function = $stack[1]['function'];
+
+  //If a replacement method is provided, show the name
+  $useinstead = (!empty($replacement)) ?  "Use {$replacement} instead." : '';
+
+  trigger_error('Function '. check_plain($function) .'() is deprecated. '.$useinstead, E_DEPRECATED);
+}
+
 if(!function_exists('psc_add_user_to_group')){
 /**
  * Can be used by developers to add a user to a group programatically.
@@ -16,6 +29,9 @@ if(!function_exists('psc_add_user_to_group')){
  */
 function psc_add_user_to_group($user_id,$group_id,$expires=null){
     global $wpdb;
+
+    //This function is deprecated
+    psc_deprecated('CTXPS_Queries::add_membership()');
 
     //If either value isnt an int, fail
     if(!is_numeric($user_id) || !is_numeric($group_id)){
@@ -64,6 +80,9 @@ if(!function_exists('psc_update_user_membership')){
 function psc_update_user_membership($user_id,$group_id,$expires=null){
     global $wpdb;
 
+    //This function is deprecated
+    psc_deprecated('CTXPS_Queries::update_enrollment_grel()');
+
     //Fail if the id's aren't numeric
     if(!is_numeric($user_id) || !is_numeric($group_id)){ return false; }
 
@@ -89,6 +108,10 @@ if(!function_exists('psc_remove_user_from_group')){
  */
 function psc_remove_user_from_group($user_id,$group_id){
     global $wpdb;
+
+    //This function is deprecated
+    psc_deprecated('CTXPS_Queries::delete_membership()');
+
     //If either value isnt an int, fail
     if(!is_numeric($user_id) || !is_numeric($group_id)){
         return false;
@@ -109,6 +132,9 @@ if(!function_exists('psc_get_groups')){
 function psc_get_groups($user_id=null){
     global $wpdb, $current_user;
     $array = array();
+
+    //This function is deprecated
+    psc_deprecated('CTXPS_Queries::get_groups()');
 
     //Determine if we're looking up groups for a user, or all groups
     if(is_numeric($user_id)){
@@ -160,6 +186,9 @@ if(!function_exists('psc_has_protection')){
  */
 function psc_has_protection($post_id=null,$dontcheck=false){
     global $wpdb, $post;
+
+    //This function is deprecated
+    psc_deprecated('CTXPS_Queries::check_section_protection()');
 
     //If $post_id isnt set, try to get global post id
     if(empty($post_id) && !$dontcheck && isset($post->ID)){ $post_id=$post->ID; }

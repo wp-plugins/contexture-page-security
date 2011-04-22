@@ -182,7 +182,7 @@ class CTXPS_Ajax {
         $db_expires = ($_POST['expires']=='1') ? $_POST['date'] : 'NULL';
 
         //Determine response
-        if(CTXPS_Queries::grel_enrollment_update($_POST['grel'], $db_expires) === false){
+        if(CTXPS_Queries::update_enrollment_grel($_POST['grel'], $db_expires) === false){
             $response = array(
                 'what'=>    'update',
                 'action'=>  'update_membership',
@@ -297,10 +297,10 @@ class CTXPS_Ajax {
         $response = new WP_Ajax_Response($response);
         $response->send();
     }
-    
+
     public static function add_bulk_users_to_group(){
         $added_users = 0;
-        
+
         //ERROR - No users selected!
         if(empty($_GET['users'])){
             $response = new WP_Ajax_Response(array(
@@ -311,7 +311,7 @@ class CTXPS_Ajax {
             ));
             $response->send();
         }
-        
+
         //ERROR - No group selected
         if(empty($_GET['group_id'])){
             $response = new WP_Ajax_Response(array(
@@ -322,7 +322,7 @@ class CTXPS_Ajax {
             ));
             $response->send();
         }
-        
+
         //Loop through all selected users...
         foreach($_GET['users'] as $user){
             //Ensure users exists and is isnt already in group
@@ -334,7 +334,7 @@ class CTXPS_Ajax {
                 }
             }
         }
-        
+
         $response = new WP_Ajax_Response(array(
             'what'=>    'bulk_enroll',
             'action'=>  'add_bulk_users_to_group',

@@ -16,7 +16,15 @@ class CTXPS_App{
         $post_types = get_post_types();
         foreach($post_types as $type){
             add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
-        }
+        }unset($type);
+        //Enable Restrict Access options for taxonomy terms
+        $tax_types = get_taxonomies();
+        foreach($tax_types as $tax){
+            //Add fields to the taxonomy term edit form
+            add_action($tax.'_edit_form',array('CTXPS_Components','render_taxonomy_protection_panel'));
+            //Add fields to the taxonomy add form
+            add_action($tax.'_add_form',array('CTXPS_Components','render_taxonomy_protection_panel'));
+        }unset($tax);
 
         //Add our custom admin styles
         wp_enqueue_style('psc_admin',CTXPSURL.'views/admin.css');
@@ -140,7 +148,7 @@ class CTXPS_App{
     }
 
     /**
-     *
+     * Uses javascript to inject an AJAX-loaded bulk-add-to-group box to the Users list
      */
     public static function js_userbulk_init(){
         ?>
