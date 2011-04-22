@@ -422,6 +422,22 @@ class CTXPS_Components{
         return sprintf('<div id="message" class="%s"><p>%s</p></div>',$type,$message);
     }
 
+
+    /**
+     * Simply adds a header to taxonomy general settings, to make the page categories
+     * more common-sense.
+     *
+     * I hate to use JS for this, but the hook is in a different place on edit-tag-form.php
+     * than on edit-tags.php. This is the only way to inject it after the page title.
+     */
+    public static function render_taxonomy_protection_panel_pre(){
+        ?>
+            <script type="text/javascript">
+                jQuery('#edittag').before('<h3>General Settings</h3>');
+            </script>
+        <?php
+    }
+
     /**
      * Renders the security options for a specific taxonomy term
      *
@@ -429,10 +445,6 @@ class CTXPS_Components{
      */
     public static function render_taxonomy_protection_panel($tag){
         global $taxonomy;
-        $html = '<td>hi</td>';
-
-        $html = CTX_Helper::tr(array('class'=>'form-field'), $html, false);
-        CTX_Helper::table(array('class'=>'form-table'), $html);
     }
 
 }}

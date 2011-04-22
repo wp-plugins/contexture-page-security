@@ -14,11 +14,13 @@ class CTXPS_Router{
      * @global wpdb $wpdb
      * @param string $view The name of the view to load (filename conventions)
      * @param boolean $auto_load If true, a view will be automatically loaded. Set to false if controller will select view.
+     * @param array $args Provide an array if you need to pass values to a controller
      */
-    public static function render($view,$auto_load=true){
+    public static function render($view,$auto_load=true,$args=array()){
         global $wpdb,$ctxpsdb;
-        //Load the controller
-        require_once CTXPSPATH.'/controllers/'.$view.'_controller.php';
+        $controller_path = CTXPSPATH.'/controllers/'.$view.'_controller.php';
+        //Load the controller, if it exists
+        if (file_exists($controller_path)) require_once $controller_path;
         //Load the view automatically unless overridden (some controllers may need to handle this dynamically)
         if ($auto_load) require_once CTXPSPATH.'/views/'.$view.'.php';
     }
@@ -28,9 +30,10 @@ class CTXPS_Router{
     public static function group_edit(){ self::render('group-edit'); }
     public static function groups_list(){ self::render('groups-list'); }
     public static function options(){ self::render('options'); }
-    public static function sidebar_security(){ self::render('sidebar-security',false); }
     public static function user_groups(){ self::render('user-groups'); }
-
+    public static function sidebar_security(){ self::render('sidebar-security',false); }
+    public static function security_posts(){ self::render('sidebar-security',false); }
+    public static function security_tax(){ self::render('security-tax'); }
 }}
 
 ?>
