@@ -22,10 +22,9 @@ class CTXPS_App{
         foreach($tax_types as $tax){
             //Add fields to the taxonomy term edit form
             add_action( $tax.'_edit_form', array('CTXPS_Router','security_tax') );
-            //Add fields to the taxonomy add form
-            //add_action( $tax.'_add_form',array( 'CTXPS_Components', 'render_taxonomy_protection_panel' ) );
-            //Add fields to the taxonomy add form
-            add_action( $tax.'_edit_form', array('CTXPS_Router','security_tax') );
+            //Add "fields to the taxonomy add form"General Settings" title to 
+            add_action( $tax.'_edit_form', array('CTXPS_Components','render_taxonomy_protection_panel_pre') );
+
         }unset($tax);
 
         //Add our custom admin styles

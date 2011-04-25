@@ -47,6 +47,14 @@ class CTXPS_Queries{
             PRIMARY KEY (`ID`)
         )",$ctxpsdb->security);
 
+        $sql_create_term_meta = sprintf('CREATE TABLE IF NOT EXISTS `%stermmeta` (
+            `meta_id` bigint(20) UNSIGNED NOT NULL auto_increment,
+            `term_id` bigint(20) UNSIGNED NOT NULL,
+            `meta_key` varchar(255),
+            `meta_value` longtext,
+            PRIMARY KEY (`meta_id`)
+        )',$wpdb->prefix);
+
         //deactivate_plugins($ctxpsdb->pluginbase);
         //wp_die('<pre>'.print_r($ctxpsdb,true).'</pre>');
         //wp_die($ctxpsdb->security);
@@ -56,9 +64,10 @@ class CTXPS_Queries{
         $wpdb->query($sql_create_groups);
         $wpdb->query($sql_create_group_relationships);
         $wpdb->query($sql_create_security);
+        $wpdb->query($sql_create_term_meta);
 
         //Record what version of the db we're using (only works if option not already set - handy for ensuring upgrade path works as planned)
-        add_option("contexture_ps_db_version", "1.4");
+        add_option("contexture_ps_db_version", "1.5");
 
         //Set plugin options (not db version)
         CTXPS_Queries::set_options();
@@ -79,7 +88,9 @@ class CTXPS_Queries{
         }
         /******** END UPGRADE PATH < 1.2 **************/
 
+        /********* START UPGRADE PATH < 1.3 ***********/
         //Skip 1.3 - DB versions will now match major PSC releases
+        /******** END UPGRADE PATH < 1.3 **************/
 
         /********* START UPGRADE PATH < 1.4 ***********/
         $dbver = get_option("contexture_ps_db_version");
@@ -88,6 +99,10 @@ class CTXPS_Queries{
             update_option("contexture_ps_db_version", "1.4");
         }
         /******** END UPGRADE PATH < 1.4 **************/
+
+        /********* START UPGRADE PATH < 1.5 ***********/
+        //termmeta table added. No other changes necessary.
+        /******** END UPGRADE PATH < 1.5 **************/
 
         //Check if our "Registered Users" group already exists
         $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `".$ctxpsdb->groups."` WHERE `group_system_id` = 'CPS01' LIMIT 1");
@@ -175,14 +190,63 @@ class CTXPS_Queries{
         global $wpdb, $ctxpsdb;
 
         return $wpdb->insert($ctxpsdb->security,
-                array(
-                    'sec_protect_type'  =>$content_type,
-                    'sec_protect_id'    =>$content_id,
-                    'sec_access_type'   =>$protection_type,
-                    'sec_access_id'     =>$protection_id
-                    )
-                );
+            array(
+                'sec_protect_type'  =>$content_type,
+                'sec_protect_id'    =>$content_id,
+                'sec_access_type'   =>$protection_type,
+                'sec_access_id'     =>$protection_id
+            )
+        );
+    }
 
+
+    /**
+     * Hooked to 'edit_terms'. Adds security toggle meta to the database for a specified
+     * term.
+     */
+    public static function toggle_term_protection(){
+        if ( !empty($_POST['tag_ID']) ){
+            if( isset($_POST['prot-term']) ){
+                return add_metadata('term', $_POST['tag_ID'], 'ctx_ps_security', '1', true);
+            }else{
+                return delete_metadata('term', $_POST['tag_ID'], 'ctx_ps_security');
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Alias of get_metadata(), but with term and meta_key set in advance
+     *
+     * @param int $term_id The id of the term (see: tag_ID)
+     * @param string $meta_key The key for the meta to get
+     * @return mixed Returns false if no setting, else returns value.
+     */
+    public static function get_term_protection($term_id,$meta_key='ctx_ps_security'){
+        $value = get_metadata('term',$term_id,$meta_key,'',true);
+        return !empty($value);
+    }
+
+    /**
+     * Alias of delete_metadata(), but with term and meta_key set in advance
+     *
+     * @param int $term_id The id of the term (see: tag_ID)
+     * @param string $meta_key The key for the meta to get
+     * @return mixed Returns false if no setting, else returns value.
+     */
+    public static function delete_term_protection(){
+        if(!isset($_POST['prot-term']) && !empty($_POST['tag_ID'])){
+            return delete_metadata('term', $_POST['tag_ID'], 'ctx_ps_security');
+        }
+        return false;
+    }
+
+    /**
+     * Alias of self::add_security(), but automatically changes $content_type to 'term'. Try not to use this as I plan on
+     * deleting it, but want it here for reference.
+     */
+    public static function add_term_security($content_id,$protection_id,$content_type='term',$protection_type='group'){
+        return self::add_security($content_id,$protection_id,$content_type,$protection_type);
     }
 
     /**

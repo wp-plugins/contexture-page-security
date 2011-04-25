@@ -19,6 +19,7 @@ class CTXPS_Tables{
         $this->group_rels = $wpdb->prefix.$this->prefix.'group_relationships';
         $this->security =   $wpdb->prefix.$this->prefix.'security';
         $this->pluginbase = CTXPSDIR.'/contexture-page-security.php';
+        $wpdb->termmeta = $wpdb->prefix.'termmeta';
     }
 }
 }

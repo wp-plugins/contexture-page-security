@@ -433,19 +433,11 @@ class CTXPS_Components{
     public static function render_taxonomy_protection_panel_pre(){
         ?>
             <script type="text/javascript">
-                jQuery('#edittag').before('<h3>General Settings</h3>');
+                jQuery('#edittag').before('<h3><?php _e('General Settings','contexture-page-security') ?></h3>');
             </script>
         <?php
     }
 
-    /**
-     * Renders the security options for a specific taxonomy term
-     *
-     * @param object $tag
-     */
-    public static function render_taxonomy_protection_panel($tag){
-        global $taxonomy;
-    }
 
 }}
 ?>

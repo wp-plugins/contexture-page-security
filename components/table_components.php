@@ -2,16 +2,16 @@
 if(!class_exists('CTX_Tables')){
 /**
  * STATIC. Contains methods for generating WP-style table lists.
- * 
+ *
  * Usage:
  * Create a "packages" class that extends this one. In that class, create public
  * methods that start with the name "package_". You may want to copy the package_demo
  * class from here and use that as a template for your own
- * 
+ *
  * If you're a developer reading this. Yes, you can steal this class wholesale. It should
  * be very portable. Take a look in table-packages.php too, as it shows this class being
  * used in a practical application.
- * 
+ *
  * TODO: Add pagination support.
  */
 class CTX_Tables {
@@ -25,6 +25,7 @@ class CTX_Tables {
      * @var 'record_slug' : Used for generating table row classes
      * @var 'bulk' : true will show bulk options (if any are set). False will hide them.
      * @var 'no_records' : The text/html to render out if the query returns no records
+     * @var 'actions_col' : The 0-index (int) or name (string) of the column to place the actions in
      */
     public $table_conf      = array();
     /** Index array => Assoc arrays.
@@ -67,13 +68,13 @@ class CTX_Tables {
     public $list_data       = array();
     /**
      * If true, output will only include list-table content (useful for ajax)
-     * @var boolean 
+     * @var boolean
      */
     public $content_only    = false;
-    
+
     /**
      * Stores the completed list table
-     * @var string 
+     * @var string
      */
     public $rendered_table      = '';
 
@@ -82,27 +83,27 @@ class CTX_Tables {
      * @param string $list The name of the list to generate (if using packaged ;ist table)
      */
     public function __construct($list='demo',$echo=true,$content_only=false){
-        
+
         //STORE VALUE IN PROPERTY
         $this->content_only = $content_only;
-        
+
         //USE EXISTING PACKAGE, IF EXISTS....
         if( method_exists($this,sprintf('package_%s',$list)) ){
             eval(sprintf('$this->package_%s();',$list));
-            
+
         //PACKAGE NOT FOUND, TRY LOADING VIA HOOK...
         }else{
             do_action('ctx_list_table_prepare-'.$list,$this);
         }
-        
+
         //RENDER THE TABLE...
         $this->render($echo);
     }
-    
+
     /**
      * If class is called like a string ($echo is false), be sure to return a string.
-     * 
-     * @return string The rendered table as a string 
+     *
+     * @return string The rendered table as a string
      */
     public function __toString() {
         return $this->rendered_table;
@@ -111,7 +112,7 @@ class CTX_Tables {
     /** Immediately renders/echos the table in it's current state. */
     public function render($echo=true){
         $this->rendered_table = $this->create($this->table_conf, $this->column_conf, $this->actions_conf, $this->bulk_conf, $this->list_data, $this->content_only);
-        
+
         //ECHO IF SET
         if($echo){ echo $this->rendered_table; }
     }
@@ -185,7 +186,6 @@ class CTX_Tables {
         $action_count=0;
         /** The page this form is currently on */
         $current_page=(!empty($_GET['page'])) ? $_GET['page'] : '';
-
 
         /****** USE DEFAULT ARRAYS ********************************************
         if($demo===true){
@@ -262,7 +262,7 @@ class CTX_Tables {
                     //Main column content
                     $colhtml = '<div>'.$record['columns'][$column['slug']].'</div>';
                     //If this is the first loop, load actions
-                    if($count_cols===0){
+                    if(empty($table_conf['actions_col']) || ($count_cols===$table_conf['actions_col']) || $column['slug']===$table_conf['actions_col']){
                         if(count($action_conf)>0){
                             //***************** ACTIONS ********************
                             $colhtml .= '<div class="row-actions" style="white-space:nowrap">';
@@ -350,24 +350,29 @@ class CTX_Tables {
 
 
         /****** RETURN FORM & TABLE *******************************************/
+        if( empty($table_conf['form_id']) || empty($table_conf['form_method'])){
+            return $html;
+        }
+
         return sprintf('<form id="%1$s" action="" method="%2$s">%3$s</form>',
-                /*1*/$table_conf['form_id'],
-                /*2*/$table_conf['form_method'],
-                /*3*/$html);
+            /*1*/$table_conf['form_id'],
+            /*2*/$table_conf['form_method'],
+            /*3*/$html);
     }
 
     /**
      * Default demo package. usually, packages are places in a separate, inherrited class.
      */
     public function package_demo(){
-        
+
         $this->table_conf = array(
             'form_id'=>'new_table', //id value for the form (css-friendly id)
             'form_method'=>'get',   //how to submit the form get/post
             'list_id'=>'new-list',  //id value for the table (css-friendly id)
             'record_slug'=>'record',//css-class-friendly slug for uniquely referring to records
-            'bulk'=>'true',       //set to true to include checkboxes (if false, bulk options will be disabled)
-            'no_records'=>__('There are no records to show... yet!','ctxfp') //HTML to show if no records are provided
+            'bulk'=>'true',         //set to true to include checkboxes (if false, bulk options will be disabled)
+            'no_records'=>__('There are no records to show... yet!','contexture-page-security'), //HTML to show if no records are provided
+            'actions_col'=>0        //Set the column where actions will appear. Takes an int (zero-index) or string (column slug)
         );
         $this->bulk_conf = array(
             'Delete'=>'delete',
@@ -442,7 +447,7 @@ class CTX_Tables {
                     'col3'=>'first row'
                 ),
                 /**
-                 * Associative array. Each key MUST correspond to an action slug. If value is a string, 
+                 * Associative array. Each key MUST correspond to an action slug. If value is a string,
                  * it will be automatically turned into an href value. If value is an array, it will be
                  * parsed into link attributes (useful for adding ajax).
                  */
@@ -481,6 +486,6 @@ class CTX_Tables {
         );
 
     }
-    
+
 }}
 ?>

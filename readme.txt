@@ -118,6 +118,12 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.5.0 =
+* New feature: Protection can now be applied to categories, tags, and custom taxonomy terms.
+* New feature: Protection can now be applied to media.
+* New feature: Entire post types can now be protected (posts, pages, movies, etc).
+* New feature: Create specialized access denied pages for different areas of your site.
+
 = 1.4.3 =
 * Improved support for older PHP versions (5.1+)
 * Improved PHP requirement checks

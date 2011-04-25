@@ -70,7 +70,7 @@
             $outputHtml .= CTX_Helper::gen('select',array('id'=>'groups-available','name'=>'groups-available'),$group_avail_opts);
 
             $outputHtml .= sprintf('<input type="button" id="add_group_page" class="button-secondary action" value="%s" />',__('Add','contexture-page-security'));
-            $outputHtml .= sprintf('<h5>%s</h5>',__('Allowed Groups','contexture-page-security'));
+            $outputHtml .= sprintf('<h5>%s</h5>',__('Groups with Access','contexture-page-security'));
             $outputHtml .= '<div id="ctx-ps-page-group-list">';
 
 
