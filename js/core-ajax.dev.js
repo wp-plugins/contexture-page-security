@@ -147,7 +147,7 @@ CTXPS_Ajax.showSaveMsg = function(selector){
 }
 
 /**
- * SIDEBAR. Updates the security status of the page
+ * SIDEBAR. Updates the security status of a post/page
  */
 CTXPS_Ajax.toggleSecurity = function(){
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
@@ -191,6 +191,66 @@ CTXPS_Ajax.toggleSecurity = function(){
         }else{
             //If user cancelled, re-check the box
             jQuery('#ctx_ps_protectmy').attr('checked','checked');
+        }
+    }
+}
+
+/**
+ * SIDEBAR. Updates the security status of a taxonomy term
+ */
+CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id){
+
+
+    if(typeof(object_type)=="undefined"){
+        alert('Programming Error: Type was undefined. Changes not saved.');
+    }
+    if(typeof(object_id)=="undefined"){
+        object_id = parseInt(jQuery('#ctxps_object_id').val());
+    }
+
+
+    if(jQuery('#ctxps-cb-protect:checked').length !== 0){
+        //Turn security ON for this group
+        jQuery.get('admin-ajax.php',
+            {
+                action:      'ctxps_security_update',
+                setting:     'on',
+                object_type: object_type,
+                object_id:   object_id
+
+            },
+            function(response){ response = jQuery(response);
+                if(response.find('update_sec').attr('id') == '1'){
+                    jQuery("#ctxps-relationships-list").show(); //Show box that lists groups attached to content
+                    CTXPS_Ajax.showSaveMsg('#ctxps-relationships .hndle') //Show save message
+                }else{
+                    alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
+                }
+            },'xml'
+        );
+    }else{
+        if(confirm(ctxpsmsg.EraseSec)){
+            //Turn security OFF for this group
+            jQuery.get('admin-ajax.php',
+                {
+                    action:     'ctxps_security_update',
+                    setting:    'off',
+                    object_type: object_type,
+                    object_id:   object_id
+                },
+                function(response){
+                    response = jQuery(response);
+                    if(response.find('update_sec').attr('id') == '1'){
+                        jQuery("#ctxps-relationships").hide();
+                        CTXPS_Ajax.showSaveMsg('#ctxps-relationships .hndle')
+                    }else{
+                        alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
+                    }
+                },'xml'
+            );
+        }else{
+            //If user cancelled, re-check the box
+            jQuery('#ctxps-cb-protect').attr('checked','checked');
         }
     }
 }

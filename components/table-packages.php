@@ -103,7 +103,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
         $this->table_conf = array(
             'form_id'=>     '',                 //id value for the form (css-friendly id)
             'form_method'=> '',              //how to submit the form get/post
-            'list_id'=>     'pagetable',        //id value for the table (css-friendly id)
+            'list_id'=>     'ctxps-relationships',        //id value for the table (css-friendly id)
             'record_slug'=> 'term_group_rec',   //css-class-friendly slug for uniquely referring to records
             'bulk'=>        'false',            //set to true to include checkboxes (if false, bulk options will be disabled)
             'no_records'=>  __('No groups have been added yet.','contexture-page-security'), //HTML to show if no records are provided
