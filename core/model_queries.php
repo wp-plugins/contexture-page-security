@@ -38,7 +38,7 @@ class CTXPS_Queries{
 
         $sql_create_security = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
             `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
-            `sec_protect_type` varchar(10) NOT NULL default 'page' COMMENT 'What type of item is being protected? (page, post, category, etc)',
+            `sec_protect_type` varchar(10) NOT NULL default 'post' COMMENT 'What type of item is being protected? (post, term, media, archive, etc)',
             `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
             `sec_access_type` varchar(10) NOT NULL default 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
             `sec_access_id` bigint(20) NOT NULL COMMENT 'The id of the user, group, or role this pertains to.',
@@ -102,6 +102,13 @@ class CTXPS_Queries{
 
         /********* START UPGRADE PATH < 1.5 ***********/
         //termmeta table added. No other changes necessary.
+        $dbver = get_option("contexture_ps_db_version");
+        if($dbver == "" || (float)$dbver < 1.5){
+            //Default for posts/pages is now 'post' to correctly match WP conventions
+            $wpdb->query("ALTER TABLE `".$ctxpsdb->security."` ALTER COLUMN `sec_protect_type` default 'post'");
+            $wpdb->query("UPDATE `".$ctxpsdb->security."` SET `sec_protect_type`='post' WHERE `sec_protect_type`='page'");
+            update_option("contexture_ps_db_version", "1.5");
+        }
         /******** END UPGRADE PATH < 1.5 **************/
 
         //Check if our "Registered Users" group already exists
@@ -186,7 +193,7 @@ class CTXPS_Queries{
      * @param string $protection_type The type of protection being applied (group/user/role/etc)
      * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
      */
-    public static function add_security($content_id,$protection_id,$content_type='page',$protection_type='group'){
+    public static function add_security($content_id,$protection_id,$content_type='post',$protection_type='group'){
         global $wpdb, $ctxpsdb;
 
         return $wpdb->insert($ctxpsdb->security,
@@ -282,7 +289,7 @@ class CTXPS_Queries{
      * @param string $content_type Unused. Will tell PSC what type of content to protect.
      * @return mixed Either a boolean (false) if failed, or an int if succeeded (no rows affected)
      */
-    public static function delete_security($content_id='',$protection_id='',$content_type='page',$protection_type='group'){
+    public static function delete_security($content_id='',$protection_id='',$content_type='post',$protection_type='group'){
         global $wpdb, $ctxpsdb;
         $sql=false;
 
@@ -659,9 +666,26 @@ class CTXPS_Queries{
      */
     public static function get_groups_by_post($post_id,$security=false){
         global $wpdb,$ctxpsdb;
+        return self::get_groups_by_object('post',$post_id,$security);
+    }
+
+    /**
+     * Returns an array containing the groups attached to the specified content. This can be used
+     * to either return a "simple" group list (used in tables) or a "security" group list (which
+     * includes security info necessary to check permissions). Default is "simple" style list.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param string $object_type The object type to check. Such as "media", "term", or "post"
+     * @param integer $object_id The Tag_ID, post_id, etc of the content to get groups for (can be any content type that uses posts table)
+     * @param boolean $security If true, will return a 'protection' array (used for validating access). Default is false.
+     * @return array
+     */
+    public static function get_groups_by_object($object_type, $object_id, $security=false){
+        global $wpdb,$ctxpsdb;
 
         //Only continue if $post_id is a valid int
-        if(is_numeric($post_id) && !empty($post_id)){
+        if(is_numeric($object_id) && !empty($object_id)){
 
             //If this is a simple query, do this...
             if($security==false){
@@ -670,8 +694,10 @@ class CTXPS_Queries{
                     'SELECT * FROM `'.$ctxpsdb->security.'`
                         JOIN `'.$ctxpsdb->groups.'`
                             ON '.$ctxpsdb->security.'.sec_access_id = '.$ctxpsdb->groups.'.ID
-                        WHERE sec_protect_id = %s',
-                    $post_id
+                        WHERE sec_protect_type = %s
+                        AND sec_protect_id = %s',
+                    $object_type,
+                    $object_id
                 ));
 
             }else{
@@ -689,8 +715,10 @@ class CTXPS_Queries{
                     JOIN `'.$ctxpsdb->groups.'`
                         ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
                     WHERE `'.$ctxpsdb->security.'`.sec_protect_id = %s
+                    AND `'.$ctxpsdb->security.'`.sec_protect_type = %s
                 ',
-                 $post_id));
+                 $object_id,
+                 $object_type));
 
             }
 

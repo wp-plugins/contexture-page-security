@@ -1,4 +1,5 @@
-#ctx_ps_pagegroupoptions {display:none;}
+#ctx_ps_pagegroupoptions,
+#ctxps-relationships-list {display:none;}
 #ctx-ps-page-group-list > div {}
 #ctx-ps-page-group-list > div.inherited {color:silver;}
 #ctx-ps-page-group-list > div .removegrp {float:right;color:red;font-family:arial,helvetica,sans-serif;display:none;font-weight:bold;}

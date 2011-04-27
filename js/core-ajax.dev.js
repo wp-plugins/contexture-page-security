@@ -1,24 +1,47 @@
 //When DOM Ready...
 jQuery(function(){
-    jQuery('#groups-available') //On restrict-access sidebar AND edit-users page
+
+    //Set data on restrict-access sidebar AND edit-users page
+    jQuery('#groups-available')
         .data('options',jQuery('#groups-available').html())
         .children('.detach')
             .remove();
+
+    //Handle adding group to a page for post protection sidebar
     jQuery('#add_group_page').click(function(){
         CTXPS_Ajax.addGroupToPage()
     });
-    jQuery('#ctx_ps_protectmy').click(function(){
-        CTXPS_Ajax.toggleSecurity()
+
+    //Handle click for post protection sidebar
+    jQuery('#ctx_ps_sidebar_security #ctxps-cb-protect').click(function(){
+        //CTXPS_Ajax.toggleSecurity()
+        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctx_ps_sidebar_security h3.hndle');
     });
-    jQuery('label[for="ctx_ps_protectmy"]').click(function(){
+    //Handle click for post protection sidebar label
+    jQuery('#ctx_ps_sidebar_security label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
             alert(ctxpsmsg.NoUnprotect);
         }
     });
+
+    //Handle click for post protection sidebar
+    jQuery('#edittag #ctxps-cb-protect').click(function(){
+        //CTXPS_Ajax.toggleSecurity()
+        CTXPS_Ajax.toggleContentSecurity( 'term', parseInt( jQuery('#edittag input[name="tag_ID"]').val() ) );
+    });
+
+
+    //Handle adding user to a group on group edit page
     jQuery('#btn-add-grp-2-user').click(function(){
         CTXPS_Ajax.addGroupToUser()
     });
+
+    //Handle bulk-adding of users to groups on Users.php page
+    jQuery('#enrollit').click(function(){
+        CTXPS_Ajax.addBulkUsersToGroup();
+    });
+
     //Notify users if they are trying to remove site security (options.php)
     jQuery('#ad-protect-site:checked').click(function(){
         if(jQuery(this).filter(':checked').length===0){
@@ -26,6 +49,7 @@ jQuery(function(){
         }
         return true;
     });
+
     //Toggle visibility of page options (options.php)
     jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
 
@@ -65,6 +89,7 @@ jQuery(function(){
         }
     });
 
+
     //Toggle visibility of anon boxes with force redirect
     jQuery('#ad-msg-forcelogin, label[for="ad-msg-forcelogin"]').click(function(){
         var anon = jQuery('.ad-opt-anon'),
@@ -83,9 +108,7 @@ jQuery(function(){
         }
     });
 
-    jQuery('#enrollit').click(function(){
-        CTXPS_Ajax.addBulkUsersToGroup();
-    });
+
 
 });
 
@@ -156,11 +179,12 @@ CTXPS_Ajax.toggleSecurity = function(){
         //Turn security ON for this group
         jQuery.get('admin-ajax.php',
             {
-                action:     'ctxps_security_update',
-                setting:    'on',
-                postid:     post_id
+                action:        'ctxps_security_update',
+                setting:       'on',
+                object_type:   'post',
+                object_id:     post_id
             },
-            function(response){ response = jQuery(response);
+            function(response){response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
                     CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
@@ -174,9 +198,10 @@ CTXPS_Ajax.toggleSecurity = function(){
             //Turn security OFF for this group
             jQuery.get('admin-ajax.php',
                 {
-                    action:     'ctxps_security_update',
-                    setting:    'off',
-                    postid:     post_id
+                    action:        'ctxps_security_update',
+                    setting:       'off',
+                    object_type:   'post',
+                    object_id:     post_id
                 },
                 function(response){
                     response = jQuery(response);
@@ -196,18 +221,16 @@ CTXPS_Ajax.toggleSecurity = function(){
 }
 
 /**
- * SIDEBAR. Updates the security status of a taxonomy term
+ * SIDEBAR. Updates the security status of a taxonomy term or other type
  */
-CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id){
-
+CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector){
 
     if(typeof(object_type)=="undefined"){
         alert('Programming Error: Type was undefined. Changes not saved.');
     }
     if(typeof(object_id)=="undefined"){
-        object_id = parseInt(jQuery('#ctxps_object_id').val());
+        object_id = parseInt(jQuery('#ctxps-object-id').val());
     }
-
 
     if(jQuery('#ctxps-cb-protect:checked').length !== 0){
         //Turn security ON for this group
@@ -219,10 +242,12 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id){
                 object_id:   object_id
 
             },
-            function(response){ response = jQuery(response);
+            function(response){response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctxps-relationships-list").show(); //Show box that lists groups attached to content
-                    CTXPS_Ajax.showSaveMsg('#ctxps-relationships .hndle') //Show save message
+                    if(typeof(save_selector)!="undefined"){
+                        CTXPS_Ajax.showSaveMsg(save_selector) //Show save message
+                    }
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -241,8 +266,10 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id){
                 function(response){
                     response = jQuery(response);
                     if(response.find('update_sec').attr('id') == '1'){
-                        jQuery("#ctxps-relationships").hide();
-                        CTXPS_Ajax.showSaveMsg('#ctxps-relationships .hndle')
+                        jQuery("#ctxps-relationships-list").hide();
+                        if(typeof(save_loc)!="undefined"){
+                            CTXPS_Ajax.showSaveMsg(save_selector) //Show save message
+                        }
                     }else{
                         alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                     }

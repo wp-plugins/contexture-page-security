@@ -248,6 +248,7 @@ class CTXPS_Ajax {
      */
     public static function update_security(){
         global $wpdb;
+        $response = array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
         if(!current_user_can('edit_others_posts')){
@@ -260,22 +261,31 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        $response = array();
+        if(empty($_GET['object_type']) || empty($_GET['object_id'])){
+            //ERROR! - membership not found.
+            $response = new WP_Ajax_Response(array(
+                'what'=>    'update_sec',
+                'action'=>  'update_security',
+                'id'=>      new WP_Error('error',__('Object type or ID was not defined.','contexture-page-security'))
+            ));
+            $response->send();
+        }
+
         switch($_GET['setting']){
             case 'on':
                 $response = array(
                     'what'=>    'update_sec',
                     'action'=>  'update_security',
-                    'id'=>      add_post_meta($_GET['postid'],'ctx_ps_security','1'),
+                    'id'=>      add_metadata($_GET['object_type'], $_GET['object_id'], 'ctx_ps_security', '1', true),
                     'data'=>    __('Security enabled.','contexture-page-security')
                 );
                 break;
             case 'off':
-                if(CTXPS_Queries::delete_security($_GET['postid']) !== false){
+                if(CTXPS_Queries::delete_security($_GET['object_id']) !== false){
                     $response = array(
                         'what'=>    'update_sec',
                         'action'=>  'update_security',
-                        'id'=>      delete_post_meta($_GET['postid'],'ctx_ps_security'),
+                        'id'=>      delete_metadata($_GET['object_type'], $_GET['object_id'], 'ctx_ps_security'),
                         'data'=>    __('Security disabled.','contexture-page-security')
                     );
                 }else{

@@ -22,7 +22,7 @@ class CTXPS_App{
         foreach($tax_types as $tax){
             //Add fields to the taxonomy term edit form
             add_action( $tax.'_edit_form', array('CTXPS_Router','security_tax') );
-            //Add "fields to the taxonomy add form"General Settings" title to 
+            //Add "fields to the taxonomy add form"General Settings" title to
             add_action( $tax.'_edit_form', array('CTXPS_Components','render_taxonomy_protection_panel_pre') );
 
         }unset($tax);
@@ -84,7 +84,7 @@ class CTXPS_App{
         <script type="text/javascript">
             var ctxpsmsg = {
                 NoUnprotect : '<?php _e('You cannot unprotect this page. It is protected by a parent or ancestor.','contexture-page-security') ?>',
-                EraseSec : "<?php _e("This will completely erase this page's security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>",
+                EraseSec : "<?php _e("This will completely erase this content's security settings and make it accessible to the public. Continue?",'contexture-page-security') ?>",
                 RemoveGroup : '<?php _e('Are you sure you want to remove group "%s" from this page?','contexture-page-security') ?>',
                 RemovePage : '<?php _e('Are you sure you want to remove this group from %s ?','contexture-page-security') ?>',
                 RemoveUser : '<?php _e('Remove this user from the group?','contexture-page-security') ?>',

@@ -29,8 +29,8 @@
             $outputHtml .= sprintf('<input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="%s" />',$_GET['post']);
 
             //Build "Protect this page" label
-            $outputHtml .= CTX_Helper::wrap('<label for="ctx_ps_protectmy">',
-                sprintf('<input type="checkbox" id="ctx_ps_protectmy" name="ctx_ps_protectmy" %s %s />',
+            $outputHtml .= CTX_Helper::wrap('<label for="ctxps-cb-protect">',
+                sprintf('<input type="checkbox" id="ctxps-cb-protect" name="ctxps-cb-protect" %s %s />',
                     (!!$securityStatus)? 'checked="checked"' : '',
                     ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ) ? 'disabled="disabled"' : '')
                 .__(' Protect this page and its descendants','contexture-page-security')
@@ -47,7 +47,7 @@
             }
 
             //Start on "Available Groups" select box
-            $outputHtml .= sprintf('<div id="ctx_ps_pagegroupoptions" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;%s">',
+            $outputHtml .= sprintf('<div id="ctxps-relationships-list" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;%s">',
                 ( !!$securityStatus )?'display:block;':''
             );
 
@@ -78,7 +78,7 @@
 
 
             $outputHtml .= '      </div>'; //ctx-ps-page-group-list
-            $outputHtml .= '  </div>'; //ctx_ps_pagegroupoptions
+            $outputHtml .= '  </div>'; //ctxps-relationships-list
 
 
         }else{
