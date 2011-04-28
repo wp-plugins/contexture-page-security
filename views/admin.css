@@ -12,7 +12,8 @@
 option.cts-ps-system-group { font-weight:bold; }
 .ctx-ps-sidebar-group { padding-bottom:2px; }
 .ctx-ps-sidebar-group:hover { background:#FFFCE0; }
-#groups-available .detach { display:none; visibility:hidden; }
+#groups-available option.detach,
+#ctxps-add-group option.detach{ display:none; visibility:hidden; }
 
 .widefat th#protected { vertical-align:middle; width:30px; }
 .widefat td.protected { vertical-align:top; }

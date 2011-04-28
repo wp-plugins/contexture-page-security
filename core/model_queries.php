@@ -21,10 +21,10 @@ class CTXPS_Queries{
             `ID` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
             `group_title` varchar(40) NOT NULL COMMENT 'The name of the group',
             `group_description` text COMMENT 'A description of or notes about the group',
-            `group_creator` bigint(20) UNSIGNED default NULL COMMENT 'The id of the user who created the group',
-            `group_date` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
+            `group_creator` bigint(20) UNSIGNED DEFAULT NULL COMMENT 'The id of the user who created the group',
+            `group_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP COMMENT 'The datetime the group was created',
             `group_system_id` varchar(5) UNIQUE NULL COMMENT 'A unique system id for system groups',
-            `group_site_access` varchar(20) default 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full',
+            `group_site_access` varchar(20) DEFAULT 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full',
             PRIMARY KEY (`ID`)
         )",$ctxpsdb->groups);
 
@@ -38,12 +38,12 @@ class CTXPS_Queries{
 
         $sql_create_security = sprintf("CREATE TABLE IF NOT EXISTS `%s` (
             `ID` bigint(20) UNSIGNED NOT NULL auto_increment,
-            `sec_protect_type` varchar(10) NOT NULL default 'post' COMMENT 'What type of item is being protected? (post, term, media, archive, etc)',
+            `sec_protect_type` varchar(10) NOT NULL DEFAULT 'post' COMMENT 'What type of item is being protected? (post, term, media, archive, etc)',
             `sec_protect_id` bigint(20) unsigned NOT NULL COMMENT 'The id of the item (post, page, etc)',
-            `sec_access_type` varchar(10) NOT NULL default 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
+            `sec_access_type` varchar(10) NOT NULL DEFAULT 'group' COMMENT 'Specifies whether this security entry pertains to a user, group, or role.',
             `sec_access_id` bigint(20) NOT NULL COMMENT 'The id of the user, group, or role this pertains to.',
-            `sec_setting` varchar(10) NOT NULL default 'allow' COMMENT 'Set to either allow or restrict',
-            `sec_cascades` tinyint(1) NOT NULL default '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
+            `sec_setting` varchar(10) NOT NULL DEFAULT 'allow' COMMENT 'Set to either allow or restrict',
+            `sec_cascades` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'If true, these settings inherit down through the pages ancestors. If false (default), settings affect this page only.',
             PRIMARY KEY (`ID`)
         )",$ctxpsdb->security);
 
@@ -95,7 +95,7 @@ class CTXPS_Queries{
         /********* START UPGRADE PATH < 1.4 ***********/
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.4){
-            $wpdb->query("ALTER TABLE `".$ctxpsdb->groups."` ADD COLUMN `group_site_access` varchar(20) default 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full'");
+            $wpdb->query("ALTER TABLE `".$ctxpsdb->groups."` ADD COLUMN `group_site_access` varchar(20) DEFAULT 'none' COMMENT 'If site security is enabled, this dictates how much access this group has. Values: none,limited,full'");
             update_option("contexture_ps_db_version", "1.4");
         }
         /******** END UPGRADE PATH < 1.4 **************/
@@ -105,7 +105,7 @@ class CTXPS_Queries{
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.5){
             //Default for posts/pages is now 'post' to correctly match WP conventions
-            $wpdb->query("ALTER TABLE `".$ctxpsdb->security."` ALTER COLUMN `sec_protect_type` default 'post'");
+            $wpdb->query("ALTER TABLE `".$ctxpsdb->security."` ALTER COLUMN `sec_protect_type` DEFAULT 'post'");
             $wpdb->query("UPDATE `".$ctxpsdb->security."` SET `sec_protect_type`='post' WHERE `sec_protect_type`='page'");
             update_option("contexture_ps_db_version", "1.5");
         }

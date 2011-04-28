@@ -8,7 +8,7 @@
     //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
     if(!empty($_GET['post']) && is_numeric($_GET['post'])){
 
-        //Create an array of groups that are already attached to the page
+        //Create an array of groups that are already attached to the page (we want the id as index)
         $currentGroups = array();
         foreach(CTXPS_Queries::get_groups_by_post($_GET['post']) as $curGrp){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;

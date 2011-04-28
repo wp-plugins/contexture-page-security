@@ -100,6 +100,8 @@ class CTXPS_Table_Packages extends CTX_Tables{
      * CONFIG PACKAGE for groups attached to taxonomy terms
      */
     public function package_taxonomy_term_groups(){
+        global $avail_groups;
+
         $this->table_conf = array(
             'form_id'=>     '',                 //id value for the form (css-friendly id)
             'form_method'=> '',              //how to submit the form get/post
@@ -166,7 +168,12 @@ class CTXPS_Table_Packages extends CTX_Tables{
             )
         );
 
-        $list = CTXPS_Queries::get_groups();
+        if(empty($avail_groups)){
+            $list = CTXPS_Queries::get_groups();
+        }else{
+            $list = $avail_groups;
+        }
+
         foreach($list as $record){
             //Get edit URL
             $edit_url = admin_url("users.php?page=ps_groups_edit&groupid={$record->ID}");
