@@ -1106,6 +1106,40 @@ class CTXPS_Queries{
         return (bool)get_post_meta($post_id,'ctx_ps_security');
     }
 
+
+    /**
+     * Reformats group arrays to be more easily worked with in certain cases.
+     *
+     * @param array $group_array The group array to reformat.
+     * @param string $type The type of array you want back (default is 'names')
+     * @param string $id Which table column do you want to use as the array key?
+     * @return array The new array.
+     */
+    public static function process_group_array($group_array,$type='names',$id='ID'){
+        $temp_array = array();
+
+        switch($type){
+
+            case 'names':
+                foreach($group_array as $group){
+                    $temp_array[$group->$id] = $group->group_title;
+                }
+                break;
+
+            case 'full':
+                foreach($group_array as $group){
+                    $temp_array[$group->$id] = $group;
+                }
+                break;
+
+            default:
+                return false;
+                break;
+
+        }
+        return $temp_array;
+    }
+
 }
 }
 ?>

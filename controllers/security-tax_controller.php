@@ -25,44 +25,42 @@ $echo_tlist_style = ($protected_status) ? 'display:block;' : '';
 //Get list of all groups
 $all_groups = CTXPS_Queries::get_groups();
 
-//Get list of attached groups
+//Start with an empty array for $term_groups
 $term_groups = CTXPS_Queries::get_groups_by_object('term', $_REQUEST['tag_ID']);
 
-//Build list of unused groups by filtering attached groups out of all groups
-$avail_groups = $all_groups;
+//Build $term_groups manually so that the array index uses id (to make it easier to sort)
+$term_groups_simple = CTXPS_Queries::process_group_array($term_groups,'names');
 
+//Set default option
 $ddl_group_opts = sprintf( '<option value="0">%s</option>', $txt_addgroup );
-
-//Count the loop position
-$loop = 0;
 
 //Loop through all groups in the db to populate the drop-down list
 foreach($all_groups as $group){
     //Generate the option HTML, hiding it if it's already in our $currentGroups array
     $ddl_group_opts .= CTX_Helper::gen('option',
         array(
-            'class'=>( isset($term_groups[$loop]->ID) && $term_groups[$loop]->ID==$group->ID )?'detach':'',
+            'class'=>(isset($term_groups_simple[$group->ID])?'detach':''),
             'value'=>$group->ID
         ),$group->group_title
     );
-    if(isset($avail_groups[$group->ID])){
-        unset($avail_groups[$group->ID]);
-    }
-    ++$loop;
 }
 
 //Put all those options into the select box
 $selectbox = CTX_Helper::gen('select', array('id'=>'ctxps-add-group','name'=>'ctxps-add-group'), $ddl_group_opts);
 
 /*
-echo '<pre>';
+echo '<pre>
+$avail::::
+';
 print_r($avail_groups);
 echo '
 
+$term_groups::::
 ';
 print_r($term_groups);
 echo '
 
+$all_groups::::
 ';
 print_r($all_groups);
 echo '</pre>';
