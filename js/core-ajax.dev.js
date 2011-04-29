@@ -1,23 +1,26 @@
 //When DOM Ready...
 jQuery(function(){
 
-    //Set data on restrict-access sidebar AND edit-users page
-    jQuery('#groups-available')
-        .data('options',jQuery('#groups-available').html())
+    //Post sidebar & Edit users (AUTO)
+    //Save data for available group drop-down list
+    jQuery('#ctx_ps_sidebar_security #groups-available')
+        .data('options',jQuery('#ctx_ps_sidebar_security #groups-available').html())
         .children('.detach')
             .remove();
 
-    //Handle adding group to a page for post protection sidebar
-    jQuery('#add_group_page').click(function(){
-        CTXPS_Ajax.addGroupToPage()
-    });
+    //Term protection (AUTO)
+    //Save data for available group drop-down list
+    jQuery('#ctxps-add-group')
+        .data('options',jQuery('#ctxps-add-group').html())
+        .children('.detach')
+            .remove();
 
-    //Handle click for post protection sidebar
+    //Post sidebar - toggle security (cb)
     jQuery('#ctx_ps_sidebar_security #ctxps-cb-protect').click(function(){
         //CTXPS_Ajax.toggleSecurity()
         CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctx_ps_sidebar_security h3.hndle');
     });
-    //Handle click for post protection sidebar label
+    //Post sidebar - toggle security (cb label)
     jQuery('#ctx_ps_sidebar_security label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
@@ -25,24 +28,42 @@ jQuery(function(){
         }
     });
 
-    //Handle click for post protection sidebar
+    //Post sidebar - add group click handler
+    jQuery('#add_group_page').click(function(){
+        CTXPS_Ajax.addGroupToPage()
+    });
+
+
+    //Term protection - toggle security (cb)
     jQuery('#edittag #ctxps-cb-protect').click(function(){
         //CTXPS_Ajax.toggleSecurity()
         CTXPS_Ajax.toggleContentSecurity( 'term', parseInt( jQuery('#edittag input[name="tag_ID"]').val() ) );
     });
+    //Post sidebar - toggle security (cb label)
+    jQuery('#edittag label[for="ctxps-cb-protect"]').click(function(){
+        //If the checkbox is disabled, it's because an ancestor is protected - let the user know
+        if(jQuery('#ctxps-cb-protect:disabled').length > 0){
+            alert(ctxpsmsg.NoUnprotect);
+        }
+    });
+
+    //Term protection - add group click handler
+    jQuery('#ctxps-add-group-btn').click(function(){
+        CTXPS_Ajax.addGroupToPage()
+    });
 
 
-    //Handle adding user to a group on group edit page
+    //Group edit - Add user button
     jQuery('#btn-add-grp-2-user').click(function(){
         CTXPS_Ajax.addGroupToUser()
     });
 
-    //Handle bulk-adding of users to groups on Users.php page
+    //Users.php - Bulk-add users to group button
     jQuery('#enrollit').click(function(){
         CTXPS_Ajax.addBulkUsersToGroup();
     });
 
-    //Notify users if they are trying to remove site security (options.php)
+    //Options.php - Notify users if they are trying to remove site security
     jQuery('#ad-protect-site:checked').click(function(){
         if(jQuery(this).filter(':checked').length===0){
             return confirm(ctxpsmsg.SiteProtectDel);
@@ -50,7 +71,7 @@ jQuery(function(){
         return true;
     });
 
-    //Toggle visibility of page options (options.php)
+    //Options.php - Toggle visibility of page options (cb)
     jQuery('#ad-msg-enable, label[for="ad-msg-enable"]').click(function(){
 
         var optmsg = jQuery('.toggle-opts-ad-msg'),
@@ -90,7 +111,7 @@ jQuery(function(){
     });
 
 
-    //Toggle visibility of anon boxes with force redirect
+    //Options.php - Toggle visibility of anon boxes with force redirect (cb)
     jQuery('#ad-msg-forcelogin, label[for="ad-msg-forcelogin"]').click(function(){
         var anon = jQuery('.ad-opt-anon'),
             pages = jQuery('#ad-msg-enable:checked').length;
@@ -372,6 +393,48 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
 CTXPS_Ajax.addGroupToPage = function(){
     var group_id = parseInt(jQuery('#groups-available').val());
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
+    if(group_id!=0){
+        //alert("The group you want to add is: "+$groupid);
+        jQuery.get('admin-ajax.php',
+            {
+                action:     'ctxps_add_group_to_page',
+                groupid:    group_id,
+                postid:     post_id
+            },
+            function(data){
+                data = jQuery(data);
+                if(data.find('add_group').attr('id')=='1'){
+                    //Add group to the Allowed Groups list
+                    jQuery('#ctx-ps-page-group-list').html(data.find('supplemental html').text());
+
+                    //Update the select box and the attached group list
+                    var grpsAvail = jQuery('#groups-available');
+                    grpsAvail
+                        .html(grpsAvail.data('options'))
+                        .children('option[value="'+group_id+'"]')
+                            .addClass('detach')
+                        .end()
+                        .data('options',grpsAvail.html())
+                        .children('.detach')
+                            .remove();
+
+                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                }
+            },'xml'
+        );
+    }else{
+        alert(ctxpsmsg.NoGroupSel);
+    }
+}
+
+
+/**
+ * SIDEBAR. Adds a group to a page with security
+ */
+CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id){
+    var group_id = parseInt(jQuery('#groups-available').val());
+    var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
+
     if(group_id!=0){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
