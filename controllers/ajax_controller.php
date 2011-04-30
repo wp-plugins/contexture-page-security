@@ -3,6 +3,55 @@ if(!class_exists('CTXPS_Ajax')){
 class CTXPS_Ajax {
 
     /**
+     * GENERAL. Handles ajax requests to add a group to various content. When successful, generates HTML to be used in the "Allowed Groups"
+     * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     */
+    public static function add_group_to_content(){
+        global $wpdb, $ctxpsdb;
+
+        //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+        if(!current_user_can('edit_others_posts')){
+            //ERROR! If user isn't authorized, stop and return error
+            $response = new WP_Ajax_Response(array(
+                'what'=>    'add_group',
+                'action'=>  'add_group_to_page',
+                'id'=>      new WP_Error('error',__('User is not authorized.','contexture-page-security'))
+            ));
+            $response->send();
+        }
+
+        //Run the query
+        $result = CTXPS_Queries::add_security($_GET['content_id'], $_GET['group_id'], 'term');
+
+        if($result!==false){
+
+            //Get security info for the specified page and it's parents
+            $security = CTXPS_Security::get_protection( $_GET['content_id'], $_GET['content_type'] );
+
+            //Let's get the security settings
+            switch($_GET['content_type']){
+                case 'post':
+                    //SUCCESS!
+                    $response = new WP_Ajax_Response(array(
+                        'what'=>    'add_group',
+                        'action'=>  'add_group_to_page',
+                        'id'=>      1,
+                        'data'=>    __('Group added to content','contexture-page-security'),
+                        'supplemental'=>array('html'=>CTXPS_Components::render_sidebar_attached_groups($security,$_GET['postid']))
+                    ));
+                    break;
+                case 'term':
+                    break;
+                default:break;
+            }
+            $response->send();
+        }
+    }
+    
+    /**
      * SIDEBAR. Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
      * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
      *

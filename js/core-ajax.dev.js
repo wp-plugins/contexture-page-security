@@ -30,7 +30,17 @@ jQuery(function(){
 
     //Post sidebar - add group click handler
     jQuery('#add_group_page').click(function(){
-        CTXPS_Ajax.addGroupToPage()
+        
+        CTXPS_Ajax.addGroupToPage();
+        /*
+        CTXPS_Ajax.addGroupToContent(
+            jQuery('#groups-available').val(), //group id
+            'post',                            //content type
+            jQuery('#ctx_ps_post_id').val(),   //content id
+            '#ctx-ps-page-group-list',         //Where do we put the new html?
+            '#ctxps-add-group',                //What ddl do we update?
+            '#ctx_ps_sidebar_security h3.hndle'//Where do we show the save msg?
+        );*/
     });
 
 
@@ -49,7 +59,13 @@ jQuery(function(){
 
     //Term protection - add group click handler
     jQuery('#ctxps-add-group-btn').click(function(){
-        CTXPS_Ajax.addGroupToPage()
+        CTXPS_Ajax.addGroupToContent(
+            jQuery('#ctxps-add-group').val(),   //group id
+            'term',                             //content type
+            jQuery('#edittag input[name="tag_ID"]').val(), //content id
+            '#the-list-ctxps-relationships',    //Where do we put the new html?
+            '#ctxps-add-group'                  //What ddl do we update?
+        );
     });
 
 
@@ -431,26 +447,29 @@ CTXPS_Ajax.addGroupToPage = function(){
 /**
  * SIDEBAR. Adds a group to a page with security
  */
-CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id){
-    var group_id = parseInt(jQuery('#groups-available').val());
-    var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
+CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id,list_selector,ddl_selector,savemsg_selector){
 
-    if(group_id!=0){
+    if( typeof(group_id)!='undefined' && group_id!=0 ){
+        
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:     'ctxps_add_group_to_page',
-                groupid:    group_id,
-                postid:     post_id
+                action:     'ctxps_add_group_to_content',
+                group_id:    group_id,
+                content_type:content_type,
+                content_id:  content_id
             },
             function(data){
                 data = jQuery(data);
                 if(data.find('add_group').attr('id')=='1'){
-                    //Add group to the Allowed Groups list
-                    jQuery('#ctx-ps-page-group-list').html(data.find('supplemental html').text());
+                    
+                    if(typeof(list_selector)!="undefined"){
+                        //Add group to the Allowed Groups list
+                        jQuery(list_selector).html(data.find('supplemental html').text());
+                    }
 
                     //Update the select box and the attached group list
-                    var grpsAvail = jQuery('#groups-available');
+                    var grpsAvail = jQuery(ddl_selector);
                     grpsAvail
                         .html(grpsAvail.data('options'))
                         .children('option[value="'+group_id+'"]')
@@ -460,7 +479,10 @@ CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id){
                         .children('.detach')
                             .remove();
 
-                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    //Show save message
+                    if(typeof(savemsg_selector)!="undefined"){
+                        CTXPS_Ajax.showSaveMsg(savemsg_selector);
+                    }
                 }
             },'xml'
         );

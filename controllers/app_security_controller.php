@@ -288,12 +288,14 @@ class CTXPS_Security{
      *
      * @global wpdb $wpdb
      *
-     * @param int $post_id The id of the post to get permissions for.
+     * @param int $content_id The id of the post to get permissions for.
+     * @param string $content_type What type of content are we checking? Defaults to "all"
      * @return mixed Returns an array with all the required permissions to access this page. If no security is present, returns false.
      */
-    public static function get_protection($post_id){
+    public static function get_protection($content_id,$content_type='all'){
+        
         //If this branch isn't protected, just stop now and save all that processing power
-        if (!CTXPS_Queries::check_section_protection($post_id)){
+        if (!CTXPS_Queries::check_section_protection($content_id)){
             return false;
         }
 
@@ -302,7 +304,7 @@ class CTXPS_Security{
         $return = array();
         $group_array = array();
         /**Gets the parent id of the current page/post*/
-        $parent_id = get_post($post_id);
+        $parent_id = get_post($content_id);
         $parent_id = (integer)$parent_id->post_parent;
         /**Gets the ctx_ps_security data for this post (if it exists) - used to determine if this is the topmost secured page*/
         //$amisecure = get_post_meta($postid,'ctx_ps_security',true);
@@ -310,7 +312,7 @@ class CTXPS_Security{
         //1. If I am secure, get my groups
         //if(!empty($amisecure)){
             //Get Group relationship info for this page from wp_ps_security, join wp_posts on postid
-            $groups = CTXPS_Queries::get_groups_by_post($post_id, true);
+            $groups = CTXPS_Queries::get_groups_by_post($content_id, true);
 
             //If 0 results, dont do anything. Otherwise...
             if(!empty($groups)){
@@ -320,7 +322,7 @@ class CTXPS_Security{
             }
         //}
         //Add an item to the array. 'pageid'=>array('groupid','groupname')
-        $return[(string)$post_id] = $group_array;
+        $return[(string)$content_id] = $group_array;
         unset($group_array);
         //2. If I have a parent, recurse
             //Using our earlier results, check post_parent. If it's != 0 then recurse this function, adding the return value to $array
