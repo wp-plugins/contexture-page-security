@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.2
-Stable tag: 1.4.3
+Stable tag: 1.4.4
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -118,11 +118,8 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
-= 1.5.0 =
-* New feature: Protection can now be applied to categories, tags, and custom taxonomy terms.
-* New feature: Protection can now be applied to media.
-* New feature: Entire post types can now be protected (posts, pages, movies, etc).
-* New feature: Create specialized access denied pages for different areas of your site.
+= 1.4.4 =
+* Author page excerpts are now correctly filtered.
 
 = 1.4.3 =
 * Improved support for older PHP versions (5.1+)
