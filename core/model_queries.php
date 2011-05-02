@@ -685,11 +685,12 @@ class CTXPS_Queries{
         global $wpdb,$ctxpsdb;
 
         //Only continue if $post_id is a valid int
-        if(is_numeric($object_id) && !empty($object_id)){
+        if(is_numeric($object_id) && !empty($object_id) && !empty($object_type)){
 
             //If this is a simple query, do this...
             if($security==false){
 
+                //Only return security info
                 return $wpdb->get_results($wpdb->prepare(
                     'SELECT * FROM `'.$ctxpsdb->security.'`
                         JOIN `'.$ctxpsdb->groups.'`
@@ -700,30 +701,62 @@ class CTXPS_Queries{
                     $object_id
                 ));
 
+
+            //If we need full security arrays with heirarchal relationships...
             }else{
 
-                //If we need to include security info, use this...
-                return $wpdb->get_results($wpdb->prepare(
-                    'SELECT
-                        `'.$wpdb->posts.'`.id AS post_id,
-                        `'.$wpdb->posts.'`.post_parent AS post_parent_id,
-                        `'.$ctxpsdb->groups.'`.ID AS group_id,
-                        `'.$ctxpsdb->groups.'`.group_title
-                    FROM `'.$ctxpsdb->security.'`
-                    JOIN `'.$wpdb->posts.'`
-                        ON `'.$ctxpsdb->security.'`.sec_protect_id = `'.$wpdb->posts.'`.ID
-                    JOIN `'.$ctxpsdb->groups.'`
-                        ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
-                    WHERE `'.$ctxpsdb->security.'`.sec_protect_id = %s
-                    AND `'.$ctxpsdb->security.'`.sec_protect_type = %s
-                ',
-                 $object_id,
-                 $object_type));
+                //Which table do we join with?
+                switch($object_type){
+                    //Get full security info for posts (posts,pages,galleries,custom types, etc)
+                    case 'post':
+                        return $wpdb->get_results($wpdb->prepare(
+                            'SELECT
+                                `'.$wpdb->posts.'`.id AS post_id,
+                                `'.$wpdb->posts.'`.post_parent AS post_parent_id,
+                                `'.$ctxpsdb->groups.'`.ID AS group_id,
+                                `'.$ctxpsdb->groups.'`.group_title
+                            FROM `'.$ctxpsdb->security.'`
+                            JOIN `'.$wpdb->posts.'`
+                                ON `'.$ctxpsdb->security.'`.sec_protect_id = `'.$wpdb->posts.'`.ID
+                            JOIN `'.$ctxpsdb->groups.'`
+                                ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
+                            WHERE `'.$ctxpsdb->security.'`.sec_protect_id = %s
+                            AND `'.$ctxpsdb->security.'`.sec_protect_type = %s
+                        ',
+                         $object_id,
+                         $object_type));
+                        break;
+
+                    //Get full security info for taxonomy terms
+                    case 'term':
+                        return $wpdb->get_results($wpdb->prepare(
+                            'SELECT
+                                `'.$wpdb->terms.'`.term_id,
+                                `'.$wpdb->term_taxonomy.'`.parent AS term_parent_id,
+                                `'.$ctxpsdb->groups.'`.ID AS group_id,
+                                `'.$ctxpsdb->groups.'`.group_title
+                            FROM `'.$ctxpsdb->security.'`
+                            JOIN `'.$wpdb->terms.'`
+                                ON `'.$ctxpsdb->security.'`.sec_protect_id = `'.$wpdb->terms.'`.term_id
+                            JOIN `'.$wpdb->term_taxonomy.'`
+                                ON `'.$wpdb->terms.'`.term_id = `'.$wpdb->term_taxonomy.'`.term_id
+                            JOIN `'.$ctxpsdb->groups.'`
+                                ON `'.$ctxpsdb->security.'`.sec_access_id = `'.$ctxpsdb->groups.'`.ID
+                            WHERE `'.$ctxpsdb->security.'`.sec_protect_id = %s
+                            AND `'.$ctxpsdb->security.'`.sec_protect_type = %s
+                        ',
+                         $object_id,
+                         $object_type));
+                        break;
+
+                    //Object_type did not match anything
+                    default:break;
+                }
 
             }
 
         }
-        //If $post_id is improper, return false
+        //If $object_id or $object_type is improper, return false
         return false;
     }
 
@@ -841,6 +874,31 @@ class CTXPS_Queries{
             $parent_id = $parent_id->post_parent;
             if ($parent_id != 0)
                 return self::check_section_protection($parent_id);
+            else
+                return false;
+        }
+    }
+
+
+    /**
+     * Recursively checks security for this page/post and it's ancestors. Returns true
+     * if any of them are protected or false if none of them are protected.
+     *
+     * @global wpdb $wpdb
+     * @param int $term_id The id of the term to check security for.
+     * @param string $taxonomy The name of the taxonomy the term belongs to.
+     *
+     * @return bool If this page or it's ancestors has the "protected page" flag
+     */
+    public static function check_term_protection($term_id,$taxonomy){
+        global $wpdb;
+        if(get_metadata('term',$term_id,'ctx_ps_security')){
+            return true;
+        } else {
+            $parent_id = get_term($term_id,$taxonomy);//$wpdb->get_var($wpdb->prepare('SELECT * FROM '.$wpdb->terms.' JOIN '.$wpdb->term_taxonomy.' ON '.$wpdb->terms.'.term_id = '.$wpdb->term_taxonomy.'.term_id'));
+            $parent_id = $parent_id->parent;
+            if ($parent_id != 0)
+                return self::check_term_protection($parent_id);
             else
                 return false;
         }

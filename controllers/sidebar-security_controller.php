@@ -15,7 +15,7 @@
         }
 
         //Get array with security requirements for this page
-        $securityStatus = CTXPS_Security::get_protection( $_GET['post'] );
+        $securityStatus = CTXPS_Security::get_post_protection( $_GET['post'] );
 
         //Get options
         $dbOpts = get_option('contexture_ps_options');

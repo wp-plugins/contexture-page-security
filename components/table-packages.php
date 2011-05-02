@@ -11,12 +11,12 @@ class CTXPS_Table_Packages extends CTX_Tables{
      */
     public function package_associated_content(){
         $this->table_conf = array(
-            'form_id'=>'assoc_content_form', //id value for the form (css-friendly id)
-            'form_method'=>'get',   //how to submit the form get/post
-            'list_id'=>'pagetable',  //id value for the table (css-friendly id)
-            'record_slug'=>'assoc_cont_rec',//css-class-friendly slug for uniquely referring to records
-            'bulk'=>'false',       //set to true to include checkboxes (if false, bulk options will be disabled)
-            'no_records'=>__('No content is attached to this group.','contexture-page-security') //HTML to show if no records are provided
+            'form_id'       =>'assoc_content_form', //id value for the form (css-friendly id)
+            'form_method'   =>'get',   //how to submit the form get/post
+            'list_id'       =>'pagetable',  //id value for the table (css-friendly id)
+            'record_slug'   =>'assoc_cont_rec',//css-class-friendly slug for uniquely referring to records
+            'bulk'          =>'false',       //set to true to include checkboxes (if false, bulk options will be disabled)
+            'no_records'    =>__('No content is attached to this group.','contexture-page-security') //HTML to show if no records are provided
         );
         $this->bulk_conf = array();
 
@@ -29,22 +29,22 @@ class CTXPS_Table_Packages extends CTX_Tables{
              * width: Leave empty for auto. Specify a css width value to force
              */
             array(
-                'title'=>__('Title','contexture-page-security'),
-                'slug'=>'title',
-                'class'=>'col-first',
-                'width'=>''
+                'title' =>__('Title','contexture-page-security'),
+                'slug'  =>'title',
+                'class' =>'col-first',
+                'width' =>''
             ),
             array(
-                'title'=>'',
-                'slug'=>'protected',
-                'class'=>'',
-                'width'=>'50px'
+                'title' =>'',
+                'slug'  =>'protected',
+                'class' =>'',
+                'width' =>'50px'
             ),
             array(
-                'title'=>__('Type','contexture-page-security'),
-                'slug'=>'type',
-                'class'=>'col-last',
-                'width'=>'100px'
+                'title' =>__('Type','contexture-page-security'),
+                'slug'  =>'type',
+                'class' =>'col-last',
+                'width' =>'100px'
             )
         );
 
@@ -56,22 +56,22 @@ class CTXPS_Table_Packages extends CTX_Tables{
              * color: Set to any css color value to override default color
              */
             array(
-                'title'=>__('Edit','contexture-page-security'),
-                'tip'=>__('Edit this content.','contexture-page-security'),
-                'slug'=>'edit',
-                'color'=>''
+                'title' =>__('Edit','contexture-page-security'),
+                'tip'   =>__('Edit this content.','contexture-page-security'),
+                'slug'  =>'edit',
+                'color' =>''
             ),
             array(
-                'title'=>__('Remove','contexture-page-security'),
-                'tip'=>__('Detach this group from the content.','contexture-page-security'),
-                'slug'=>'trash',
-                'color'=>'red'
+                'title' =>__('Remove','contexture-page-security'),
+                'tip'   =>__('Detach this group from the content.','contexture-page-security'),
+                'slug'  =>'trash',
+                'color' =>'red'
             ),
             array(
-                'title'=>__('View','contexture-page-security'),
-                'tip'=>__('View this content on the website.','contexture-page-security'),
-                'slug'=>'view',
-                'color'=>''
+                'title' =>__('View','contexture-page-security'),
+                'tip'   =>__('View this content on the website.','contexture-page-security'),
+                'slug'  =>'view',
+                'color' =>''
                 )
         );
         //Get list of pages...
@@ -81,14 +81,14 @@ class CTXPS_Table_Packages extends CTX_Tables{
             $this->list_data[] = array(
                 'id'=>$page->sec_protect_id,
                 'columns'=>array(
-                    'title'=>sprintf('<strong><a href="%s">%s</a></strong>',admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),$page_title),
-                    'protected'=>'',
-                    'type'=>$page->post_type
+                    'title'     => sprintf('<strong><a href="%s">%s</a></strong>',admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),$page_title),
+                    'protected' => '',
+                    'type'      => $page->post_type
                 ),
                 'actions'=>array(
-                    'edit'=>admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
-                    'trash'=>array('onclick'=>sprintf('CTXPS_Ajax.removePageFromGroup(%1$s,jQuery(this));return false;',$page->sec_protect_id)),
-                    'view'=>get_permalink($page->ID)
+                    'edit'  => admin_url('post.php?post='.$page->sec_protect_id.'&action=edit'),
+                    'trash' => array('onclick'=>sprintf('CTXPS_Ajax.removePageFromGroup(%1$s,jQuery(this));return false;',$page->sec_protect_id)),
+                    'view'  => get_permalink($page->ID)
                 )
             );
 
@@ -167,8 +167,11 @@ class CTXPS_Table_Packages extends CTX_Tables{
             )
         );
 
+        //Get the tag id (can be called different things in different places)
+        $term_id = (isset($_REQUEST['tag_ID'])) ? $_REQUEST['tag_ID'] : $_REQUEST['content_id'];
+
         //Get a list of all the groups attached to this term
-        $list = CTXPS_Queries::get_groups_by_object('term', $_REQUEST['tag_ID']);
+        $list = CTXPS_Queries::get_groups_by_object('term', $term_id);
 
         foreach($list as $record){
             //Get edit URL
@@ -187,7 +190,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 //Define available actions
                 'actions'=>array(
                     'edit'=>$edit_url,
-                    'trash'=>$edit_url //array('onclick'=>'alert("test")')
+                    'trash'=>array('onclick'=>'CTXPS_Ajax.removeGroupFromTerm('.$record->ID.',jQuery(this))')
                 )
             );//End array add
 

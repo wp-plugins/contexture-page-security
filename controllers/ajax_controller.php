@@ -9,7 +9,7 @@ class CTXPS_Ajax {
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
      */
-    public static function add_group_to_content(){
+    public static function add_group_to_term(){
         global $wpdb, $ctxpsdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
@@ -17,40 +17,39 @@ class CTXPS_Ajax {
             //ERROR! If user isn't authorized, stop and return error
             $response = new WP_Ajax_Response(array(
                 'what'=>    'add_group',
-                'action'=>  'add_group_to_page',
+                'action'=>  'add_group_to_post',
                 'id'=>      new WP_Error('error',__('User is not authorized.','contexture-page-security'))
             ));
             $response->send();
         }
 
         //Run the query
-        $result = CTXPS_Queries::add_security($_GET['content_id'], $_GET['group_id'], 'term');
+        $result = CTXPS_Queries::add_security($_REQUEST['content_id'], $_REQUEST['group_id'], 'term');
 
         if($result!==false){
 
             //Get security info for the specified page and it's parents
-            $security = CTXPS_Security::get_protection( $_GET['content_id'], $_GET['content_type'] );
+            //$security = CTXPS_Security::get_term_protection( $_REQUEST['content_id'], $_REQUEST['taxonomy'] );
 
-            //Let's get the security settings
-            switch($_GET['content_type']){
-                case 'post':
-                    //SUCCESS!
-                    $response = new WP_Ajax_Response(array(
-                        'what'=>    'add_group',
-                        'action'=>  'add_group_to_page',
-                        'id'=>      1,
-                        'data'=>    __('Group added to content','contexture-page-security'),
-                        'supplemental'=>array('html'=>CTXPS_Components::render_sidebar_attached_groups($security,$_GET['postid']))
-                    ));
-                    break;
-                case 'term':
-                    break;
-                default:break;
-            }
+            $response = new WP_Ajax_Response(array(
+                'what'=>    'add_group',
+                'action'=>  'add_group_to_post',
+                'id'=>      1,
+                'data'=>    __('Group added to content','contexture-page-security'),
+                'supplemental'=> array( 'html'=>new CTXPS_Table_Packages( 'taxonomy_term_groups', false, true ) )
+            ));
+
             $response->send();
         }
     }
-    
+
+    /**
+     * Alias for add_group_to_post() for BC purposes.
+     */
+    public static function add_group_to_page(){
+        self::add_group_to_post();
+    }
+
     /**
      * SIDEBAR. Handles ajax requests to add a group to a page. When successful, generates HTML to be used in the "Allowed Groups"
      * section of the "Restrict Page" sidebar. Spits out XML response for AJAX use.
@@ -58,7 +57,7 @@ class CTXPS_Ajax {
      * @global wpdb $wpdb
      * @global CTXPSC_Tables $ctxpsdb
      */
-    public static function add_group_to_page(){
+    public static function add_group_to_post(){
         global $wpdb, $ctxpsdb;
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
@@ -66,27 +65,27 @@ class CTXPS_Ajax {
             //ERROR! If user isn't authorized, stop and return error
             $response = new WP_Ajax_Response(array(
                 'what'=>    'add_group',
-                'action'=>  'add_group_to_page',
+                'action'=>  'add_group_to_post',
                 'id'=>      new WP_Error('error',__('User is not authorized.','contexture-page-security'))
             ));
             $response->send();
         }
 
         //Run the query
-        $result = CTXPS_Queries::add_security($_GET['postid'],$_GET['groupid']);
+        $result = CTXPS_Queries::add_security( $_REQUEST['post_id'], $_REQUEST['group_id'] );
 
         if($result!==false){
 
             //Get security info for the specified page and it's parents
-            $security = CTXPS_Security::get_protection( $_GET['postid'] );
+            $security = CTXPS_Security::get_post_protection( $_REQUEST['post_id'] );
 
             //SUCCESS!
             $response = new WP_Ajax_Response(array(
                 'what'=>    'add_group',
-                'action'=>  'add_group_to_page',
+                'action'=>  'add_group_to_post',
                 'id'=>      1,
                 'data'=>    __('Group added to content','contexture-page-security'),
-                'supplemental'=>array('html'=>CTXPS_Components::render_sidebar_attached_groups($security,$_GET['postid']))
+                'supplemental'=>array( 'html'=>CTXPS_Components::render_sidebar_attached_groups( $security, $_REQUEST['post_id'] ) )
             ));
             $response->send();
         }
@@ -113,12 +112,12 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        if(CTXPS_Queries::delete_security($_GET['postid'],$_GET['groupid']) !== false){
+        if(CTXPS_Queries::delete_security($_REQUEST['post_id'],$_REQUEST['group_id']) !== false){
             //Which content do we need to render?
-            if(isset($_GET['requester']) && $_GET['requester']=='sidebar'){
-                $supplemental = array('html'=>CTXPS_Components::render_sidebar_attached_groups($_GET['postid']));//We need to regenerate sidebar content
+            if(isset($_REQUEST['requester']) && $_REQUEST['requester']=='sidebar'){
+                $supplemental = array('html'=>CTXPS_Components::render_sidebar_attached_groups($_REQUEST['post_id']));//We need to regenerate sidebar content
             }else{
-                $supplemental = array('html'=>new CTXPS_Table_Packages('associated_content',false,true)/*CTXPS_Components::render_content_by_group_list($_GET['groupid'])*/);//We need to regenerate list-table content
+                $supplemental = array('html'=>new CTXPS_Table_Packages('associated_content',false,true)/*CTXPS_Components::render_content_by_group_list($_REQUEST['group_id'])*/);//We need to regenerate list-table content
             }
 
             //SUCCESS!
@@ -135,6 +134,53 @@ class CTXPS_Ajax {
             $response = array(
                 'what'=>    'remove_group',
                 'action'=>  'remove_group_from_page',
+                'id'=>      new WP_Error('error',__('Query failed or content not in group.','contexture-page-security'))
+            );
+        }
+        $response = new WP_Ajax_Response($response);
+        $response->send();
+    }
+
+    /**
+     * Handles ajax requests to remove a group from a specified page
+     */
+    public static function remove_group_from_term(){
+        global $wpdb;
+
+        $response='';
+        $supplemental=array();
+
+        //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
+        if(!current_user_can('edit_others_posts')){
+            //ERROR! If user isn't authorized
+            $response = array(
+                'what'=>    'remove_group',
+                'action'=>  'remove_group_from_term',
+                'id'=>      new WP_Error('error',__('User is not authorized.','contexture-page-security'))
+            );
+            $response = new WP_Ajax_Response($response);
+            $response->send();
+        }
+
+        //NOT YET UPDATED BELOW THIS LINE!!!!!!
+        if( CTXPS_Queries::delete_security( $_REQUEST['content_id'], $_REQUEST['group_id'], 'term' )!==false ){
+            //Which content do we need to render?
+            $supplemental = array('html'=>new CTXPS_Table_Packages('taxonomy_term_groups',false,true));//We need to regenerate list-table content
+
+            //SUCCESS!
+            $response = array(
+                'what'=>    'remove_group',
+                'action'=>  'remove_group_from_term',
+                'id'=>      1,
+                'data'=>    __('Group removed from content','contexture-page-security'),
+                'supplemental'=>$supplemental
+            );
+        }
+        else{
+            //ERROR!
+            $response = array(
+                'what'=>    'remove_group',
+                'action'=>  'remove_group_from_term',
                 'id'=>      new WP_Error('error',__('Query failed or content not in group.','contexture-page-security'))
             );
         }
@@ -162,7 +208,7 @@ class CTXPS_Ajax {
         }
 
         //If this user doesn't exist
-        if(!CTXPS_Queries::check_user_exists($_GET['user_id'])){
+        if(!CTXPS_Queries::check_user_exists($_REQUEST['user_id'])){
             //ERROR!
             $response = new WP_Ajax_Response(array(
                 'what'=>    'enroll',
@@ -173,7 +219,7 @@ class CTXPS_Ajax {
         } else {
 
             //Make sure user isnt already in the group
-            if(CTXPS_Queries::check_membership($_GET['user_id'], $_GET['groupid'])){
+            if(CTXPS_Queries::check_membership($_REQUEST['user_id'], $_REQUEST['groupid'])){
                 //ERROR!
                 $response = new WP_Ajax_Response(array(
                     'what'=>    'enroll',
@@ -184,7 +230,7 @@ class CTXPS_Ajax {
             }
 
             //Add the user to the group
-            if(CTXPS_Queries::add_membership($_GET['user_id'], $_GET['groupid']) === false){
+            if(CTXPS_Queries::add_membership($_REQUEST['user_id'], $_REQUEST['groupid']) === false){
                 //ERROR!
                 $response = new WP_Ajax_Response(array(
                     'what'=>    'enroll',
@@ -199,7 +245,7 @@ class CTXPS_Ajax {
                     'action'=>  'add_group_to_user',
                     'id'=>      1,
                     'data'=>    __('User enrolled in group','contexture-page-security'),
-                    'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_GET['user_id'],'users'))//We need to regenerate table content
+                    'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_REQUEST['user_id'],'users'))//We need to regenerate table content
                 ));
                 $response->send();
             }
@@ -269,7 +315,7 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        if(!CTXPS_Queries::delete_membership($_GET['user_id'], $_GET['groupid'])){
+        if( !CTXPS_Queries::delete_membership( $_REQUEST['user_id'], $_REQUEST['groupid'] ) ){
             //Error - membership not found.
             $response = array(
                 'what'=>    'unenroll',
@@ -283,7 +329,7 @@ class CTXPS_Ajax {
                 'action'=>  'remove_group_from_user',
                 'id'=>      1,
                 'data'=>    __('User removed from group.','contexture-page-security'),
-                'supplemental'=>array('html'=>CTXPS_Components::render_group_list($_GET['user_id'],'users',current_user_can('promote_users'),($_GET['user_id']==$current_user->ID)))//We need to regenerate table content
+                'supplemental'=>array( 'html'=>CTXPS_Components::render_group_list( $_REQUEST['user_id'], 'users', current_user_can('promote_users'), ($_REQUEST['user_id']==$current_user->ID) ) )//We need to regenerate table content
             );
         }
         $response = new WP_Ajax_Response($response);
@@ -291,7 +337,7 @@ class CTXPS_Ajax {
     }
 
     /**
-     * Toggles page security on or off - removes all groups from page if toggled off
+     * Toggles page security on or off - removes all groups from post if toggled off
      *
      * @global wpdb $wpdb
      */
@@ -300,7 +346,7 @@ class CTXPS_Ajax {
         $response = array();
 
         //Added in 1.1 - ensures current user is an admin before processing, else returns an error (probably not necessary - but just in case...)
-        if(!current_user_can('edit_others_posts')){
+        if( !current_user_can('edit_others_posts') ){
             //ERROR! - membership not found.
             $response = new WP_Ajax_Response(array(
                 'what'=>    'update_sec',
@@ -310,7 +356,7 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        if(empty($_GET['object_type']) || empty($_GET['object_id'])){
+        if(empty($_REQUEST['object_type']) || empty($_REQUEST['object_id'])){
             //ERROR! - membership not found.
             $response = new WP_Ajax_Response(array(
                 'what'=>    'update_sec',
@@ -320,21 +366,21 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        switch($_GET['setting']){
+        switch($_REQUEST['setting']){
             case 'on':
                 $response = array(
                     'what'=>    'update_sec',
                     'action'=>  'update_security',
-                    'id'=>      add_metadata($_GET['object_type'], $_GET['object_id'], 'ctx_ps_security', '1', true),
+                    'id'=>      add_metadata($_REQUEST['object_type'], $_REQUEST['object_id'], 'ctx_ps_security', '1', true),
                     'data'=>    __('Security enabled.','contexture-page-security')
                 );
                 break;
             case 'off':
-                if(CTXPS_Queries::delete_security($_GET['object_id']) !== false){
+                if(CTXPS_Queries::delete_security($_REQUEST['object_id']) !== false){
                     $response = array(
                         'what'=>    'update_sec',
                         'action'=>  'update_security',
-                        'id'=>      delete_metadata($_GET['object_type'], $_GET['object_id'], 'ctx_ps_security'),
+                        'id'=>      delete_metadata($_REQUEST['object_type'], $_REQUEST['object_id'], 'ctx_ps_security'),
                         'data'=>    __('Security disabled.','contexture-page-security')
                     );
                 }else{
@@ -361,7 +407,7 @@ class CTXPS_Ajax {
         $added_users = 0;
 
         //ERROR - No users selected!
-        if(empty($_GET['users'])){
+        if(empty($_REQUEST['users'])){
             $response = new WP_Ajax_Response(array(
                 'what'=>    'bulk_enroll',
                 'action'=>  'add_bulk_users_to_group',
@@ -372,7 +418,7 @@ class CTXPS_Ajax {
         }
 
         //ERROR - No group selected
-        if(empty($_GET['group_id'])){
+        if(empty($_REQUEST['group_id'])){
             $response = new WP_Ajax_Response(array(
                 'what'=>    'bulk_enroll',
                 'action'=>  'add_bulk_users_to_group',
@@ -383,11 +429,11 @@ class CTXPS_Ajax {
         }
 
         //Loop through all selected users...
-        foreach($_GET['users'] as $user){
+        foreach($_REQUEST['users'] as $user){
             //Ensure users exists and is isnt already in group
-            if(CTXPS_Queries::check_user_exists($user['value']) && !CTXPS_Queries::check_membership($user['value'], $_GET['group_id'])){
+            if(CTXPS_Queries::check_user_exists($user['value']) && !CTXPS_Queries::check_membership($user['value'], $_REQUEST['group_id'])){
                 //Try to add user
-                if(CTXPS_Queries::add_membership($user['value'], $_GET['group_id'])){
+                if(CTXPS_Queries::add_membership($user['value'], $_REQUEST['group_id'])){
                     //increment for added users
                     $added_users++;
                 }

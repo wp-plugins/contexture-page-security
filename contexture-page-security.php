@@ -77,9 +77,13 @@ add_action('admin_init', array('CTXPS_App','admin_init'));
 add_action('init',array('CTXPS_App','localize_init'));
 
 //Handle Ajax for Edit Page/Post page
-add_action('wp_ajax_ctxps_add_group_to_page', array('CTXPS_Ajax','add_group_to_page'));
+add_action('wp_ajax_ctxps_add_group_to_post', array('CTXPS_Ajax','add_group_to_post'));
 add_action('wp_ajax_ctxps_remove_group_from_page', array('CTXPS_Ajax','remove_group_from_page'));
 add_action('wp_ajax_ctxps_security_update', array('CTXPS_Ajax','update_security'));
+
+//Handle Ajax for term page
+add_action('wp_ajax_ctxps_add_group_to_term', array('CTXPS_Ajax','add_group_to_term'));
+add_action('wp_ajax_ctxps_remove_group_from_term', array('CTXPS_Ajax','remove_group_from_term'));
 
 //Handle Ajax for Edit User page
 add_action('wp_ajax_ctxps_add_group_to_user', array('CTXPS_Ajax','add_group_to_user'));

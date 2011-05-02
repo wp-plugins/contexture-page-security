@@ -29,19 +29,7 @@ jQuery(function(){
     });
 
     //Post sidebar - add group click handler
-    jQuery('#add_group_page').click(function(){
-        
-        CTXPS_Ajax.addGroupToPage();
-        /*
-        CTXPS_Ajax.addGroupToContent(
-            jQuery('#groups-available').val(), //group id
-            'post',                            //content type
-            jQuery('#ctx_ps_post_id').val(),   //content id
-            '#ctx-ps-page-group-list',         //Where do we put the new html?
-            '#ctxps-add-group',                //What ddl do we update?
-            '#ctx_ps_sidebar_security h3.hndle'//Where do we show the save msg?
-        );*/
-    });
+    jQuery('#add_group_page').click(function(){ CTXPS_Ajax.addGroupToPage(); });
 
 
     //Term protection - toggle security (cb)
@@ -59,13 +47,7 @@ jQuery(function(){
 
     //Term protection - add group click handler
     jQuery('#ctxps-add-group-btn').click(function(){
-        CTXPS_Ajax.addGroupToContent(
-            jQuery('#ctxps-add-group').val(),   //group id
-            'term',                             //content type
-            jQuery('#edittag input[name="tag_ID"]').val(), //content id
-            '#the-list-ctxps-relationships',    //Where do we put the new html?
-            '#ctxps-add-group'                  //What ddl do we update?
-        );
+        CTXPS_Ajax.addGroupToTerm();
     });
 
 
@@ -413,9 +395,9 @@ CTXPS_Ajax.addGroupToPage = function(){
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:     'ctxps_add_group_to_page',
-                groupid:    group_id,
-                postid:     post_id
+                action:     'ctxps_add_group_to_post',
+                group_id:    group_id,
+                post_id:     post_id
             },
             function(data){
                 data = jQuery(data);
@@ -443,18 +425,71 @@ CTXPS_Ajax.addGroupToPage = function(){
     }
 }
 
+/**
+ * SIDEBAR. Adds a group to a protected term
+ */
+CTXPS_Ajax.addGroupToTerm = function(){
+
+    var group_id = jQuery('#ctxps-add-group').val(),
+        content_id = jQuery('#edittag input[name="tag_ID"]').val(),
+        taxonomy = jQuery('#edittag input[name="taxonomy"]').val(),
+        list_selector = '#the-list-ctxps-relationships',
+        ddl_selector = '#ctxps-add-group';
+
+    if( typeof(group_id)!='undefined' && group_id!=0 ){
+
+        //alert("The group you want to add is: "+$groupid);
+        jQuery.get('admin-ajax.php',
+            {
+                action:       'ctxps_add_group_to_term',
+                group_id:     group_id,
+                content_id:   content_id,
+                taxonomy:     taxonomy
+            },
+            function(data){
+                data = jQuery(data);
+                //Only do the following if we get back a successful result
+                if(data.find('add_group').attr('id')=='1'){
+
+                    //Add group to the Allowed Groups list
+                    if(typeof(list_selector)!="undefined"){
+                        jQuery(list_selector).html(data.find('supplemental html').text());
+                    }
+
+                    //Update the select box and the attached group list
+                    var grpsAvail = jQuery(ddl_selector);
+                    grpsAvail
+                        .html(grpsAvail.data('options'))
+                        .children('option[value="'+group_id+'"]')
+                            .addClass('detach')
+                        .end()
+                        .data('options',grpsAvail.html())
+                        .children('.detach')
+                            .remove();
+
+                    //Show save message
+                    if(typeof(savemsg_selector)!="undefined"){
+                        CTXPS_Ajax.showSaveMsg(savemsg_selector);
+                    }
+                }
+            },'xml'
+        );
+    }else{
+        alert(ctxpsmsg.NoGroupSel);
+    }
+}
 
 /**
- * SIDEBAR. Adds a group to a page with security
+ * SIDEBAR. Adds a group to any content with security
  */
 CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id,list_selector,ddl_selector,savemsg_selector){
 
     if( typeof(group_id)!='undefined' && group_id!=0 ){
-        
+
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
-                action:     'ctxps_add_group_to_content',
+                action:     'ctxps_add_group_to_term',
                 group_id:    group_id,
                 content_type:content_type,
                 content_id:  content_id
@@ -462,7 +497,7 @@ CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id,list_se
             function(data){
                 data = jQuery(data);
                 if(data.find('add_group').attr('id')=='1'){
-                    
+
                     if(typeof(list_selector)!="undefined"){
                         //Add group to the Allowed Groups list
                         jQuery(list_selector).html(data.find('supplemental html').text());
@@ -526,6 +561,54 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
                     });
 
                     CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                }else{
+                    alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
+                }
+            },'xml'
+        );
+    }
+}
+
+
+/**
+ * SIDEBAR. Removes a group from a term with security
+ */
+CTXPS_Ajax.removeGroupFromTerm = function(group_id,me){
+    var content_id = jQuery('#edittag input[name="tag_ID"]').val(),
+        taxonomy = jQuery('#edittag input[name="taxonomy"]').val(),
+        list_selector = '#the-list-ctxps-relationships',
+        ddl_selector = '#ctxps-add-group';
+
+    if( confirm( ctxpsmsg.RemoveGroup.replace( /%s/, me.parents('tr:first').children('td.column-name a:first').text() ) ) ){
+
+        //Submit the ajax request
+        jQuery.get('admin-ajax.php',
+            {
+                action:     'ctxps_remove_group_from_term',
+                group_id:    group_id,
+                content_id:  content_id,
+                taxonomy:    taxonomy
+            },
+            function(response){
+                response = jQuery(response);
+                //If request was successful
+                if(response.find('remove_group').attr('id') == '1'){
+                    //Update the groups drop-down by adding the group back in
+                    var grpsAvail = jQuery('#ctxps-add-group');
+                    grpsAvail
+                        .html(grpsAvail.data('options'))
+                        .children('option[value="'+group_id+'"]')
+                            .removeClass('detach')
+                        .end()
+                        .data('options',grpsAvail.html())
+                        .children('.detach')
+                            .remove();
+                    //Animate the removal of this row
+                    me.parents('tr:first').fadeOut(500,function(){
+                        jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
+                    });
+
+                    //CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }

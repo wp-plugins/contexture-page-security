@@ -55,7 +55,7 @@ class CTXPS_Shortcodes{
             'showempty' => 'true',
         ), $atts);
 
-        $requiredGroups = CTXPS_Security::get_protection( $post->ID );
+        $requiredGroups = CTXPS_Security::get_post_protection( $post->ID );
 
         //Set this var to count groups for current page
         $groupcount = 0;

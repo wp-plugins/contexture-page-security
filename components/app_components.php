@@ -329,7 +329,7 @@ class CTXPS_Components{
 
         if(is_numeric($security) || is_string($security)){
             //Get array with security requirements for this page
-            $security = CTXPS_Security::get_protection( $security );
+            $security = CTXPS_Security::get_post_protection( $security );
         }
 
         //Set this to 0, we are going to count the number of groups attached to this page next...
