@@ -91,7 +91,7 @@ class CTXPS_Security{
             return $content;
         }else{
             //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_search() )  && !is_admin()) {
+            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_search() || is_author() )  && !is_admin()) {
                 foreach($content as $post->key => $post->value){
 
                     /**Groups that this user is a member of*/
