@@ -13,9 +13,9 @@
     <!--<h4><?php echo $txt_subtitle_table ?></h4>-->
     <div class="tablenav top">
         <div class="alignleft actions">
-            <label class="screen-reader-text" for="ctxps-add-group"><?php echo $echo_addgroup ?></label>
+            <label class="screen-reader-text" for="ctxps-grouplist-ddl"><?php echo $echo_addgroup ?></label>
             <?php echo $selectbox; ?>
-            <input type="button" name="ctxps-add-group-btn" id="ctxps-add-group-btn" class="button-secondary" value="Add">
+            <input type="button" name="ctxps-grouplist-ddl-btn" id="ctxps-grouplist-ddl-btn" class="button-secondary" value="Add">
         </div>
     </div>
     <?php new CTXPS_Table_Packages('taxonomy_term_groups'); ?>

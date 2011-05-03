@@ -67,7 +67,7 @@
             }
 
             //Put all those options into the select box
-            $outputHtml .= CTX_Helper::gen('select',array('id'=>'groups-available','name'=>'groups-available'),$group_avail_opts);
+            $outputHtml .= CTX_Helper::gen('select',array('id'=>'ctxps-grouplist-ddl','name'=>'ctxps-grouplist-ddl'),$group_avail_opts);
 
             $outputHtml .= sprintf('<input type="button" id="add_group_page" class="button-secondary action" value="%s" />',__('Add','contexture-page-security'));
             $outputHtml .= sprintf('<h5>%s</h5>',__('Groups with Access','contexture-page-security'));

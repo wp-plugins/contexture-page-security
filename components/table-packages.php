@@ -74,8 +74,28 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 'color' =>''
                 )
         );
+        
+        //Get list of terms...
+        $termlist = CTXPS_Queries::get_content_by_group($_GET['groupid'],'term');
+        foreach($termlist as $term){
+            $term_edit_url = admin_url('edit-tags.php?action=edit&taxonomy='.$term->taxonomy.'&tag_ID='.$term->term_id);
+            $this->list_data[] = array(
+                'id'=>$term->sec_protect_id,
+                'columns'=>array(
+                    'title'     => sprintf('<strong><a href="%s">%s</a></strong>',$term_edit_url,$term->name),
+                    'protected' => '',
+                    'type'      => 'term'
+                ),
+                'actions'=>array(
+                    'edit'  => $term_edit_url,
+                    'trash' => array('onclick'=>sprintf('CTXPS_Ajax.removeTermFromGroup(%1$s,jQuery(this));return false;',$term->sec_protect_id)),
+                    'view'  => get_term_link($term->name, $term->taxonomy)
+                )
+            );
+        }unset($termlist,$term);
+
         //Get list of pages...
-        $pagelist = CTXPS_Queries::get_content_by_group($_GET['groupid']);
+        $pagelist = CTXPS_Queries::get_content_by_group($_GET['groupid'],'post');
         foreach($pagelist as $page){
             $page_title = $page->post_title;
             $this->list_data[] = array(
@@ -91,8 +111,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                     'view'  => get_permalink($page->ID)
                 )
             );
-
-        }
+        }unset($pagelist,$page);
 
     }
 
@@ -167,8 +186,11 @@ class CTXPS_Table_Packages extends CTX_Tables{
             )
         );
 
-        //Get the tag id (can be called different things in different places)
-        $term_id = (isset($_REQUEST['tag_ID'])) ? $_REQUEST['tag_ID'] : $_REQUEST['content_id'];
+        //Try to get a tag id (can be called different things in different places)
+        $term_id = 0;
+        if(isset($_REQUEST['tag_ID'])){ $term_id=$_REQUEST['tag_ID']; }
+        else if (isset($_REQUEST['content_id'])){ $term_id=$_REQUEST['content_id']; }
+        else if (isset($_REQUEST['object_id'])){ $term_id=$_REQUEST['object_id']; }
 
         //Get a list of all the groups attached to this term
         $list = CTXPS_Queries::get_groups_by_object('term', $term_id);

@@ -261,10 +261,17 @@ class CTX_Tables {
                 foreach($column_conf as $column){
                     //Main column content
                     $colhtml = '<div>'.$record['columns'][$column['slug']].'</div>';
-                    //If this is the first loop, load actions
-                    if(empty($table_conf['actions_col']) || ($count_cols===$table_conf['actions_col']) || $column['slug']===$table_conf['actions_col']){
-                        if(count($action_conf)>0){
-                            //***************** ACTIONS ********************
+
+                    //***************** ACTIONS ********************
+                    if(
+                        //If this is the column specified for the actions (by index or slug name), show actions here
+                        ( isset($table_conf['actions_col']) && ( $count_cols===$table_conf['actions_col'] || $column['slug']===$table_conf['actions_col'] ) )
+                        //Or if there is no override and this is the first column, show actions
+                        || ( empty($table_conf['actions_col']) && $count_cols===0 )
+                    ){
+
+                        if(count($action_conf)>0){ //If actions are defined
+
                             $colhtml .= '<div class="row-actions" style="white-space:nowrap">';
                             $count_acts = 0;
                             foreach($action_conf as $action){
@@ -292,12 +299,13 @@ class CTX_Tables {
                             }
                             $colhtml .= '</div>'; //Close out .row-actions
                         }
-                    }
+
+                    } //**************** End actions ****************
                     ++$count_cols;
 
                     //Wrap cell content in a <td>
                     $rowhtml .= sprintf('<td class="%1$s column-%1$s">%2$s</td>',$column['slug'],$colhtml);
-                }
+                } //**************** End columns ****************
 
                 //Wrap the $rowhtml content in a <tr>
                 $table .= sprintf(' <tr id="%1$s-%2$s" class="%4$s">%3$s</tr>',

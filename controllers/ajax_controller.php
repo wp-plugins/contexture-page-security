@@ -356,6 +356,7 @@ class CTXPS_Ajax {
             $response->send();
         }
 
+        //VALIDATE - ensure type and id are set
         if(empty($_REQUEST['object_type']) || empty($_REQUEST['object_id'])){
             //ERROR! - membership not found.
             $response = new WP_Ajax_Response(array(
@@ -366,7 +367,11 @@ class CTXPS_Ajax {
             $response->send();
         }
 
+
+        //PROCESS REQUEST....
         switch($_REQUEST['setting']){
+
+            //TURNING SECURITY ON
             case 'on':
                 $response = array(
                     'what'=>    'update_sec',
@@ -375,15 +380,23 @@ class CTXPS_Ajax {
                     'data'=>    __('Security enabled.','contexture-page-security')
                 );
                 break;
+
+            //TURNING SECURITY OFF
             case 'off':
-                if(CTXPS_Queries::delete_security($_REQUEST['object_id']) !== false){
+                if(CTXPS_Queries::delete_security($_REQUEST['object_id'],'',$_REQUEST['object_type']) !== false){
+                    //Successfully deleted security
                     $response = array(
                         'what'=>    'update_sec',
                         'action'=>  'update_security',
                         'id'=>      delete_metadata($_REQUEST['object_type'], $_REQUEST['object_id'], 'ctx_ps_security'),
                         'data'=>    __('Security disabled.','contexture-page-security')
                     );
+                    //If we disabled a term, return supplemental table data
+                    if($_REQUEST['object_type']=='term'){
+                        $response['supplemental'] = array( 'html'=>new CTXPS_Table_Packages( 'taxonomy_term_groups', false, true ) );
+                    }
                 }else{
+                    //Failed to delete security
                     $response = new WP_Ajax_Response(array(
                         'what'=>    'update_sec',
                         'action'=>  'update_security',
@@ -391,6 +404,8 @@ class CTXPS_Ajax {
                     ));
                 }
                 break;
+
+            //ERROR: UNSPECIFIED SETTING CHANGE
             default:
                 $response = new WP_Ajax_Response(array(
                     'what'=>    'update_sec',
@@ -399,6 +414,8 @@ class CTXPS_Ajax {
                 ));
                 break;
         }
+
+        //SEND THE RESULT
         $response = new WP_Ajax_Response($response);
         $response->send();
     }

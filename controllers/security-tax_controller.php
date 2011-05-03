@@ -46,7 +46,7 @@ foreach($all_groups as $group){
 }
 
 //Put all those options into the select box
-$selectbox = CTX_Helper::gen('select', array('id'=>'ctxps-add-group','name'=>'ctxps-add-group'), $ddl_group_opts);
+$selectbox = CTX_Helper::gen('select', array('id'=>'ctxps-grouplist-ddl','name'=>'ctxps-grouplist-ddl'), $ddl_group_opts);
 
 /*
 echo '<pre>

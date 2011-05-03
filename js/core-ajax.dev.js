@@ -3,25 +3,25 @@ jQuery(function(){
 
     //Post sidebar & Edit users (AUTO)
     //Save data for available group drop-down list
-    var grouplist_ddl = jQuery('#ctx_ps_sidebar_security, #groups-available');
+    var grouplist_ddl = jQuery('#ctxps-grouplist-ddl');
     grouplist_ddl.data('options',grouplist_ddl.html())
         .children('.detach')
             .remove();
 
     //Term protection (AUTO)
     //Save data for available group drop-down list
-    jQuery('#ctxps-add-group')
-        .data('options',jQuery('#ctxps-add-group').html())
+    jQuery('#ctxps-grouplist-ddl')
+        .data('options',jQuery('#ctxps-grouplist-ddl').html())
         .children('.detach')
             .remove();
 
     //Post sidebar - toggle security (cb)
-    jQuery('#ctx_ps_sidebar_security #ctxps-cb-protect').click(function(){
+    jQuery('#ctxps-grouplist-ddl #ctxps-cb-protect').click(function(){
         //CTXPS_Ajax.toggleSecurity()
-        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctx_ps_sidebar_security h3.hndle');
+        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctxps-grouplist-ddl h3.hndle');
     });
     //Post sidebar - toggle security (cb label)
-    jQuery('#ctx_ps_sidebar_security label[for="ctx_ps_protectmy"]').click(function(){
+    jQuery('#ctxps-grouplist-ddl label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
             alert(ctxpsmsg.NoUnprotect);
@@ -46,7 +46,7 @@ jQuery(function(){
     });
 
     //Term protection - add group click handler
-    jQuery('#ctxps-add-group-btn').click(function(){
+    jQuery('#ctxps-grouplist-ddl-btn').click(function(){
         CTXPS_Ajax.addGroupToTerm();
     });
 
@@ -206,7 +206,7 @@ CTXPS_Ajax.toggleSecurity = function(){
             function(response){response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
-                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle')
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -226,7 +226,7 @@ CTXPS_Ajax.toggleSecurity = function(){
                     response = jQuery(response);
                     if(response.find('update_sec').attr('id') == '1'){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
-                        CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle')
+                        CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle')
                     }else{
                         alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                     }
@@ -244,6 +244,8 @@ CTXPS_Ajax.toggleSecurity = function(){
  */
 CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector){
 
+    var groups_ddl = jQuery('#ctxps-grouplist-ddl');
+
     if(typeof(object_type)=="undefined"){
         alert('Programming Error: Type was undefined. Changes not saved.');
     }
@@ -251,6 +253,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
         object_id = parseInt(jQuery('#ctxps-object-id').val());
     }
 
+    //ENABLING SECURITY:
     if(jQuery('#ctxps-cb-protect:checked').length !== 0){
         //Turn security ON for this group
         jQuery.get('admin-ajax.php',
@@ -263,15 +266,32 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
             },
             function(response){response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
-                    jQuery("#ctxps-relationships-list").show(); //Show box that lists groups attached to content
+
+                    //Before we show the list, regenerate the content
+                    if(response.find('supplemental html').length!=0){
+                        switch(object_type){
+                            case 'term':
+                                jQuery('#the-list-ctxps-relationships').replaceWith(response.find('supplemental html').text());
+                                break;
+                            default:break;
+                        }
+                    }
+
+                    //Reveal the table with attached groups
+                    jQuery("#ctxps-relationships-list").show();
+
+                    //Show the saved message if the selector isn't empty
                     if(typeof(save_selector)!="undefined"){
                         CTXPS_Ajax.showSaveMsg(save_selector) //Show save message
                     }
                 }else{
+                    //If there was an error, show it
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
             },'xml'
         );
+
+    //DISABLING SECURITY
     }else{
         if(confirm(ctxpsmsg.EraseSec)){
             //Turn security OFF for this group
@@ -282,10 +302,28 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
                     object_type: object_type,
                     object_id:   object_id
                 },
-                function(response){
-                    response = jQuery(response);
+                function(response){ response = jQuery(response);
                     if(response.find('update_sec').attr('id') == '1'){
+
+                        //Hide the list of attached groups
                         jQuery("#ctxps-relationships-list").hide();
+
+                        //Before we show the list, regenerate the content
+                        if(response.find('supplemental html').length>0){
+                            switch(object_type){
+                                case 'term':
+                                    jQuery('#the-list-ctxps-relationships').replaceWith(response.find('supplemental html').text());
+                                    break;
+                                default:break;
+                            }
+                        }
+
+                        //Reset the ddl, if needed
+                        if(groups_ddl.length!=0){
+                            
+                        }
+
+                        //Show the saved message if the selector isn't empty
                         if(typeof(save_loc)!="undefined"){
                             CTXPS_Ajax.showSaveMsg(save_selector) //Show save message
                         }
@@ -305,7 +343,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
  * USER PROFILE MEMBERSHIP TABLE. Adds a group to a user
  */
 CTXPS_Ajax.addGroupToUser = function(){
-    var group_id = parseInt(jQuery('#groups-available').val());
+    var group_id = parseInt(jQuery('#ctxps-grouplist-ddl').val());
     var user_id = parseInt(jQuery('#ctx-group-user-id').val());
     if(group_id!=0){
         jQuery('#btn-add-grp-2-user').attr('disabled','disabled');
@@ -324,7 +362,7 @@ CTXPS_Ajax.addGroupToUser = function(){
                     jQuery('#grouptable > tbody').html(response.find('supplemental html').text());
 
                     //Load the select drop down list
-                    var groups_ddl = jQuery('#groups-available');
+                    var groups_ddl = jQuery('#ctxps-grouplist-ddl');
                     groups_ddl
                         .html(groups_ddl.data('options'))           //Set the ddl content = saved response
                         .children('option[value="'+group_id+'"]')   //Select option that we just added
@@ -361,7 +399,7 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
             if(response.find('unenroll').attr('id') == '1'){
 
                 //Use a cool fade effect to remove item from the list
-                var group_ddl = jQuery('#groups-available');
+                var group_ddl = jQuery('#ctxps-grouplist-ddl');
                 group_ddl
                     .html(group_ddl.data('options'))
                     .children('option[value="'+group_id+'"]')
@@ -389,7 +427,7 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
  * SIDEBAR. Adds a group to a page with security
  */
 CTXPS_Ajax.addGroupToPage = function(){
-    var group_id = parseInt(jQuery('#groups-available').val());
+    var group_id = parseInt(jQuery('#ctxps-grouplist-ddl').val());
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
     if(group_id!=0){
         //alert("The group you want to add is: "+$groupid);
@@ -406,7 +444,7 @@ CTXPS_Ajax.addGroupToPage = function(){
                     jQuery('#ctx-ps-page-group-list').html(data.find('supplemental html').text());
 
                     //Update the select box and the attached group list
-                    var grpsAvail = jQuery('#groups-available');
+                    var grpsAvail = jQuery('#ctxps-grouplist-ddl');
                     grpsAvail
                         .html(grpsAvail.data('options'))
                         .children('option[value="'+group_id+'"]')
@@ -416,7 +454,7 @@ CTXPS_Ajax.addGroupToPage = function(){
                         .children('.detach')
                             .remove();
 
-                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
                 }
             },'xml'
         );
@@ -430,11 +468,11 @@ CTXPS_Ajax.addGroupToPage = function(){
  */
 CTXPS_Ajax.addGroupToTerm = function(){
 
-    var group_id = jQuery('#ctxps-add-group').val(),
+    var group_id = jQuery('#ctxps-grouplist-ddl').val(),
         content_id = jQuery('#edittag input[name="tag_ID"]').val(),
         taxonomy = jQuery('#edittag input[name="taxonomy"]').val(),
         list_selector = '#the-list-ctxps-relationships',
-        ddl_selector = '#ctxps-add-group';
+        ddl_selector = '#ctxps-grouplist-ddl';
 
     if( typeof(group_id)!='undefined' && group_id!=0 ){
 
@@ -546,7 +584,7 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
                 //If request was successful
                 if(response.find('remove_group').attr('id') == '1'){
                     //Remove the row from the sidebar with a nifty fade effect, and add it back to the select box
-                    var grpsAvail = jQuery('#groups-available');
+                    var grpsAvail = jQuery('#ctxps-grouplist-ddl');
                     grpsAvail
                         .html(grpsAvail.data('options'))
                         .children('option[value="'+group_id+'"]')
@@ -560,7 +598,7 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
                         jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
                     });
 
-                    CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -576,8 +614,7 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
 CTXPS_Ajax.removeGroupFromTerm = function(group_id,me){
     var content_id = jQuery('#edittag input[name="tag_ID"]').val(),
         taxonomy = jQuery('#edittag input[name="taxonomy"]').val(),
-        list_selector = '#the-list-ctxps-relationships',
-        ddl_selector = '#ctxps-add-group';
+        listbody = jQuery('#the-list-ctxps-relationships');
 
     if( confirm( ctxpsmsg.RemoveGroup.replace( /%s/, me.parents('tr:first').children('td.column-name a:first').text() ) ) ){
 
@@ -593,22 +630,24 @@ CTXPS_Ajax.removeGroupFromTerm = function(group_id,me){
                 response = jQuery(response);
                 //If request was successful
                 if(response.find('remove_group').attr('id') == '1'){
+
                     //Update the groups drop-down by adding the group back in
-                    var grpsAvail = jQuery('#ctxps-add-group');
-                    grpsAvail
-                        .html(grpsAvail.data('options'))
+                    var grouplist_ddl = jQuery('#ctxps-grouplist-ddl');
+                    grouplist_ddl
+                        .html(grouplist_ddl.data('options'))
                         .children('option[value="'+group_id+'"]')
                             .removeClass('detach')
                         .end()
-                        .data('options',grpsAvail.html())
+                        .data('options',grouplist_ddl.html())
                         .children('.detach')
                             .remove();
+
                     //Animate the removal of this row
                     me.parents('tr:first').fadeOut(500,function(){
-                        jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
+                        listbody.replaceWith(response.find('supplemental html').text());
                     });
 
-                    //CTXPS_Ajax.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    //CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -638,7 +677,7 @@ CTXPS_Ajax.removePageFromGroup = function(post_id,me){
                         jQuery(this).parents('tbody:first')
                             .html(data.find('supplemental html').text());
                     });
-                    //CTXPS.showSaveMsg('#ctx_ps_sidebar_security h3.hndle');
+                    //CTXPS.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
                 }
                 else{
                     alert(ctxpsmsg.GeneralError+data.find('wp_error').text());

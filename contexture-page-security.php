@@ -30,6 +30,8 @@ define('CTXPSPATH',dirname(__FILE__));
 define('CTXPSDIR',basename(CTXPSPATH));
 /**The URL of the plugin directory*/
 define('CTXPSURL',plugin_dir_url(__FILE__));
+/**If true, use dev javascript - minify all js and set to false before release */
+define('CTXPSJSDEV',true);
 global $wpdb, $ctxpsdb;
 
 /************************** LOAD WP DEPENDENCIES ******************************/

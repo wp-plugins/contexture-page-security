@@ -768,16 +768,44 @@ class CTXPS_Queries{
      * @param type $group_id
      * @return type
      */
-    public static function get_content_by_group($group_id){
+    public static function get_content_by_group($group_id,$content_type='post'){
         global $wpdb,$ctxpsdb;
-        if(is_numeric($group_id) && !empty($group_id)){
-            return $wpdb->get_results($wpdb->prepare(
-                'SELECT * FROM `'.$ctxpsdb->security.'`
-                    JOIN `'.$wpdb->posts.'`
-                        ON `sec_protect_id` = `'.$wpdb->posts.'`.ID
-                    WHERE sec_access_id=%s',
-                $group_id
-            ));
+
+        //Validate
+        if(is_numeric($group_id) && !empty($group_id) && !empty($content_type)){
+
+            //Default return value (empty array)
+            $return = array();
+            switch($content_type){
+                case 'post':
+                    $return += $wpdb->get_results($wpdb->prepare(
+                        'SELECT * FROM `'.$ctxpsdb->security.'`
+                            JOIN `'.$wpdb->posts.'`
+                                ON `sec_protect_id` = `'.$wpdb->posts.'`.`ID`
+                            WHERE `sec_access_id`=%s
+                            AND `sec_protect_type`="post"',
+                        $group_id
+                    ));
+                    break;
+                case 'term':
+                    $return += $wpdb->get_results($wpdb->prepare(
+                        'SELECT * FROM `'.$ctxpsdb->security.'`
+                            JOIN `'.$wpdb->terms.'`
+                                ON `sec_protect_id` = `'.$wpdb->terms.'`.term_id
+                            JOIN `'.$wpdb->term_taxonomy.'`
+                                ON `'.$wpdb->term_taxonomy.'`.`term_id` = `'.$wpdb->terms.'`.`term_id`
+                            WHERE `sec_access_id`=%s
+                            AND `sec_protect_type`="term"',
+                        $group_id
+                    ));
+                    break;
+                default:
+                    return false;
+                    break;
+            }
+
+            return $return;
+
         }
         //If $group_id is improper, return false
         return false;

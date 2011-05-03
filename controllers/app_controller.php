@@ -15,7 +15,7 @@ class CTXPS_App{
         //Enable Restrict Access sidebar for ALL post types (will also automatically enable support for any custom types)
         $post_types = get_post_types();
         foreach($post_types as $type){
-            add_meta_box('ctx_ps_sidebar_security', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
+            add_meta_box('ctxps-grouplist-ddl', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
         }unset($type);
         //Enable Restrict Access options for taxonomy terms
         $tax_types = get_taxonomies();
@@ -95,7 +95,7 @@ class CTXPS_App{
                 SiteProtectDel : '<?php _e('This will completely erase site-level security settings and make it accessible to the public. Continue?','contexture-page-security') ?>'
             };
         </script>
-        <script type="text/javascript" src="<?php echo CTXPSURL.'js/core-ajax.dev.js' ?>"></script>
+        <script type="text/javascript" src="<?php echo CTXPSURL.'js/core-ajax'.((CTXPSJSDEV)?'.dev':'').'.js' ?>"></script>
         <?php
     }
 

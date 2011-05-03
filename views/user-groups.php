@@ -20,7 +20,7 @@
         <h3>Group Membership</h3>
         <?php if ( current_user_can('promote_users') ) { ?>
         <div class="tablenav ctx-ps-tablenav">
-            <select id="groups-available">
+            <select id="ctxps-grouplist-ddl">
                 <option value="0">-- Select -- </option>
                 <?php
                 //Loop through all groups in the db to populate the drop-down list
