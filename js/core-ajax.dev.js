@@ -3,8 +3,8 @@ jQuery(function(){
 
     //Post sidebar & Edit users (AUTO)
     //Save data for available group drop-down list
-    jQuery('#ctx_ps_sidebar_security #groups-available')
-        .data('options',jQuery('#ctx_ps_sidebar_security #groups-available').html())
+    var grouplist_ddl = jQuery('#ctx_ps_sidebar_security, #groups-available');
+    grouplist_ddl.data('options',grouplist_ddl.html())
         .children('.detach')
             .remove();
 
@@ -324,15 +324,15 @@ CTXPS_Ajax.addGroupToUser = function(){
                     jQuery('#grouptable > tbody').html(response.find('supplemental html').text());
 
                     //Load the select drop down list
-                    var grpsAvail = jQuery('#groups-available');
-                    grpsAvail
-                        .html(grpsAvail.data('options')) //Set the ddl content = saved response
-                        .children('option[value="'+group_id+'"]') //Select option that we just added
-                            .addClass('detach') //Add detach class to it
-                        .end() //Reselect ddl again
-                        .data('options',grpsAvail.html()) //Re-save the options html as response
-                        .children('.detach') //Select all detached options
-                            .remove(); //Remove them
+                    var groups_ddl = jQuery('#groups-available');
+                    groups_ddl
+                        .html(groups_ddl.data('options'))           //Set the ddl content = saved response
+                        .children('option[value="'+group_id+'"]')   //Select option that we just added
+                            .addClass('detach')                     //Add detach class to it
+                            .end()                                  //Reselect ddl again
+                        .data('options',groups_ddl.html())          //Re-save the options html as response
+                        .children('.detach')                        //Select all detached options
+                            .remove();                              //Remove them
 
                     jQuery('#btn-add-grp-2-user').removeAttr('disabled');
                     CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
@@ -361,13 +361,13 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
             if(response.find('unenroll').attr('id') == '1'){
 
                 //Use a cool fade effect to remove item from the list
-                var grpsAvail = jQuery('#groups-available');
-                grpsAvail
-                    .html(grpsAvail.data('options'))
+                var group_ddl = jQuery('#groups-available');
+                group_ddl
+                    .html(group_ddl.data('options'))
                     .children('option[value="'+group_id+'"]')
                         .removeClass('detach')
-                    .end()
-                    .data('options',grpsAvail.html())
+                        .end()
+                    .data('options',group_ddl.html())
                     .children('.detach')
                         .remove();
 
@@ -451,9 +451,9 @@ CTXPS_Ajax.addGroupToTerm = function(){
                 //Only do the following if we get back a successful result
                 if(data.find('add_group').attr('id')=='1'){
 
-                    //Add group to the Allowed Groups list
+                    //Update the table
                     if(typeof(list_selector)!="undefined"){
-                        jQuery(list_selector).html(data.find('supplemental html').text());
+                        jQuery(list_selector).replaceWith(data.find('supplemental html').text());
                     }
 
                     //Update the select box and the attached group list
