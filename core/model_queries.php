@@ -889,22 +889,52 @@ class CTXPS_Queries{
      * Recursively checks security for this page/post and it's ancestors. Returns true
      * if any of them are protected or false if none of them are protected.
      *
-     * @global wpdb $wpdb
+     * Note that this check automatically includes term checks. If a post includes a
+     * term that is protected, this function automatically returns
      *
-     * @return bool If this page or it's ancestors has the "protected page" flag
+     * @global wpdb $wpdb
+     * @param int $post_id The id of the post to check.
+     * @param bool $check_terms Optional. Set to false if you don't want to automatically check terms.
+     *
+     * @return bool Returns true if the page or one of it's ancestors has the "protected" flag
      */
-    public static function check_section_protection($post_id){
+    public static function check_section_protection($post_id,$check_terms=true){
         global $wpdb;
         if(get_post_meta($post_id,'ctx_ps_security')){
             return true;
         } else {
-            $parent_id = get_post($post_id);//$wpdb->get_var("SELECT post_parent FROM $wpdb->posts WHERE `ID` = $post_id");
+
+            //If $check_terms is true, also check term protection
+            if($check_terms){
+                if( self::check_post_term_protection($post_id) )
+                    return true;
+            }
+
+            $parent_id = get_post($post_id);
             $parent_id = $parent_id->post_parent;
             if ($parent_id != 0)
                 return self::check_section_protection($parent_id);
             else
                 return false;
         }
+    }
+
+
+    /**
+     * Checks whether a page is protected because it contains a protected term
+     * @param int $post_id
+     * @return bool
+     */
+    public static function check_post_term_protection($post_id){
+        //Get all the terms associated with this post
+        $terms = wp_get_post_terms($post_id);
+
+        foreach($terms as $term){
+            if()
+                return true;
+        }
+
+        return false;
     }
 
 
@@ -1178,18 +1208,46 @@ class CTXPS_Queries{
      * Checks this page/post's metadata to see if it's protected. Returns true if
      * protected false if not.
      *
+     * @param mixed $content_id The id (post, term) or slug (archive) of the content to check (leave empty if checking post within the_loop)
+     * @param string $content_type Optional. Must specify with $content_id if checking non-post protection. (ie: post, term, archive)
+     *
      * @return bool Whether this page has the "protected page" flag
      */
-    public static function check_protection($post_id=null){
+    public static function check_protection($content_id=null,$content_type='post'){
         global $post;
 
-        //If $post_id isnt set, try to set with current global post id
-        if(empty($post_id) && isset($post->ID)){ $post_id=$post->ID; }
+        switch($content_type){
+            case 'post':
+                //If $post_id isnt set, try to set with current global post id
+                if(empty($content_id) && isset($post->ID)){ $content_id=$post->ID; }
 
-        //Fail if the post id isn't numeric at this point
-        if(!is_numeric($post_id)){ return false; }
+                //Validate: Fail if the post id isn't numeric at this point
+                if(!is_numeric($content_id)){ return false; }
 
-        return (bool)get_post_meta($post_id,'ctx_ps_security');
+                //Return the metadata
+                return (bool)get_post_meta($content_id,'ctx_ps_security');
+                break;
+
+
+            case 'term':
+                //Validate: Fail if the post id isn't numeric at this point
+                if(!is_numeric($content_id)){ return false; }
+
+                //Return the metadata
+                return (bool)get_metadata('term',$content_id,'ctx_ps_security');
+
+                break;
+
+            case 'archive':
+                /* Don't know how this will be handled yet as archives have no numeric ids
+                 * Maybe create a "blank" entry in the grel table?
+                 */
+                break;
+
+            default:
+                return false;
+                break;
+        }
     }
 
 
