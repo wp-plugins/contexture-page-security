@@ -321,7 +321,7 @@ class CTXPS_Components{
 
     /**
      *
-     * @param type $security
+     * @param mixed $security Takes a security array, by default - but can provide an int or string (post_id) if security array isnt already available.
      * @param int $cur_page_id Optional. The current page id. If null, tries to get current page id from $_GET['post'] or $_GET['postid'].
      * @return string
      */

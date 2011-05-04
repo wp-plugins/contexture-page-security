@@ -1,6 +1,6 @@
 <?php
     /**
-     * This is still a disgraceful mess, but at least it's marginally more readable. Let's put this on hold till 1.5
+     * This is still a disgraceful mess, but at least it's marginally more readable. Let's put refactoring this on hold till 1.5 or 1.6
      */
     global $wpdb, $post;
     $outputHtml = '';
