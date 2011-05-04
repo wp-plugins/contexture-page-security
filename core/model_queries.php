@@ -695,6 +695,13 @@ class CTXPS_Queries{
                     unset($tgrp);
                 }
             }
+            //Get groups for ancestor terms as necessary
+            if(!empty($term->parent)){
+                foreach(self::get_groups_by_object('term',$term->parent) as $tgrp){
+                    $groups[$tgrp->group_id] = $tgrp->group_title;
+                    unset($tgrp);
+                }
+            }
             unset($term_groups);
         }
         return $groups;
@@ -925,11 +932,11 @@ class CTXPS_Queries{
      *
      * @global wpdb $wpdb
      * @param int $post_id The id of the post to check.
-     * @param bool $check_terms Optional. Set to false if you don't want to automatically check terms.
+     * @param bool $check_terms Optional. Set to true if you want to include term groups with the posts.
      *
      * @return bool Returns true if the page or one of it's ancestors has the "protected" flag
      */
-    public static function check_section_protection($post_id,$check_terms=true){
+    public static function check_section_protection($post_id,$check_terms=false){
         global $wpdb;
         if(get_post_meta($post_id,'ctx_ps_security')){
             return true;
