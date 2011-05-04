@@ -320,7 +320,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
 
                         //Reset the ddl, if needed
                         if(groups_ddl.length!=0){
-                            
+
                         }
 
                         //Show the saved message if the selector isn't empty
@@ -430,7 +430,7 @@ CTXPS_Ajax.addGroupToPage = function(){
     var group_id = parseInt(jQuery('#ctxps-grouplist-ddl').val());
     var post_id = parseInt(jQuery('#ctx_ps_post_id').val());
     if(group_id!=0){
-        //alert("The group you want to add is: "+$groupid);
+        //alert("The group you want to add is: "+group_id);
         jQuery.get('admin-ajax.php',
             {
                 action:     'ctxps_add_group_to_post',

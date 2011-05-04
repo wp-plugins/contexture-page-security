@@ -670,6 +670,37 @@ class CTXPS_Queries{
     }
 
     /**
+     * Returns an array containing a security list of groups attached to terms that
+     * are associated with the specified post.
+     *
+     * The returned data is usually used to automatically apply term groups to all
+     * posts associated with the term.
+     *
+     * @global wpdb $wpdb
+     * @param integer $post_id The post_id of the content to get groups for (can be any content type that uses posts table)
+     * @param boolean $security If true, will return a 'protection' array (used for validating access). Default is false.
+     * @global CTXPSC_Tables $ctxpsdb
+     */
+    public static function get_groups_by_post_terms($post_id){
+        global $wpdb,$ctxpsdb;
+        $terms = wp_get_post_terms($post_id);
+        $groups = array();
+        foreach($terms as $term){
+            //Note: Not necessary to check permission flag here - could result in extra queries
+            $term_groups = self::get_groups_by_object('term',$term->term_id,true);
+            if(!empty($term_groups)){
+                //If there are groups for a term, compile them into $groups as id=>title
+                foreach($term_groups as $tgrp){
+                    $groups[$tgrp->group_id] = $tgrp->group_title;
+                    unset($tgrp);
+                }
+            }
+            unset($term_groups);
+        }
+        return $groups;
+    }
+
+    /**
      * Returns an array containing the groups attached to the specified content. This can be used
      * to either return a "simple" group list (used in tables) or a "security" group list (which
      * includes security info necessary to check permissions). Default is "simple" style list.
@@ -687,10 +718,10 @@ class CTXPS_Queries{
         //Only continue if $post_id is a valid int
         if(is_numeric($object_id) && !empty($object_id) && !empty($object_type)){
 
-            //If this is a simple query, do this...
+            //If this is a simple query (no security info), do this...
             if($security==false){
 
-                //Only return security info
+                //Only return basic security info (no extended results)
                 return $wpdb->get_results($wpdb->prepare(
                     'SELECT * FROM `'.$ctxpsdb->security.'`
                         JOIN `'.$ctxpsdb->groups.'`
@@ -928,15 +959,26 @@ class CTXPS_Queries{
     public static function check_post_term_protection($post_id){
         //Get all the terms associated with this post
         $terms = wp_get_post_terms($post_id);
+        $recursive_check = false;
 
         foreach($terms as $term){
-            if()
+            if(get_metadata('term',$term->term_id,'ctx_ps_security')){
                 return true;
+            }else{
+                if( $term->parent!=0 ){
+                    if(self::check_term_protection($term->term_id))
+                        $recursive_check = true;
+                }
+            }
         }
 
+        //If any ancestor terms are protected, return true
+        if($recursive_check)
+            return true;
+
+        //If no protection flags were triggered, return false
         return false;
     }
-
 
     /**
      * Recursively checks security for this page/post and it's ancestors. Returns true
@@ -956,7 +998,7 @@ class CTXPS_Queries{
             $parent_id = get_term($term_id,$taxonomy);//$wpdb->get_var($wpdb->prepare('SELECT * FROM '.$wpdb->terms.' JOIN '.$wpdb->term_taxonomy.' ON '.$wpdb->terms.'.term_id = '.$wpdb->term_taxonomy.'.term_id'));
             $parent_id = $parent_id->parent;
             if ($parent_id != 0)
-                return self::check_term_protection($parent_id);
+                return self::check_term_protection($parent_id,$taxonomy);
             else
                 return false;
         }

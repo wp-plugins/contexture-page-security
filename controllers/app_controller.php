@@ -15,7 +15,7 @@ class CTXPS_App{
         //Enable Restrict Access sidebar for ALL post types (will also automatically enable support for any custom types)
         $post_types = get_post_types();
         foreach($post_types as $type){
-            add_meta_box('ctxps-grouplist-ddl', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
+            add_meta_box('ctxps-grouplist-box', 'Restrict Access', array('CTXPS_Router','sidebar_security'), $type, 'side', 'low');
         }unset($type);
         //Enable Restrict Access options for taxonomy terms
         $tax_types = get_taxonomies();

@@ -55,6 +55,9 @@ class CTXPS_Security{
             /**Groups required to access this page*/
             $pagereqs = CTXPS_Security::get_post_protection($post->ID);
 
+            /**Groups required to access terms attached to this page*/
+            //GOOGLE SECURITY CHECK FOR TERMS
+
             //wp_die(print_r($pagereqs,true));
 
             if(!!$pagereqs){
@@ -311,14 +314,13 @@ class CTXPS_Security{
      *
      * @global wpdb $wpdb
      *
-     * @param int $content_id The id of the post to get permissions for.
-     * @param string $content_type What type of content are we checking? Defaults to "all"
+     * @param int $post_id The id of the post to get permissions for.
      * @return mixed Returns an array with all the required permissions to access this page. If no security is present, returns false.
      */
-    public static function get_post_protection($content_id){
+    public static function get_post_protection($post_id){
 
         //If this branch isn't protected, just stop now and save all that processing power
-        if (!CTXPS_Queries::check_section_protection($content_id)){
+        if (!CTXPS_Queries::check_section_protection($post_id)){
             return false;
         }
 
@@ -327,27 +329,37 @@ class CTXPS_Security{
         $return = array();
         $group_array = array();
         /**Gets the parent id of the current page/post*/
-        $parent_id = get_post($content_id);
+        $parent_id = get_post($post_id);
         $parent_id = (integer)$parent_id->post_parent;
-        /**Gets the ctx_ps_security data for this post (if it exists) - used to determine if this is the topmost secured page*/
-        //$amisecure = get_post_meta($postid,'ctx_ps_security',true);
 
-        //1. If I am secure, get my groups
-        //if(!empty($amisecure)){
-            //Get Group relationship info for this page from wp_ps_security, join wp_posts on postid
-            $groups = CTXPS_Queries::get_groups_by_object('post',$content_id, true);
 
-            //If 0 results, dont do anything. Otherwise...
+        /** 1. If I am secure, get my groups ***********************************/
+
+            //Get Group relationship info for this page
+            $groups = CTXPS_Queries::get_groups_by_object('post',$post_id, true);
+
+            //If 0 results, dont do anything. Otherwise, re-sort into id=>name array
             if(!empty($groups)){
                 foreach($groups as $group){
                     $group_array[$group->group_id] = $group->group_title;
                 }unset($group);
+            } unset($groups);
+
+            //Now get groups for terms attached to the page
+            $groups = CTXPS_Queries::get_groups_by_post_terms($post_id);
+
+            //If 0 results, dont do anything. Otherwise, re-sort into id=>name array (ok to overwrite groups)
+            if(!empty($groups)){
+                $group_array += $groups;
             }
-        //}
+
         //Add an item to the array. 'pageid'=>array('groupid','groupname')
-        $return[(string)$content_id] = $group_array;
+        $return[(string)$post_id] = $group_array;
         unset($group_array);
-        //2. If I have a parent, recurse
+
+
+        /** 2. If I have a parent, recurse  ************************************/
+
             //Using our earlier results, check post_parent. If it's != 0 then recurse this function, adding the return value to $array
             if($parent_id != 0){
                 //$recursedArray = CTXPS_Security::get_protection($parentid);
@@ -357,6 +369,7 @@ class CTXPS_Security{
                   $return += $parent_array;
                 }
             }
+
 
         //3. Return the completed $array
         return $return;
