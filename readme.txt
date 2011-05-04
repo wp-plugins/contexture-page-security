@@ -118,6 +118,9 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.4.5 =
+* Bug fix
+
 = 1.4.4 =
 * Author page excerpts are now correctly filtered.
 
