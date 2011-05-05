@@ -335,6 +335,7 @@ class CTXPS_Components{
         //Set this to 0, we are going to count the number of groups attached to this page next...
         $groupcount = 0;
         $return = '';
+        $termGroups = array();
 
         //If $cur_page_id isn't set, try to get the value from the querystring
         if(empty($cur_page_id)){
@@ -348,11 +349,16 @@ class CTXPS_Components{
                 $cur_page_id = $_GET['postid'];
             }
         }
+        
+        //Fetch term groups, if we have a page id
+        if(!empty($cur_page_id))
+            $termGroups = CTXPS_Queries::get_groups_by_post_terms($cur_page_id,true);
+        
 
         //Count the number of groups attached to this page (including inherited groups)
         if(!!$security){
             foreach($security as $securityGroups){
-                $groupcount = $groupcount+count($securityGroups);
+                $groupcount = $groupcount+count($securityGroups)+count($termGroups);
             }
         }
 
@@ -372,6 +378,10 @@ class CTXPS_Components{
                         $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
                     }
                 }
+            }
+                        
+            foreach($termGroups as $tgroup){
+                $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$tgroup->group_title.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$tgroup->group_id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.get_term_link($tgroup->term_id, $tgroup->taxonomy).'" >'.__('term','contexture-page-security').'</a></div>';
             }
         }
         return $return;

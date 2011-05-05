@@ -16,12 +16,12 @@ jQuery(function(){
             .remove();
 
     //Post sidebar - toggle security (cb)
-    jQuery('#ctxps-grouplist-ddl #ctxps-cb-protect').click(function(){
+    jQuery('#ctxps-grouplist-box #ctxps-cb-protect').click(function(){
         //CTXPS_Ajax.toggleSecurity()
-        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctxps-grouplist-ddl h3.hndle');
+        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctxps-grouplist-box h3.hndle');
     });
     //Post sidebar - toggle security (cb label)
-    jQuery('#ctxps-grouplist-ddl label[for="ctx_ps_protectmy"]').click(function(){
+    jQuery('#ctxps-grouplist-box label[for="ctx_ps_protectmy"]').click(function(){
         //If the checkbox is disabled, it's because an ancestor is protected - let the user know
         if(jQuery('#ctx_ps_protectmy:disabled').length > 0){
             alert(ctxpsmsg.NoUnprotect);
@@ -206,7 +206,7 @@ CTXPS_Ajax.toggleSecurity = function(){
             function(response){response = jQuery(response);
                 if(response.find('update_sec').attr('id') == '1'){
                     jQuery("#ctx_ps_pagegroupoptions").show();
-                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle')
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-box h3.hndle')
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -226,7 +226,7 @@ CTXPS_Ajax.toggleSecurity = function(){
                     response = jQuery(response);
                     if(response.find('update_sec').attr('id') == '1'){
                         jQuery("#ctx_ps_pagegroupoptions").hide();
-                        CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle')
+                        CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-box h3.hndle')
                     }else{
                         alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                     }
@@ -454,7 +454,7 @@ CTXPS_Ajax.addGroupToPage = function(){
                         .children('.detach')
                             .remove();
 
-                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-box h3.hndle');
                 }
             },'xml'
         );
@@ -598,7 +598,7 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
                         jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
                     });
 
-                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
+                    CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-box h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -647,7 +647,7 @@ CTXPS_Ajax.removeGroupFromTerm = function(group_id,me){
                         listbody.replaceWith(response.find('supplemental html').text());
                     });
 
-                    //CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
+                    //CTXPS_Ajax.showSaveMsg('#ctxps-grouplist-box h3.hndle');
                 }else{
                     alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
                 }
@@ -677,7 +677,7 @@ CTXPS_Ajax.removePageFromGroup = function(post_id,me){
                         jQuery(this).parents('tbody:first')
                             .html(data.find('supplemental html').text());
                     });
-                    //CTXPS.showSaveMsg('#ctxps-grouplist-ddl h3.hndle');
+                    //CTXPS.showSaveMsg('#ctxps-grouplist-box h3.hndle');
                 }
                 else{
                     alert(ctxpsmsg.GeneralError+data.find('wp_error').text());

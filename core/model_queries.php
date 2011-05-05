@@ -670,7 +670,7 @@ class CTXPS_Queries{
     }
 
     /**
-     * Returns an array containing a security list of groups attached to terms that
+     * Returns a flat array containing a security list of groups attached to terms that
      * are associated with the specified post.
      *
      * The returned data is usually used to automatically apply term groups to all
@@ -678,31 +678,68 @@ class CTXPS_Queries{
      *
      * @global wpdb $wpdb
      * @param integer $post_id The post_id of the content to get groups for (can be any content type that uses posts table)
-     * @param boolean $security If true, will return a 'protection' array (used for validating access). Default is false.
+     * @param boolean $inc_terms Optional. If true, will return a jagged array containing group & term info. Default is false.
      * @global CTXPSC_Tables $ctxpsdb
      */
-    public static function get_groups_by_post_terms($post_id){
+    public static function get_groups_by_post_terms($post_id,$inc_terms=false){
         global $wpdb,$ctxpsdb;
-        $terms = wp_get_post_terms($post_id);
+              
         $groups = array();
+        $terms = array();
+                
+        /******* Build a list of terms, using all taxonomies *******************/
+        foreach(get_post_taxonomies($post_id) as $tax){
+            //On each loop, add terms to same array
+            $terms = array_merge(wp_get_post_terms($post_id,$tax),$terms);
+        }
+        
+        
+        /******* Use terms to find associated groups ***************************/
         foreach($terms as $term){
+            
             //Note: Not necessary to check permission flag here - could result in extra queries
             $term_groups = self::get_groups_by_object('term',$term->term_id,true);
+            
+            /*GOOGLE
+            if(!empty($term_groups))
+                wp_die('<pre>'.print_r($term_groups,true).'</pre><pre>'.print_r($term,true).'</pre>');
+            */
+            
             if(!empty($term_groups)){
                 //If there are groups for a term, compile them into $groups as id=>title
                 foreach($term_groups as $tgrp){
-                    $groups[$tgrp->group_id] = $tgrp->group_title;
+                    
+                    
+                    //ARGH! Where is this going wrong?
+                    print_r($tgrp,true);
+                    echo '<p/>';
+                    
+                    if($inc_terms){
+                        $groups[$tgrp->group_id] = $tgrp->group_title;
+                    }else{
+                        $groups[] = array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
+                    }
                     unset($tgrp);
                 }
             }
+            
+            die();
+
+            
             //Get groups for ancestor terms as necessary
+            /*
             if(!empty($term->parent)){
                 foreach(self::get_groups_by_object('term',$term->parent) as $tgrp){
-                    $groups[$tgrp->group_id] = $tgrp->group_title;
+                    if($inc_terms){
+                        $groups[$tgrp->group_id] = $tgrp->group_title;
+                    }else{
+                        $groups[] = array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
+                    }
                     unset($tgrp);
                 }
             }
             unset($term_groups);
+            */
         }
         return $groups;
     }
@@ -723,10 +760,10 @@ class CTXPS_Queries{
         global $wpdb,$ctxpsdb;
 
         //Only continue if $post_id is a valid int
-        if(is_numeric($object_id) && !empty($object_id) && !empty($object_type)){
+        if(!empty($object_id) && is_numeric($object_id) && !empty($object_type)){
 
             //If this is a simple query (no security info), do this...
-            if($security==false){
+            if($security===false){
 
                 //Only return basic security info (no extended results)
                 return $wpdb->get_results($wpdb->prepare(
@@ -766,10 +803,12 @@ class CTXPS_Queries{
                         break;
 
                     //Get full security info for taxonomy terms
-                    case 'term':
+                    case 'term':                        
                         return $wpdb->get_results($wpdb->prepare(
                             'SELECT
                                 `'.$wpdb->terms.'`.term_id,
+                                `'.$wpdb->terms.'`.name AS term_name,
+                                `'.$wpdb->term_taxonomy.'`.taxonomy,
                                 `'.$wpdb->term_taxonomy.'`.parent AS term_parent_id,
                                 `'.$ctxpsdb->groups.'`.ID AS group_id,
                                 `'.$ctxpsdb->groups.'`.group_title

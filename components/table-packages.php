@@ -75,7 +75,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 )
         );
         
-        //Get list of terms...
+        //****** GET & SHOW TERMS **************************************************
         $termlist = CTXPS_Queries::get_content_by_group($_GET['groupid'],'term');
         foreach($termlist as $term){
             $term_edit_url = admin_url('edit-tags.php?action=edit&taxonomy='.$term->taxonomy.'&tag_ID='.$term->term_id);
@@ -94,7 +94,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
             );
         }unset($termlist,$term);
 
-        //Get list of pages...
+        //****** GET & SHOW POSTS *************************************************
         $pagelist = CTXPS_Queries::get_content_by_group($_GET['groupid'],'post');
         foreach($pagelist as $page){
             $page_title = $page->post_title;
@@ -207,7 +207,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                     'id'=>$record->ID,
                     'name'=>sprintf('<strong><a href="%s">%s</a></strong>',$edit_url,$record->group_title),
                     'description'=>$record->group_description,
-                    'users'=>''//CTXPS_Queries::count_members($record->ID)
+                    'users'=>CTXPS_Queries::count_members($record->ID)
                 ),
                 //Define available actions
                 'actions'=>array(
