@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.2
-Stable tag: 1.4.3
+Stable tag: 1.4.5
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -21,6 +21,7 @@ PSC is created to be simple, yet powerful - and is designed to integrate seamles
 = Features =
 1. Easy to use and integrates seamlessly with WordPress.
 1. Restrict your ENTIRE website (use WordPress as an intranet)!
+1. Restrict categories, tags, or custom taxonomies!
 1. Subscription support! Set expiration dates for memberships.
 1. Create customized "Access Denied" pages!
 1. Fully Ajax-loaded! All your security updates are saved in real time!
@@ -72,13 +73,11 @@ PSC has only been tested with WordPress 3.0 and higher. It's possible that it ma
 
 = How does "Protect Entire Site" Work? =
 
-We added this option specifically for those who want to create private, intranet-like sites. When this option is enabled, only groups that you approve will be able to access any part of the website. Anonymous users are automatically denied access, while users who are logged in have their group permissions checked.
+This option is great for those who want to create private, intranet-like websites. When this option is enabled, only registered users will be able to access any part of the website while unauthenticated users are automatically denied access or redirected to the login screen.
 
-It's important to remember that ALL OTHER SECURITY RESTRICTIONS are still applied. For instance, if I am in a group with site access, but try to access protected content that isn't attached to my group, I will STILL be denied access.
+Best of all, ALL SECURITY RESTRICTIONS you have created are still in effect, even if a user is registered. For instance, if a registered user (who has site-level access) tries to access content not enabled for their group, they will be denied access (just like normal).
 
-This allows you create an intranet-style site while keeping multiple levels of security for the site content.
-
-Note: Site-settings are currently unavailable for the "Registered Users" special group. We'll be adding this functionality very, very soon.
+This is powerful because it allows you to quickly and completely restrict site access to all unapproved users, while maintaining multiple levels of ADDITIONAL security for your content. To ensure your site is completely intranet-secure, remember to disable WordPress's "Anyone Can Register" setting.
 
 = Can I help translate PSC into my language? =
 
@@ -88,6 +87,10 @@ Absolutely! PO files are now included with each PSC download. You can use a Word
 
 Yes! This is particularly handy if you're working on a new section of your website but you aren't quite ready to share it with the world. From the page's edit screen, simply find the "Restrict Access" sidebar and check "Protect this page and it's descendants". That's it! Even if you don't assign any groups, anyone who's logged in as an admin will still have full access to that page.
 
+= If I protect a term (category, tag, etc) will it protect all the posts too? =
+
+Yes. Whenever you add protection to a term, those permissions are automatically inherited by the content.
+
 = Is there a way to give new users temporary group membership? =
 
 Yes, although it involves a little bit of coding. Please see this thread on the WordPress Support Forum for details: http://goo.gl/oXDyh
@@ -96,17 +99,30 @@ Yes, although it involves a little bit of coding. Please see this thread on the 
 
 Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad to help you out.
 
+= Can I help test out pre-release versions of PSC =
+
+Absolutely. If you want access to all the newest features, and don't mind dealing with occassional bugs, visit our support page http://goo.gl/Cw7v7 and look for the "Development Build" option.
+
 == Theme Functions ==
 
 As of 1.4.x, Page Security is organized in a way that roughly corresponds to MVC guidelines. If you are a developer and want to take to extend any of PSC's features, it's usually as easily as calling any of the included static classes.
 
-Most database-interaction functions can be found in /wp-content/plugins/contexture-page-security/core/model_queries.php - these are the same ones used by every facet of PSC and should be conveniently exposed to any other plugins or themes.
+Most database-interaction functions can be found in /wp-content/plugins/contexture-page-security/core/queries.php - these are the same ones used by every facet of PSC and should be conveniently exposed to any other plugins or themes.
 
 Here are just a few examples:
 
 = Add a User to a Group =
 
+$result = CTXPS_Queries::add_membership_with_expiration($user_id,$group_id);
+
+= Add a User with Expiration =
+
 $result = CTXPS_Queries::add_membership_with_expiration($user_id,$group_id,$expiration_date);
+
+= Change Membership Expiration =
+
+$grel_id = get_grel($user_id,$group_id);
+$result = update_enrollment_grel($grel_id,$expiration_date);
 
 = Get a List of Groups =
 
@@ -118,8 +134,9 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
-= 1.4.5 =
-* Bug fix
+= 1.5.0 =
+* New feature: You can now add security to taxonomy terms (categories, tags, or custom).
+* Updated readme to include more theme function examples
 
 = 1.4.4 =
 * Author page excerpts are now correctly filtered.

@@ -30,7 +30,7 @@ define('CTXPSPATH',dirname(__FILE__));
 define('CTXPSDIR',basename(CTXPSPATH));
 /**The URL of the plugin directory*/
 define('CTXPSURL',plugin_dir_url(__FILE__));
-/**If true, use dev javascript - minify all js and set to false before release */
+/**If true, uses dev javascript - minify all dev js and set this to false before release */
 define('CTXPSJSDEV',true);
 global $wpdb, $ctxpsdb;
 
@@ -38,7 +38,7 @@ global $wpdb, $ctxpsdb;
 //require_once ABSPATH . WPINC . '/ms-functions.php'; //We were using get_user_id_by_string(), but including this broke many people's sites
 /**************************** LOAD CORE FILES *********************************/
 require_once 'core/model.php';          //Model instance ($ctxpsdb)
-require_once 'core/model_queries.php';  //Stored db queries
+require_once 'core/queries.php';  //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
 /**************************** LOAD COMPONENTS *********************************/
 require_once 'components/app_components.php';          //Plugin-wide components
@@ -115,6 +115,7 @@ add_filter('manage_pages_columns', array('CTXPS_Components','add_list_protection
 add_filter('manage_posts_columns', array('CTXPS_Components','add_list_protection_column'));
 add_action('manage_pages_custom_column', array('CTXPS_Components','render_list_protection_column'),10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
 add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_protection_column'),10,2); //Priority 10, Takes 2 args (use default priority only so we can specify args)
+//Taxonomy columns added from admin_init (app_controller.php)
 
 //Modify the global help array so we can add extra help text to default WP pages
 add_action('admin_head', array('CTXPS_App','help_init'));

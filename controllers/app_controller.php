@@ -24,7 +24,9 @@ class CTXPS_App{
             add_action( $tax.'_edit_form', array('CTXPS_Router','security_tax') );
             //Add "fields to the taxonomy add form"General Settings" title to
             add_action( $tax.'_edit_form', array('CTXPS_Components','render_taxonomy_protection_panel_pre') );
-
+            //Add protected columns to all taxonomy types
+            add_filter('manage_edit-'.$tax.'_columns', array('CTXPS_Components','add_term_protection_column'));
+            add_action('manage_'.$tax.'_custom_column', array('CTXPS_Components','render_term_protection_column'),10,3); //Priority 10, Takes 2 args (use default priority only so we can specify args)
         }unset($tax);
 
         //Add our custom admin styles

@@ -9,15 +9,39 @@ class CTXPS_Components{
      * @return array The adjusted WP column array (with protected column added)
      */
     public static function add_list_protection_column($columns){
+        //Initialize variables (good practice)
+        $date = '';
 
         //Peel of the date (set temp var, remove from array)
-        $date = $columns['date'];
-        unset($columns['date']);
+        if(isset($columns['date'])){
+            $date = $columns['date'];
+            unset($columns['date']);
+        }
+
         //Add new column
         $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png'.'" /></div>';
-        //Add date back on (now at end of array);
-        $columns['date'] = $date;
 
+        //Add date back on (now at end of array);
+        if(!empty($date)){
+            $columns['date'] = $date;
+        }
+
+        //Return new column array
+        return $columns;
+    }
+
+    /**
+     * Adds a "Protection" column to term lists.
+     *
+     * @param type $columns WP column array
+     * @return array The adjusted WP column array (with protected column added)
+     */
+    public static function add_term_protection_column($columns){
+
+        //Add new column
+        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png'.'" /></div>';
+
+        //Return new column array
         return $columns;
     }
 
@@ -31,7 +55,7 @@ class CTXPS_Components{
      */
     public static function render_list_protection_column($column_name, $post_id){
 
-        //wp_die($columnname.' GOOGLE '.$pageid);
+        //wp_die($column_name.' GOOGLE '.$post_id);
 
         //Only do this if we've got the right column
         if($column_name==='protected'){
@@ -47,7 +71,47 @@ class CTXPS_Components{
             else if(CTXPS_Queries::check_section_protection($post_id)){
                 CTX_Helper::img (array(
                     'alt'=>__('Protected (inherited)','contexture-page-security'),
-                    'title'=>__('Inheriting an ancestors protection','contexture-page-security'),
+                    'title'=>__('Inheriting protection','contexture-page-security'),
+                    'src'=>CTXPSURL.'images/protected-inline-descendant.png'
+                ));
+            //If theres no direct protection, is this content protected through term inheritance?
+            }else{
+                //If the post belongs to a protected term, show lighter (inherited) icon
+                if(false){
+                    CTX_Helper::img (array(
+                        'alt'=>__('Protected (inherited)','contexture-page-security'),
+                        'title'=>__('Inheriting protection','contexture-page-security'),
+                        'src'=>CTXPSURL.'images/protected-inline-descendant.png'
+                    ));
+                }
+            }
+        }
+    }
+
+        /**
+     * Generates a "lock" symbol for the "Protected" column, if the current content
+     * is protected. See WP's template.php -> display_page_row() for  more.
+     *
+     * @param type $column_name The name of the column to affect ('protected')
+     * @param type $term_id The id of the page to check.
+     */
+    public static function render_term_protection_column($test, $column_name, $term_id){
+
+        //Only do this if we've got the right column
+        if($column_name==='protected'){
+            //If page is protected, return lock icon
+            if(CTXPS_Queries::check_protection($term_id,'term')){
+                CTX_Helper::img (array(
+                    'alt'=>__('Protected','contexture-page-security'),
+                    'title'=>__('Protected','contexture-page-security'),
+                    'src'=>CTXPSURL.'images/protected-inline.png'
+                ));
+            }
+            //If this page isnt protected, but an ancestor is, return a lighter icon
+            else if(CTXPS_Queries::check_term_protection($term_id,$_REQUEST['taxonomy'])){
+                CTX_Helper::img (array(
+                    'alt'=>__('Protected (inherited)','contexture-page-security'),
+                    'title'=>__('Inheriting protection','contexture-page-security'),
                     'src'=>CTXPSURL.'images/protected-inline-descendant.png'
                 ));
             }
@@ -349,11 +413,11 @@ class CTXPS_Components{
                 $cur_page_id = $_GET['postid'];
             }
         }
-        
+
         //Fetch term groups, if we have a page id
         if(!empty($cur_page_id))
             $termGroups = CTXPS_Queries::get_groups_by_post_terms($cur_page_id,true);
-        
+
 
         //Count the number of groups attached to this page (including inherited groups)
         if(!!$security){
@@ -379,7 +443,7 @@ class CTXPS_Components{
                     }
                 }
             }
-                        
+
             foreach($termGroups as $tgroup){
                 $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$tgroup->group_title.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$tgroup->group_id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.get_term_link($tgroup->term_id, $tgroup->taxonomy).'" >'.__('term','contexture-page-security').'</a></div>';
             }
