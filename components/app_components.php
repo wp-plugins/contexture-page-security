@@ -77,11 +77,11 @@ class CTXPS_Components{
             //If theres no direct protection, is this content protected through term inheritance?
             }else{
                 //If the post belongs to a protected term, show lighter (inherited) icon
-                if(false){
+                if(CTXPS_Queries::check_post_term_protection($post_id)){
                     CTX_Helper::img (array(
-                        'alt'=>__('Protected (inherited)','contexture-page-security'),
-                        'title'=>__('Inheriting protection','contexture-page-security'),
-                        'src'=>CTXPSURL.'images/protected-inline-descendant.png'
+                        'alt'=>__('Protected (inherited from term)','contexture-page-security'),
+                        'title'=>__('Inheriting protection from term','contexture-page-security'),
+                        'src'=>CTXPSURL.'images/protected-inline-inherit.png'
                     ));
                 }
             }
@@ -435,17 +435,17 @@ class CTXPS_Components{
                 //If this is the current page (and not an ancestor)
                 if($sec_array->pageid == $cur_page_id){
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
                     }
                 }else{
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
+                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
                     }
                 }
             }
 
             foreach($termGroups as $tgroup){
-                $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$tgroup->group_title.' <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$tgroup->group_id).'">&raquo;</a></span><a class="viewgrp" target="_blank" href="'.get_term_link($tgroup->term_id, $tgroup->taxonomy).'" >'.__('term','contexture-page-security').'</a></div>';
+                $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$tgroup->group_title.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$tgroup->group_id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'.get_term_link($tgroup->term_id, $tgroup->taxonomy).'" >'.__('term','contexture-page-security').'</a></div>';
             }
         }
         return $return;

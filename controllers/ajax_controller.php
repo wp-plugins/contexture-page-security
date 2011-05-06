@@ -71,6 +71,10 @@ class CTXPS_Ajax {
             $response->send();
         }
 
+        //If the protected flag isnt explicitly set already, set it (prevent problems when parent permissions are removed)
+        if(!get_post_meta($_REQUEST['post_id'], 'ctx_ps_security'))
+            add_post_meta($_REQUEST['post_id'], 'ctx_ps_security', '1', true);
+
         //Run the query
         $result = CTXPS_Queries::add_security( $_REQUEST['post_id'], $_REQUEST['group_id'] );
 

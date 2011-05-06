@@ -212,11 +212,11 @@ class CTXPS_Queries{
      * term.
      */
     public static function toggle_term_protection(){
-        if ( !empty($_POST['tag_ID']) ){
-            if( isset($_POST['prot-term']) ){
-                return add_metadata('term', $_POST['tag_ID'], 'ctx_ps_security', '1', true);
+        if ( !empty($_REQUEST['tag_ID']) ){
+            if( isset($_REQUEST['prot-term']) ){
+                return add_metadata('term', $_REQUEST['tag_ID'], 'ctx_ps_security', '1', true);
             }else{
-                return delete_metadata('term', $_POST['tag_ID'], 'ctx_ps_security');
+                return delete_metadata('term', $_REQUEST['tag_ID'], 'ctx_ps_security');
             }
         }
         return false;
@@ -242,8 +242,8 @@ class CTXPS_Queries{
      * @return mixed Returns false if no setting, else returns value.
      */
     public static function delete_term_protection(){
-        if(!isset($_POST['prot-term']) && !empty($_POST['tag_ID'])){
-            return delete_metadata('term', $_POST['tag_ID'], 'ctx_ps_security');
+        if(!isset($_REQUEST['prot-term']) && !empty($_REQUEST['tag_ID'])){
+            return delete_metadata('term', $_REQUEST['tag_ID'], 'ctx_ps_security');
         }
         return false;
     }
@@ -683,37 +683,33 @@ class CTXPS_Queries{
      */
     public static function get_groups_by_post_terms($post_id,$inc_terms=false){
         global $wpdb,$ctxpsdb;
-              
+
         $groups = array();
-        $terms = array();
-                
+
         /******* Build a list of terms, using all taxonomies *******************/
-        foreach(get_post_taxonomies($post_id) as $tax){
-            //On each loop, add terms to same array
-            $terms = array_merge(wp_get_post_terms($post_id,$tax),$terms);
-        }
-        
-        
+        $terms = self::get_post_terms($post_id);
+
+
         /******* Use terms to find associated groups ***************************/
         foreach($terms as $term){
-            
+
             //Note: Not necessary to check permission flag here - could result in extra queries
             $term_groups = self::get_groups_by_object('term',$term->term_id,true);
-            
-            /*GOOGLE
+
+            /*GOOGLE*/
             if(!empty($term_groups))
                 wp_die('<pre>'.print_r($term_groups,true).'</pre><pre>'.print_r($term,true).'</pre>');
-            */
-            
+
+
             if(!empty($term_groups)){
                 //If there are groups for a term, compile them into $groups as id=>title
                 foreach($term_groups as $tgrp){
-                    
-                    
+
+
                     //ARGH! Where is this going wrong?
                     print_r($tgrp,true);
                     echo '<p/>';
-                    
+
                     if($inc_terms){
                         $groups[$tgrp->group_id] = $tgrp->group_title;
                     }else{
@@ -722,10 +718,8 @@ class CTXPS_Queries{
                     unset($tgrp);
                 }
             }
-            
-            die();
 
-            
+
             //Get groups for ancestor terms as necessary
             /*
             if(!empty($term->parent)){
@@ -803,7 +797,7 @@ class CTXPS_Queries{
                         break;
 
                     //Get full security info for taxonomy terms
-                    case 'term':                        
+                    case 'term':
                         return $wpdb->get_results($wpdb->prepare(
                             'SELECT
                                 `'.$wpdb->terms.'`.term_id,
@@ -998,14 +992,17 @@ class CTXPS_Queries{
 
 
     /**
-     * Checks whether a page is protected because it contains a protected term
-     * @param int $post_id
-     * @return bool
+     * Checks whether a post is using a protected term.
+     *
+     * @param int $post_id The pos to check.
+     * @return bool Returns true if post contains a protected term.
      */
     public static function check_post_term_protection($post_id){
-        //Get all the terms associated with this post
-        $terms = wp_get_post_terms($post_id);
-        $recursive_check = false;
+
+        //initialize variables
+        $terms = self::get_post_terms($post_id);
+
+        $ancestor_protected = false;
 
         foreach($terms as $term){
             if(get_metadata('term',$term->term_id,'ctx_ps_security')){
@@ -1013,18 +1010,38 @@ class CTXPS_Queries{
             }else{
                 if( $term->parent!=0 ){
                     if(self::check_term_protection($term->term_id))
-                        $recursive_check = true;
+                        $ancestor_protected = true;
                 }
             }
         }
 
         //If any ancestor terms are protected, return true
-        if($recursive_check)
+        if($ancestor_protected)
             return true;
 
         //If no protection flags were triggered, return false
         return false;
     }
+
+
+    /**
+     * Fetches a list of all terms associated with the post, ignoring taxonomy.
+     *
+     * @param int $post_id The id of the post to get terms for.
+     * @return array An array containing all the terms attached to this post, regardless of taxonomy
+     */
+    public static function get_post_terms($post_id){
+        //initialize variables
+        $terms = array();
+
+        //Get all terms for this post, regardless of taxonomy
+        foreach(get_post_taxonomies($post_id) as $taxonomy){
+            $terms = array_merge(wp_get_post_terms($post_id,$taxonomy),$terms);
+        }
+
+        return $terms;
+    }
+
 
     /**
      * Recursively checks security for this page/post and it's ancestors. Returns true
