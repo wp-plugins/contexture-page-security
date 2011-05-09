@@ -697,23 +697,19 @@ class CTXPS_Queries{
             $term_groups = self::get_groups_by_object('term',$term->term_id,true);
 
             /*GOOGLE*/
-            if(!empty($term_groups))
-                wp_die('<pre>'.print_r($term_groups,true).'</pre><pre>'.print_r($term,true).'</pre>');
-
+            //if(!empty($term_groups))
+                //wp_die('<pre>'.print_r($term_groups,true).'</pre><pre>'.print_r($term,true).'</pre>');
 
             if(!empty($term_groups)){
                 //If there are groups for a term, compile them into $groups as id=>title
                 foreach($term_groups as $tgrp){
 
-
-                    //ARGH! Where is this going wrong?
-                    print_r($tgrp,true);
-                    echo '<p/>';
-
-                    if($inc_terms){
+                    if(!$inc_terms){
+                        //Only show groups
                         $groups[$tgrp->group_id] = $tgrp->group_title;
                     }else{
-                        $groups[] = array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
+                        //Include a jagged array containing terms and additional info
+                        $groups[] = (object)array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
                     }
                     unset($tgrp);
                 }

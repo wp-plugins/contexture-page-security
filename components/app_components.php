@@ -439,13 +439,30 @@ class CTXPS_Components{
                     }
                 }else{
                     foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'.admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'.__('ancestor','contexture-page-security').'</a></div>';
+                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
+                            .$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
+                            .admin_url('/users.php?page=ps_groups_edit&groupid='
+                            .$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
+                            .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'
+                            .__('ancestor','contexture-page-security')
+                            .'</a></div>';
                     }
                 }
             }
 
+
+            //Show terms that are already added to this list
             foreach($termGroups as $tgroup){
-                $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'.$tgroup->group_title.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$tgroup->group_id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'.get_term_link($tgroup->term_id, $tgroup->taxonomy).'" >'.__('term','contexture-page-security').'</a></div>';
+
+                //Get the term archive URL. If one doesnt exist, dont link
+                $term_archive_link = admin_url(sprintf('/edit-tags.php?action=edit&taxonomy=%s&tag_ID=%s',$tgroup->taxonomy,$tgroup->term_id));
+
+                //Build the link HTML for terms
+                $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
+                    .$tgroup->group_title
+                    .'</span> <a style="text-decoration:none;" href="'.$term_archive_link.'">&raquo;</a><a class="viewgrp" target="_blank" href="'.$term_archive_link.'" >'
+                    .__('term','contexture-page-security')
+                    .'</a></div>';
             }
         }
         return $return;
