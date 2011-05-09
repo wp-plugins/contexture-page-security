@@ -247,6 +247,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
     var groups_ddl = jQuery('#ctxps-grouplist-ddl');
 
     if(typeof(object_type)=="undefined"){
+        //This should never show up unless I programmed something badly
         alert('Programming Error: Type was undefined. Changes not saved.');
     }
     if(typeof(object_id)=="undefined"){
@@ -325,7 +326,12 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
 
                         //Show the saved message if the selector isn't empty
                         if(typeof(save_loc)!="undefined"){
-                            CTXPS_Ajax.showSaveMsg(save_selector) //Show save message
+                            CTXPS_Ajax.showSaveMsg(save_selector); //Show save message
+                        }
+
+                        //Auto-update the page if this is inheriting protection (this is sloppy, but it works)
+                        if(jQuery('#ctxps-grouplist-box #ctx-parentmsg').length>0){
+                            jQuery('#publish').click();
                         }
                     }else{
                         alert(ctxpsmsg.GeneralError+response.find('wp_error').text());

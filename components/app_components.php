@@ -211,8 +211,8 @@ class CTXPS_Components{
         $alternatecss = ' class="alternate" ';
         $countusers = count_users();
 
-        if(empty($user_id) && !empty($_GET['user_id'])){
-            $user_id = $_GET['user_id'];
+        if(empty($user_id) && !empty($_REQUEST['user_id'])){
+            $user_id = $_REQUEST['user_id'];
         }
 
         foreach($groups as $group){
@@ -366,10 +366,10 @@ class CTXPS_Components{
                 /*3*/$member->user_login,
                 /*4*/$fname.' '.$lname,
                 /*5*/$member->user_email,
-                /*6*/$_GET['groupid'],
+                /*6*/$_REQUEST['groupid'],
                 /*7*/$member->grel_id,
                 /*8*/admin_url(),
-                /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_GET['groupid']),
+                /*9*/admin_url('users.php?page=ps_groups_edit&groupid='.$_REQUEST['groupid']),
                 /*10*/$displaydate,
                 /*11*/$jj,
                 /*12*/$mm,
@@ -386,7 +386,7 @@ class CTXPS_Components{
     /**
      *
      * @param mixed $security Takes a security array, by default - but can provide an int or string (post_id) if security array isnt already available.
-     * @param int $cur_page_id Optional. The current page id. If null, tries to get current page id from $_GET['post'] or $_GET['postid'].
+     * @param int $cur_page_id Optional. The current page id. If null, tries to get current page id from $_REQUEST['post'] or $_REQUEST['postid'].
      * @return string
      */
     public static function render_sidebar_attached_groups($security=null,$cur_page_id=null){
@@ -403,21 +403,20 @@ class CTXPS_Components{
 
         //If $cur_page_id isn't set, try to get the value from the querystring
         if(empty($cur_page_id)){
-            if (!empty($_GET['post_id'])){
-                $cur_page_id = $_GET['post_id'];
+            if (!empty($_REQUEST['post_id'])){
+                $cur_page_id = $_REQUEST['post_id'];
             }
-            else if(!empty($_GET['post'])){
-                $cur_page_id = $_GET['post'];
+            else if(!empty($_REQUEST['post'])){
+                $cur_page_id = $_REQUEST['post'];
             }
-            else if (!empty($_GET['postid'])){
-                $cur_page_id = $_GET['postid'];
+            else if (!empty($_REQUEST['postid'])){
+                $cur_page_id = $_REQUEST['postid'];
             }
         }
 
         //Fetch term groups, if we have a page id
         if(!empty($cur_page_id))
             $termGroups = CTXPS_Queries::get_groups_by_post_terms($cur_page_id,true);
-
 
         //Count the number of groups attached to this page (including inherited groups)
         if(!!$security){

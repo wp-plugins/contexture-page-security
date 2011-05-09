@@ -6,16 +6,18 @@
     $outputHtml = '';
 
     //We MUST have a post id in the querystring in order for this to work (ie: this wont appear for the "create new" pages, as the page doesnt exist yet)
-    if(!empty($_GET['post']) && is_numeric($_GET['post'])){
+    if(!empty($_REQUEST['post']) && is_numeric($_REQUEST['post'])){
 
         //Create an array of groups that are already attached to the page (we want the id as index)
         $currentGroups = array();
-        foreach(CTXPS_Queries::get_groups_by_post($_GET['post']) as $curGrp){
+        foreach(CTXPS_Queries::get_groups_by_post($_REQUEST['post']) as $curGrp){
             $currentGroups[$curGrp->sec_access_id] = $curGrp->group_title;
         }
 
-        //Get array with security requirements for this page
-        $securityStatus = CTXPS_Security::get_post_protection( $_GET['post'] );
+        //Get array with security requirements for this post
+        $securityStatus = CTXPS_Security::get_post_protection( $_REQUEST['post'] );
+        //Get array with security requirements for this posts terms
+        $termSecurityStatus = CTXPS_Queries::check_post_term_protection( $_REQUEST['post'] );
 
         //Get options
         $dbOpts = get_option('contexture_ps_options');
@@ -24,31 +26,45 @@
         /***START BUILDING HTML****************************/
 
         //Only print restriction options if this ISN'T set as an access denied page
-        if($dbOpts['ad_page_anon_id']!=$_GET['post'] && $dbOpts['ad_page_auth_id']!=$_GET['post']){
+        if($dbOpts['ad_page_anon_id']!=$_REQUEST['post'] && $dbOpts['ad_page_auth_id']!=$_REQUEST['post']){
 
-            $outputHtml .= sprintf('<input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="%s" />',$_GET['post']);
+            $outputHtml .= sprintf('<input type="hidden" id="ctx_ps_post_id" name="ctx_ps_post_id" value="%s" />',$_REQUEST['post']);
 
             //Build "Protect this page" label
             $outputHtml .= CTX_Helper::wrap('<label for="ctxps-cb-protect">',
                 sprintf('<input type="checkbox" id="ctxps-cb-protect" name="ctxps-cb-protect" %s %s />',
                     (!!$securityStatus)? 'checked="checked"' : '',
-                    ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ) ? 'disabled="disabled"' : '')
+                    ( !!$termSecurityStatus || ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'disabled="disabled"' : '')
                 .__(' Protect this page and its descendants','contexture-page-security')
             );
 
             /** TODO: Add "Use as Access Denied page" option */
 
-            //If the checkbox is disabled, give admin the option to go straight to the parent
-            if ( !!$securityStatus && !get_post_meta($_GET['post'],'ctx_ps_security') ){
-                $outputHtml .= sprintf('<a href="%s" style="display:block;font-size:0.75em;text-align:left;padding-left:20px;">%s</a>',
-                    admin_url('post.php?post='.$post->post_parent.'&action=edit'),
-                    __('Edit Parent','contexture-page-security')
+            /******** START Inform about inherited permissions *************************/
+
+            //If the checkbox is disabled, give admin the option to go straight to the parent (can still add groups, which directly auto-protects the page too)
+            if ( !!$securityStatus /*&& !get_post_meta($_REQUEST['post'],'ctx_ps_security')*/ ){
+                $outputHtml .= sprintf(
+                    '<div id="ctx-parentmsg" style="padding-left:8px;padding-bottom:3px;font-size:0.9em;color:silver;">&gt; <em>%s</em> <a href="%s" style="font-size:0.9em;color:silver;"><em>%s</em> &gt;&gt;</a></div>',
+                        __('Inheriting from an ancestor.'),
+                        admin_url('post.php?post='.$post->post_parent.'&action=edit'),
+                        __('Edit Parent','contexture-page-security')
                 );
             }
 
+            //If the checkbox is disabled, give admin the option to go straight to the parent (can still add groups, which directly auto-protects the page too)
+            if ( !!$termSecurityStatus ){
+                $outputHtml .= sprintf('<div style="padding-left:8px;font-size:0.9em;color:silver;">&gt; <em>%s</em></div>',
+                    __('Inheriting from one or more terms.','contexture-page-security')
+                );
+            }
+
+
+            /******** END Inform about inherited permissions *************************/
+
             //Start on "Available Groups" select box
             $outputHtml .= sprintf('<div id="ctxps-relationships-list" style="border-top:#EEEEEE 1px solid;margin-top:0.5em;%s">',
-                ( !!$securityStatus )?'display:block;':''
+                ( !!$securityStatus || !!$termSecurityStatus )?'display:block;':''
             );
 
             $outputHtml .=    sprintf('<h5>%1$s <a href="%3$s" title="%2$s" style="text-decoration:none;">+</a></h5>',__('Available Groups','contexture-page-security'),__('New Group','contexture-page-security'),admin_url('users.php?page=ps_groups_add'));
@@ -74,7 +90,7 @@
             $outputHtml .= '<div id="ctx-ps-page-group-list">';
 
 
-            $outputHtml .= CTXPS_Components::render_sidebar_attached_groups($securityStatus,$_GET['post']);
+            $outputHtml .= CTXPS_Components::render_sidebar_attached_groups($securityStatus,$_REQUEST['post']);
 
 
             $outputHtml .= '      </div>'; //ctx-ps-page-group-list

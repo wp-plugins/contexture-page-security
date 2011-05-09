@@ -559,6 +559,25 @@ class CTXPS_Security{
         exit(); //Useless
     }
 
-}
-}
+
+    public static function tag_protected_terms($tags_to_edit){
+
+        /*
+        //Get array of protected terms for this taxonomy
+        $terms = wp_get_post_terms($post->ID,$taxonomy);
+
+        //wp_die('GOOGLEY '.$taxonomy.' '.print_r($terms,true));
+
+        //Loop through array, str_replacing matched terms in CSV with "*$term"
+        foreach($terms as $term){
+            if(CTXPS_Queries::check_term_protection($term->term_id, $taxonomy,false)){
+                $tags_to_edit = str_replace((string)$term->name,$term->name.'*',$tags_to_edit);
+            }
+        }
+        */
+
+        return str_replace('chattels','kittens',$tags_to_edit).', test';
+    }
+
+}}
 ?>

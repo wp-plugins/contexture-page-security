@@ -690,7 +690,6 @@ class CTXPS_Queries{
         /******* Build a list of terms, using all taxonomies *******************/
         $terms = self::get_post_terms($post_id);
 
-
         /******* Use terms to find associated groups ***************************/
         foreach($terms as $term){
 
@@ -1041,7 +1040,7 @@ class CTXPS_Queries{
 
 
     /**
-     * Recursively checks security for this page/post and it's ancestors. Returns true
+     * Recursively checks security for this term and it's ancestors. Returns true
      * if any of them are protected or false if none of them are protected.
      *
      * @global wpdb $wpdb
@@ -1050,17 +1049,21 @@ class CTXPS_Queries{
      *
      * @return bool If this page or it's ancestors has the "protected page" flag
      */
-    public static function check_term_protection($term_id,$taxonomy){
+    public static function check_term_protection($term_id,$taxonomy,$recursive=true){
         global $wpdb;
         if(get_metadata('term',$term_id,'ctx_ps_security')){
             return true;
-        } else {
+        } else if($recursive) {
+            //If term has no protection, check parents
             $parent_id = get_term($term_id,$taxonomy);//$wpdb->get_var($wpdb->prepare('SELECT * FROM '.$wpdb->terms.' JOIN '.$wpdb->term_taxonomy.' ON '.$wpdb->terms.'.term_id = '.$wpdb->term_taxonomy.'.term_id'));
             $parent_id = $parent_id->parent;
             if ($parent_id != 0)
                 return self::check_term_protection($parent_id,$taxonomy);
             else
                 return false;
+        }else{
+            //Recursive is false and no protection
+            return false;
         }
     }
 

@@ -31,6 +31,9 @@ class CTXPS_App{
 
         //Add our custom admin styles
         wp_enqueue_style('psc_admin',CTXPSURL.'views/admin.css');
+
+        //Add an asterisk to the end of protected terms
+        add_filter('terms_to_edit',array('CTXPS_Security','tag_protected_terms'));
     }
 
 
@@ -96,6 +99,9 @@ class CTXPS_App{
                 SiteProtectAdd : '<?php _e('This adds protection at a site level. Until you select site options for each group, your users will be unable to access the website.','contexture-page-security') ?>',
                 SiteProtectDel : '<?php _e('This will completely erase site-level security settings and make it accessible to the public. Continue?','contexture-page-security') ?>'
             };
+            jQuery(function(){
+                jQuery('#post .tagsdiv, #post .categorydiv').parent().append('<p style="color:silver;border-top:1px solid #EEE;">* <em>indicates protected terms.</em></p>');
+            });
         </script>
         <script type="text/javascript" src="<?php echo CTXPSURL.'js/core-ajax'.((CTXPSJSDEV)?'.dev':'').'.js' ?>"></script>
         <?php
