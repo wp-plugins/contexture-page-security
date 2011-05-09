@@ -84,7 +84,7 @@
                                     <label for="ad-msg-anon"><?php _e('Anonymous Users:','contexture-page-security') ?></label>
                                 </th>
                                 <td>
-                                    <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="<?php echo esc_attr($ADMsg['ad_msg_anon']); ?>" /><br/>
+                                    <input type="text" name="ad-msg-anon" id="ad-msg-anon" value="<?php echo esc_attr($ADMsg['ad_msg_anon']); ?>" title="<?php _e('Use the %login_url% token to dynamically generate a login URL.','contexture-page-security') ?>" /><br/>
                                     <div class="ctx-footnote"><?php _e('The "access denied" message to show users who are <strong><em>not</em></strong> logged in (HTML OK).','contexture-page-security') ?></div>
                                 </td>
                             </tr>

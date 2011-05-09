@@ -556,11 +556,12 @@ class CTXPS_Queries{
      * @return string
      */
     public static function set_options($arrayOverrides=false){
+        global $post;
 
         //Set defaults
         $defaultOpts = array(
             'ad_msg_usepages'       =>'false', //Whether to use pages as access denied
-            'ad_msg_anon'           =>sprintf(__('You do not have the appropriate group permissions to access this page. Please try <a href="%s">logging in</a> or contact an administrator for assistance.','contexture-page-security'),wp_login_url((empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'])),
+            'ad_msg_anon'           =>__('You do not have the appropriate group permissions to access this page. Please try <a href="%login_url%">logging in</a> or contact an administrator for assistance.','contexture-page-security'),
             'ad_msg_auth'           =>__('You do not have the appropriate group permissions to access this page. If you believe you <em>should</em> have access to this page, please contact an administrator for assistance.','contexture-page-security'),
             'ad_page_anon_id'       =>'',      //Id of the page to use for default anonymous denied users
             'ad_page_auth_id'       =>'',      //Id of the page to use for default authorized denied users

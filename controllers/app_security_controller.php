@@ -48,7 +48,9 @@ class CTXPS_Security{
 
         //POST/PAGE-SPECIFIC PROTECTION
         if(!is_home() && !is_category() && !is_tag() && !is_feed() && !is_tax() && !is_admin() && !is_404() && !is_archive() && !is_search()) {
-            if(empty($useraccess)){
+
+            //We may want to use a global override, so check first...
+            if(!isset($useraccess)){
                 /**Groups that this user is a member of*/
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             }
@@ -70,9 +72,11 @@ class CTXPS_Security{
             /**TERM CHECK*/
             $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
 
+            //wp_die(print_r($termreqs,true).' | '.print_r($termreqs,true));
+
             if(!!$termreqs){
                 //Determine if user can access this content
-                $termallowed = CTXPS_Security::check_access($useraccess,$pagereqs);
+                $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
 
                 //NOT ALLOWED TO ACCESS!
                 if(!$termallowed){
@@ -253,17 +257,22 @@ class CTXPS_Security{
      * This function takes an array of user groups and an array of page-required groups
      * and determines if the user should be allowed to access the specified content.
      *
-     * @param array $UserGroupsArray The array returned by CTXPS_Queries::get_user_groups()
-     * @param array $PageSecurityArray The array returned by ctx_ps_get_protection()
+     * @param array $UserGroupsArray The array returned by CTXPS_Queries::get_user_groups() (groups the user is a member of)
+     * @param array $PageSecurityArray The array returned by ctx_ps_get_protection() (groups required by the current content)
      * @return bool Returns true if user has necessary permissions to access the page, false if not.
      */
     public static function check_access($UserGroupsArray,$PageSecurityArray){
 
-        //Testing...
-        //wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));
+        /*Testing...
+        wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));*/
 
-        //If our page-security array is empty, automatically return false
-        if(!!$PageSecurityArray && count($PageSecurityArray) == 0){return false;}
+        //If our page-security array is empty, automatically return false (no groups have been granted access)
+        if( empty($PageSecurityArray) )
+            return false;
+
+        //If our user array is empty, automatically return false (user does not belong to any groups)
+        if( empty($UserGroupsArray) )
+            return false;
 
         //Used to count each page that has at least one group
         $loopswithgroups = 0;
@@ -500,13 +509,13 @@ class CTXPS_Security{
 
                 //INVALID PAGE, USE MSG
                 }else{
-                    wp_die($plugin_opts['ad_msg_anon'].$homepage_link);
+                    wp_die(str_replace( '%login_url%', wp_login_url( get_permalink($post->ID) ), $plugin_opts['ad_msg_anon'] ).$homepage_link );
                 }
 
             //SHOW AD *MSG*
             }else{
                 //If user is anonymous, show this message
-                wp_die($plugin_opts['ad_msg_anon'].$homepage_link);
+                wp_die(str_replace( '%login_url%', wp_login_url( get_permalink($post->ID) ), $plugin_opts['ad_msg_anon'] ).$homepage_link );
             }
 
 

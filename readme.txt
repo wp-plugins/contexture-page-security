@@ -136,6 +136,7 @@ $result = CTXPS_Queries::check_protection();
 
 = 1.5.0 =
 * New feature: You can now add security to taxonomy terms (categories, tags, or custom).
+* Added %login_url% token for use with anonymous access denied messages. When used, the token auto-generates a login link with correct redirect.
 * Updated readme to include more theme function examples
 
 = 1.4.4 =
