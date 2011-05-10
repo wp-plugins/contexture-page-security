@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.0.0
 Tested up to: 3.2
-Stable tag: 1.4.5
+Stable tag: 1.4.3
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -21,7 +21,7 @@ PSC is created to be simple, yet powerful - and is designed to integrate seamles
 = Features =
 1. Easy to use and integrates seamlessly with WordPress.
 1. Restrict your ENTIRE website (use WordPress as an intranet)!
-1. Restrict categories, tags, or custom taxonomies!
+1. Restrict categories, tags, or even custom taxonomy terms!
 1. Subscription support! Set expiration dates for memberships.
 1. Create customized "Access Denied" pages!
 1. Fully Ajax-loaded! All your security updates are saved in real time!
