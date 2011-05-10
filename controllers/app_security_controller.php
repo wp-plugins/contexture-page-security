@@ -559,24 +559,32 @@ class CTXPS_Security{
         exit(); //Useless
     }
 
+    /**
+     * Used to filter the CSV data that WP uses to show tag lists on edit pages. This adds an
+     * asterisk to the end of the protected terms.
+     *
+     * @global int $post_id Defined in get_terms_to_edit();
+     * @param string $tags_to_edit A CSV with the list of attached tags/terms.
+     * @param string $taxonomy The name of the taxonomy associated with this term list.
+     * @return string Returns the same CSV, with an asterisk appended to the end of protected terms.
+     */
+    public static function tag_protected_terms($tags_to_edit,$taxonomy='post_tag'){
+        global $post_id;
 
-    public static function tag_protected_terms($tags_to_edit){
+        //Assign these so we can test
+        $edited_tags = $tags_to_edit;
 
-        /*
         //Get array of protected terms for this taxonomy
-        $terms = wp_get_post_terms($post->ID,$taxonomy);
-
-        //wp_die('GOOGLEY '.$taxonomy.' '.print_r($terms,true));
+        $terms = wp_get_post_terms($post_id,$taxonomy);
 
         //Loop through array, str_replacing matched terms in CSV with "*$term"
-        foreach($terms as $term){
-            if(CTXPS_Queries::check_term_protection($term->term_id, $taxonomy,false)){
-                $tags_to_edit = str_replace((string)$term->name,$term->name.'*',$tags_to_edit);
+        foreach($terms as $t){
+            if(CTXPS_Queries::check_term_protection($t->term_id, $taxonomy, false)){
+                $edited_tags = str_replace($t->name,$t->name.'*',$tags_to_edit);
             }
         }
-        */
 
-        return str_replace('chattels','kittens',$tags_to_edit).', test';
+        return $edited_tags;
     }
 
 }}

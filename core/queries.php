@@ -1046,6 +1046,7 @@ class CTXPS_Queries{
      * @global wpdb $wpdb
      * @param int $term_id The id of the term to check security for.
      * @param string $taxonomy The name of the taxonomy the term belongs to.
+     * @param bool $recursive Set to false to disable the checking of ancestors. (Default: true)
      *
      * @return bool If this page or it's ancestors has the "protected page" flag
      */
