@@ -105,7 +105,7 @@ class CTXPS_Queries{
         $dbver = get_option("contexture_ps_db_version");
         if($dbver == "" || (float)$dbver < 1.5){
             //Default for posts/pages is now 'post' to correctly match WP conventions
-            $wpdb->query("ALTER TABLE `".$ctxpsdb->security."` ALTER COLUMN `sec_protect_type` DEFAULT 'post'");
+            $wpdb->query("ALTER TABLE `".$ctxpsdb->security."` ALTER COLUMN `sec_protect_type` SET DEFAULT 'post'");
             $wpdb->query("UPDATE `".$ctxpsdb->security."` SET `sec_protect_type`='post' WHERE `sec_protect_type`='page'");
             update_option("contexture_ps_db_version", "1.5");
         }
@@ -165,20 +165,25 @@ class CTXPS_Queries{
     public static function plugin_delete(){
         global $wpdb, $ctxpsdb;
 
-        //Build our SQL scripts to delete the old db tables
+        //Build our SQL scripts to delete the old db tables (don't touch termmeta, no telling if someone else is using it)
         $sql_drop_groups = "DROP TABLE IF EXISTS `" . $ctxpsdb->groups . "`";
         $sql_drop_group_relationships = "DROP TABLE IF EXISTS `" . $ctxpsdb->group_rels . "`";
         $sql_drop_security = "DROP TABLE IF EXISTS `" . $ctxpsdb->security . "`";
+
+        //Build SQL script to remove all old postmeta
+        $sql_scrub_postmeta = "DELETE FROM {$wpdb->postmeta} WHERE meta_key='ctx_ps_security'";
 
         //Run our cleanup queries
         $wpdb->show_errors();
         $wpdb->query($sql_drop_groups);
         $wpdb->query($sql_drop_group_relationships);
         $wpdb->query($sql_drop_security);
+        $wpdb->query($sql_scrub_postmeta);
 
         //Remove our db version reference from options
         delete_option("contexture_ps_db_version");
         delete_option("contexture_ps_options");
+
     }
 
 
