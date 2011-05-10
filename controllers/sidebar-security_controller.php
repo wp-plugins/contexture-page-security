@@ -33,7 +33,7 @@
             //Build "Protect this page" label
             $outputHtml .= CTX_Helper::wrap('<label for="ctxps-cb-protect">',
                 sprintf('<input type="checkbox" id="ctxps-cb-protect" name="ctxps-cb-protect" %s %s />',
-                    (!!$securityStatus)? 'checked="checked"' : '',
+                    ( !!$termSecurityStatus || ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'checked="checked"' : '',
                     ( !!$termSecurityStatus || ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'disabled="disabled"' : '')
                 .__(' Protect this page and its descendants','contexture-page-security')
             );
@@ -43,7 +43,7 @@
             /******** START Inform about inherited permissions *************************/
 
             //If the checkbox is disabled, give admin the option to go straight to the parent (can still add groups, which directly auto-protects the page too)
-            if ( !!$securityStatus /*&& !get_post_meta($_REQUEST['post'],'ctx_ps_security')*/ ){
+            if ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ){
                 $outputHtml .= sprintf(
                     '<div id="ctx-parentmsg" style="padding-left:8px;padding-bottom:3px;font-size:0.9em;color:silver;">&gt; <em>%s</em> <a href="%s" style="font-size:0.9em;color:silver;"><em>%s</em> &gt;&gt;</a></div>',
                         __('Inheriting from an ancestor.'),

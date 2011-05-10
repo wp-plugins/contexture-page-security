@@ -1043,6 +1043,18 @@ class CTXPS_Queries{
         return $terms;
     }
 
+    /**
+     * Fetches the name of the taxonomy the term is a part of.
+     *
+     * @global wpdb $wpdb
+     * @param int $term_id
+     * @return string The name of the taxonomy this term belongs to.
+     */
+    public static function get_term_taxonomy($term_id){
+        global $wpdb;
+
+        return $wpdb->get_var("SELECT `taxonomy` FROM {$wpdb->term_taxonomy} WHERE `term_id`='{$term_id}'");
+    }
 
     /**
      * Recursively checks security for this term and it's ancestors. Returns true
@@ -1055,11 +1067,18 @@ class CTXPS_Queries{
      *
      * @return bool If this page or it's ancestors has the "protected page" flag
      */
-    public static function check_term_protection($term_id,$taxonomy,$recursive=true){
+    public static function check_term_protection($term_id,$taxonomy=null,$recursive=true){
         global $wpdb;
+
+
+
         if(get_metadata('term',$term_id,'ctx_ps_security')){
             return true;
         } else if($recursive) {
+            //If taxonomy isnt set and we're using term id, try to get it
+            if(empty($taxonomy) && is_numeric($term_id))
+                $taxonomy = self::get_term_taxonomy($term_id);
+
             //If term has no protection, check parents
             $parent_id = get_term($term_id,$taxonomy);//$wpdb->get_var($wpdb->prepare('SELECT * FROM '.$wpdb->terms.' JOIN '.$wpdb->term_taxonomy.' ON '.$wpdb->terms.'.term_id = '.$wpdb->term_taxonomy.'.term_id'));
             $parent_id = $parent_id->parent;

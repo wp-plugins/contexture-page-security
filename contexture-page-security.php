@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.5.0 RC1
+Version: 1.5.0 RC4
 Author: Contexture Intl, Matt VanAndel
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -99,7 +99,7 @@ add_action('wp_ajax_ctxps_user_bulk_add', array('CTXPS_Ajax','add_bulk_users_to_
 add_action('wp', array('CTXPS_Security','protect_content'),1);
 
 //Add basic security to dynamically displayed posts (such as on Blog Posts Page, ie: Home) [highest priority]
-add_filter( 'the_posts', array('CTXPS_Security','filter_loops'),1);
+add_filter('the_posts', array('CTXPS_Security','filter_loops'),1);
 
 //Ensure that menus do not display protected pages (when using default menus only) [highest priority]
 add_filter('get_pages', array('CTXPS_Security','filter_auto_menus'),1);

@@ -587,5 +587,32 @@ class CTXPS_Security{
         return $edited_tags;
     }
 
+
+    /**
+     * JS is injected into post.php when action=edit in order to add an asterisk
+     * to protected terms. This is very, very, very bad form, but there aren't the
+     * necessary hooks to do this server side (well, there is, but its obviously
+     * never been used for anything since it's very buggy), so it's this or nothing.
+     *
+     * @param type $term_name
+     */
+    public static function tag_protected_terms_heirarchal($term_name){
+
+        //Get taxonomies for this post
+        //For each taxonomy, get a list of protected term ids
+        //Generate javascript to add asterisk to protected terms
+        ?>
+        <script type="text/javascript">
+            jQuery(function(){
+              var tax_protect = [1,5,8];
+              for(termid in tax_protect){
+                jQuery('#taxdiv input[value="'+termid+'"]').parent().append('*');
+                jQuery('#taxdiv option[value="'+termid+'"]').append('*');
+              }
+            });
+        </script>
+        <?php
+    }
+
 }}
 ?>

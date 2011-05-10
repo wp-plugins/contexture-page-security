@@ -34,6 +34,7 @@ class CTXPS_App{
 
         //Add an asterisk to the end of protected terms
         add_filter('terms_to_edit',array('CTXPS_Security','tag_protected_terms'),10,2);
+        //add_filter('the_category',array('CTXPS_Security','tag_protected_terms_heirarchal')); //Disabled, 'post' post type reports incorrect taxonomy
     }
 
 
