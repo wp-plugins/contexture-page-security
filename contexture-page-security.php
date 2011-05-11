@@ -34,23 +34,20 @@ define('CTXPSURL',plugin_dir_url(__FILE__));
 define('CTXPSJSDEV',true);
 global $wpdb, $ctxpsdb;
 
-/************************** LOAD WP DEPENDENCIES ******************************/
-//require_once ABSPATH . WPINC . '/ms-functions.php'; //We were using get_user_id_by_string(), but including this broke many people's sites
 /**************************** LOAD CORE FILES *********************************/
 require_once 'core/model.php';          //Model instance ($ctxpsdb)
-require_once 'core/queries.php';  //Stored db queries
+require_once 'core/queries.php';        //Stored db queries
 require_once 'core/helpers.php';        //Common, reusable classes, methods, functions
 /**************************** LOAD COMPONENTS *********************************/
 require_once 'components/app_components.php';          //Plugin-wide components
 require_once 'components/shortcode_components.php';    //Short-codes
 require_once 'components/table_components.php';        //Table generator
 require_once 'components/table-packages.php';          //Table generator packages
-/**************************** LOAD CONTROLLERS ********************************/
-require_once 'controllers/app_controller.php';         //Common, reusable classes, methods, functions
-require_once 'controllers/app_security_controller.php';//Most of the permissions-checking code is here
-require_once 'controllers/ajax_controller.php';                   //AJAX-specific methods
-require_once 'core/routing.php';                       //All requests for views are sent through here
-
+/**************************** LOAD CORE CONTROLLERS ***************************/
+require_once 'core/CTXPS_App.php';         //Common, reusable classes, methods, functions
+require_once 'core/CTXPS_Security.php';    //Most of the permissions-checking code is here
+require_once 'core/CTXPS_Ajax.php';        //AJAX-specific methods
+require_once 'core/CTXPS_Router.php';      //All requests for views are sent through here
 
 /********************** SPARTAN REQUIREMENT CHECK *****************************/
 if(is_admin()){
@@ -120,7 +117,7 @@ add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_p
 //Modify the global help array so we can add extra help text to default WP pages
 add_action('admin_head', array('CTXPS_App','help_init'));
 
-//Inject Javascript that marks used category tags 
+//Inject Javascript that marks used category tags
 add_action('admin_head', array('CTXPS_Security','tag_protected_terms_heirarchal'));
 
 //add_action('edit_terms', array('CTXPS_Queries','toggle_term_protection')); //Disabled. This is now done via ajax
