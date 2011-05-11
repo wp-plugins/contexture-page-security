@@ -697,45 +697,45 @@ class CTXPS_Queries{
 
         /******* Use terms to find associated groups ***************************/
         foreach($terms as $term){
+            $groups += self::get_groups_by_term($term->term_id,$term->taxonomy,$inc_terms);
 
-            //Note: Not necessary to check permission flag here - could result in extra queries
-            $term_groups = self::get_groups_by_object('term',$term->term_id,true);
-
-            /*GOOGLE*/
-            //if(!empty($term_groups))
-                //wp_die('<pre>'.print_r($term_groups,true).'</pre><pre>'.print_r($term,true).'</pre>');
-
-            if(!empty($term_groups)){
-                //If there are groups for a term, compile them into $groups as id=>title
-                foreach($term_groups as $tgrp){
-
-                    if(!$inc_terms){
-                        //Only show groups
-                        $groups[$tgrp->group_id] = $tgrp->group_title;
-                    }else{
-                        //Include a jagged array containing terms and additional info
-                        $groups[] = (object)array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
-                    }
-                    unset($tgrp);
-                }
-            }
-
-
-            //Get groups for ancestor terms as necessary
-            /*
-            if(!empty($term->parent)){
-                foreach(self::get_groups_by_object('term',$term->parent) as $tgrp){
-                    if($inc_terms){
-                        $groups[$tgrp->group_id] = $tgrp->group_title;
-                    }else{
-                        $groups[] = array('group_id'=>$tgrp->group_id,'group_title'=>$tgrp->group_title,'term_id'=>$term->term_id,'taxonomy'=>$term->taxonomy);
-                    }
-                    unset($tgrp);
-                }
-            }
-            unset($term_groups);
-            */
+//            echo '<pre>';
+//            print_r($groups);
+//            echo '</pre>';
         }
+
+        return $groups;
+    }
+
+    /**
+     * Returns all the groups associated with a term or it's ancestors.
+     *
+     * @param array $terms An array of terms to check
+     * @return array An array of groups [id]=>[name]
+     */
+    public static function get_groups_by_term($term,$taxonomy,$inc_terms=false){
+        $term = get_term($term,$taxonomy);
+        $groups = array();
+
+        //Get all the groups for this term
+        foreach(self::get_groups_by_object('term',$term->term_id,true) as $tg){
+            if($inc_terms){
+                $groups[$tg->group_id] = $tg->group_title;
+            }else{
+                $groups[] = array(
+                    'group_id'=>$tg->group_id,
+                    'group_title'=>$tg->group_title,
+                    'term_id'=>$term->term_id,
+                    'taxonomy'=>$term->taxonomy
+                );
+            }
+            unset($tg);
+        }
+
+        //If there's a parent, recurse
+        if(!empty($term->parent))
+            $groups = self::get_groups_by_term($term->parent,$taxonomy,$inc_terms);
+
         return $groups;
     }
 
@@ -1070,8 +1070,6 @@ class CTXPS_Queries{
     public static function check_term_protection($term_id,$taxonomy=null,$recursive=true){
         global $wpdb;
 
-
-
         if(get_metadata('term',$term_id,'ctx_ps_security')){
             return true;
         } else if($recursive) {
@@ -1080,7 +1078,7 @@ class CTXPS_Queries{
                 $taxonomy = self::get_term_taxonomy($term_id);
 
             //If term has no protection, check parents
-            $parent_id = get_term($term_id,$taxonomy);//$wpdb->get_var($wpdb->prepare('SELECT * FROM '.$wpdb->terms.' JOIN '.$wpdb->term_taxonomy.' ON '.$wpdb->terms.'.term_id = '.$wpdb->term_taxonomy.'.term_id'));
+            $parent_id = get_term($term_id,$taxonomy);
             $parent_id = $parent_id->parent;
             if ($parent_id != 0)
                 return self::check_term_protection($parent_id,$taxonomy);

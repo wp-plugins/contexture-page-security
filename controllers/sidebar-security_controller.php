@@ -33,7 +33,7 @@
             //Build "Protect this page" label
             $outputHtml .= CTX_Helper::wrap('<label for="ctxps-cb-protect">',
                 sprintf('<input type="checkbox" id="ctxps-cb-protect" name="ctxps-cb-protect" %s %s />',
-                    ( !!$termSecurityStatus || ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'checked="checked"' : '',
+                    ( !!$termSecurityStatus || ( !!$securityStatus && get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'checked="checked"' : '',
                     ( !!$termSecurityStatus || ( !!$securityStatus && !get_post_meta($_REQUEST['post'],'ctx_ps_security') ) ) ? 'disabled="disabled"' : '')
                 .__(' Protect this page and its descendants','contexture-page-security')
             );

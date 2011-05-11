@@ -57,11 +57,10 @@ class CTXPS_Security{
 
             /**PAGE/SECTION CHECK*/
             $pagereqs = self::get_post_protection($post->ID);
+
             if(!!$pagereqs){
                 //Determine if user can access this content
                 $pageallowed = self::check_access($useraccess,$pagereqs);
-
-                //wp_die(print_r($pageallowed,true));
 
                 //NOT ALLOWED TO ACCESS!
                 if(!$pageallowed){
@@ -69,14 +68,22 @@ class CTXPS_Security{
                 }
             }
 
+
             /**TERM CHECK*/
-            $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
+            //Ensure the term branch is protected before getting the array
+            $termreqs = false;
+            if(CTXPS_Queries::check_post_term_protection($post->ID)){
+                //If the branch isnt protected, get groups
+                $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
+            }
 
-            wp_die(print_r($termreqs,true).' | '.print_r($termreqs,true));
+            //wp_die('<pre>'.print_r($termreqs,true).'</pre>');
 
-            if(!!$termreqs){
+            if(is_array($termreqs)){
                 //Determine if user can access this content
                 $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
+
+                //wp_die('<pre>'.(string)$termallowed.'</pre>');
 
                 //NOT ALLOWED TO ACCESS!
                 if(!$termallowed){
@@ -115,17 +122,21 @@ class CTXPS_Security{
                     /**Groups required to access this page*/
                     $pagereqs = self::get_post_protection($post->value->ID);
                     /**Term groups required to access this page*/
-                    $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
+                    $termreqs = false;
+                    if(CTXPS_Queries::check_post_term_protection($post->value->ID)){
+                        //If the branch isnt protected, get groups
+                        $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
+                    }
 
                     if(!!$pagereqs){
                         $secureallowed = self::check_access($useraccess,$pagereqs);
-                        //NOT ALLOWS TO ACCESS!!
+                        //NOT ALLOWED TO ACCESS!!
                         if(!$secureallowed){
                             //If we're NOT allowed to access this page
                             unset($content[$post->key]);
                         }
                     }
-                    if(!!$termreqs){
+                    if(!!$termreqs && is_array($termreqs)){
                         //Determine if user can access this content
                         $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
 
@@ -272,7 +283,7 @@ class CTXPS_Security{
     public static function check_access($UserGroupsArray,$PageSecurityArray){
 
         //Testing...
-        //wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));
+        //wp_die('<h2>User Groups</h2><pre>'.print_r($UserGroupsArray,true).'</pre><h2>Required Groups (by Page/Content)</h2><pre>'.print_r($PageSecurityArray,true).'</pre>');
 
         //If our page-security array is empty, automatically return false (no groups have been granted access)
         if( empty($PageSecurityArray) )
