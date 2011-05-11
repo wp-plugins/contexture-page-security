@@ -120,6 +120,8 @@ add_action('manage_posts_custom_column', array('CTXPS_Components','render_list_p
 //Modify the global help array so we can add extra help text to default WP pages
 add_action('admin_head', array('CTXPS_App','help_init'));
 
+//Inject Javascript that marks used category tags 
+add_action('admin_head', array('CTXPS_Security','tag_protected_terms_heirarchal'));
 
 //add_action('edit_terms', array('CTXPS_Queries','toggle_term_protection')); //Disabled. This is now done via ajax
 

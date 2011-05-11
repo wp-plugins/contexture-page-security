@@ -596,22 +596,39 @@ class CTXPS_Security{
      *
      * @param type $term_name
      */
-    public static function tag_protected_terms_heirarchal($term_name){
+    public static function tag_protected_terms_heirarchal(){
+        global $current_screen;
+        
+        //wp_die( print_r($current_screen,true) );
+        
+        
+        if($current_screen->base==='post'){
+            ?><script type="text/javascript">jQuery(function(){<?php
 
-        //Get taxonomies for this post
-        //For each taxonomy, get a list of protected term ids
-        //Generate javascript to add asterisk to protected terms
-        ?>
-        <script type="text/javascript">
-            jQuery(function(){
-              var tax_protect = [1,5,8];
-              for(termid in tax_protect){
-                jQuery('#taxdiv input[value="'+termid+'"]').parent().append('*');
-                jQuery('#taxdiv option[value="'+termid+'"]').append('*');
-              }
-            });
-        </script>
-        <?php
+            //Get taxonomies for this post
+            $taxonomies = get_post_taxonomies($_REQUEST['post']);
+            //For each taxonomy, get a list of protected term ids
+            foreach($taxonomies as $tax){
+                $terms = get_terms($tax);
+                $termlist = array();
+                foreach($terms as $term){
+                    $termlist[] = $term->term_id;
+                }
+                $termlist = join(',', $termlist);
+                //Generate javascript to add asterisk to protected terms
+                if(!empty($termlist)){
+                    ?>
+                        var <?php echo $tax ?>_protect = [<?php echo $termlist ?>];
+                        for(termid in <?php echo $tax ?>_protect){
+                            jQuery('#<?php echo $tax ?>div input[value="'+termid+'"]').parent().append('*');
+                            jQuery('#<?php echo $tax ?>div option[value="'+termid+'"]').append('*');
+                        }
+                    <?php
+                }
+            }
+
+            ?>});</script><?php
+        }
     }
 
 }}
