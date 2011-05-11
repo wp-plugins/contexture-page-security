@@ -72,7 +72,7 @@ class CTXPS_Security{
             /**TERM CHECK*/
             $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
 
-            //wp_die(print_r($termreqs,true).' | '.print_r($termreqs,true));
+            wp_die(print_r($termreqs,true).' | '.print_r($termreqs,true));
 
             if(!!$termreqs){
                 //Determine if user can access this content
@@ -100,7 +100,6 @@ class CTXPS_Security{
     public static function filter_loops($content){
         global $current_user;
 
-            //print_r($content);
         $dbOpts = get_option('contexture_ps_options');
 
         if(is_feed() && $dbOpts['ad_msg_usefilter_rss']=='false'){
@@ -108,24 +107,33 @@ class CTXPS_Security{
             return $content;
         }else{
             //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
-            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_author() || is_search() )  && !is_admin()) {
+            if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_author() || is_search() || is_archive() )  && !is_admin()) {
                 foreach($content as $post->key => $post->value){
 
                     /**Groups that this user is a member of*/
                     $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
                     /**Groups required to access this page*/
                     $pagereqs = self::get_post_protection($post->value->ID);
+                    /**Term groups required to access this page*/
+                    $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
 
                     if(!!$pagereqs){
                         $secureallowed = self::check_access($useraccess,$pagereqs);
-
-                        if($secureallowed){
-                            //If we're allowed to access this page
-                        }else{
+                        //NOT ALLOWS TO ACCESS!!
+                        if(!$secureallowed){
                             //If we're NOT allowed to access this page
                             unset($content[$post->key]);
                         }
                     }
+                    if(!!$termreqs){
+                        //Determine if user can access this content
+                        $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
+
+                        //NOT ALLOWED TO ACCESS!
+                        if(!$termallowed){
+                            unset($content[$post->key]);
+                        }
+                    }//End if
                 }//End foreach
             }//End appropriate section check
         }
@@ -263,8 +271,8 @@ class CTXPS_Security{
      */
     public static function check_access($UserGroupsArray,$PageSecurityArray){
 
-        /*Testing...
-        wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));*/
+        //Testing...
+        //wp_die(print_r($UserGroupsArray,true).' | '.print_r($PageSecurityArray,true));
 
         //If our page-security array is empty, automatically return false (no groups have been granted access)
         if( empty($PageSecurityArray) )
@@ -279,6 +287,11 @@ class CTXPS_Security{
 
         //Loop through each page's permissions, starting with current page and travelling UP the heirarchy...
         foreach($PageSecurityArray as $security->page => $security->secarray){
+
+            //Ensure secarray is an array - if not, make it one (needed for some term checks)
+            if(!is_array($security->secarray))
+                $security->secarray = array($security->secarray);
+
             //If the current page has group settings attached...
             if(count($security->secarray) != 0){
                 //Increment our group tracking var
@@ -288,7 +301,7 @@ class CTXPS_Security{
                     //We return false as the user does not have access
                     return false;
                 }
-                /**TODO: Ensure user isnt expired?*/
+                //No expiration check necessary here. Expired memberships arent returned from db.
             }
         }
 
@@ -560,7 +573,7 @@ class CTXPS_Security{
     }
 
     /**
-     * Used to filter the CSV data that WP uses to show tag lists on edit pages. This adds an
+     * Used to filter the CSV data that WP uses to show attached tag lists on edit pages. This adds an
      * asterisk to the end of the protected terms.
      *
      * @global int $post_id Defined in get_terms_to_edit();
@@ -587,48 +600,78 @@ class CTXPS_Security{
         return $edited_tags;
     }
 
+    /**
+     * Adds asterisk to non-heirarchal terms that arent in use.
+     *
+     * @param array $tags An array of term objects
+     * @param array $args Additional arguments
+     * @return type
+     */
+    public static function tag_protected_terms_unused($tags,$args=array()){
+
+        //Check each term, if it's protected, add an asterisk to its visible name
+        foreach($tags as $term){
+            if(CTXPS_Queries::check_term_protection($term->term_id,$term->taxonomy)){
+                $term->name .= '*';
+            }
+        }
+        return $tags;
+    }
 
     /**
      * JS is injected into post.php when action=edit in order to add an asterisk
      * to protected terms. This is very, very, very bad form, but there aren't the
      * necessary hooks to do this server side (well, there is, but its obviously
-     * never been used for anything since it's very buggy), so it's this or nothing.
+     * never been used for anything since it's very buggy), so it's either this or
+     * nothing. In this case, I side with usability over good coding practices.
      *
      * @param type $term_name
      */
     public static function tag_protected_terms_heirarchal(){
         global $current_screen;
-        
-        //wp_die( print_r($current_screen,true) );
-        
-        
-        if($current_screen->base==='post'){
+
+        if( $current_screen->base==='post' && isset($_REQUEST['post']) ){
             ?><script type="text/javascript">jQuery(function(){<?php
 
             //Get taxonomies for this post
             $taxonomies = get_post_taxonomies($_REQUEST['post']);
-            //For each taxonomy, get a list of protected term ids
+
+            //For each taxonomy, get a list of term ids used for this post
             foreach($taxonomies as $tax){
+                //Initialize vars
                 $terms = get_terms($tax);
                 $termlist = array();
+
+                //Build an array out of the term ids...
                 foreach($terms as $term){
-                    $termlist[] = $term->term_id;
+                    //...but only if it's protected
+                    if(CTXPS_Queries::check_term_protection($term->term_id, $tax)){
+                        $termlist[] = $term->term_id;
+                    }
                 }
+
+                //Join the array into a CSV
                 $termlist = join(',', $termlist);
+
                 //Generate javascript to add asterisk to protected terms
                 if(!empty($termlist)){
+                    $tarray = "{$tax}_protect";
                     ?>
-                        var <?php echo $tax ?>_protect = [<?php echo $termlist ?>];
-                        for(termid in <?php echo $tax ?>_protect){
-                            jQuery('#<?php echo $tax ?>div input[value="'+termid+'"]').parent().append('*');
-                            jQuery('#<?php echo $tax ?>div option[value="'+termid+'"]').append('*');
+                        var <?php echo $tarray ?> = [<?php echo $termlist ?>];
+                        for(x in <?php echo $tarray ?>){
+                            jQuery('#<?php echo $tax ?>div input[value="'+<?php echo $tarray ?>[x]+'"]').parent().append('*');
+                            jQuery('#<?php echo $tax ?>div option[value="'+<?php echo $tarray ?>[x]+'"]').append('*');
                         }
                     <?php
                 }
+                //So there's no accidental carryovers
+                unset($terms,$termlist);
             }
 
             ?>});</script><?php
         }
+        //Nothing to do
+        return false;
     }
 
 }}

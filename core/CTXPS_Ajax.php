@@ -223,7 +223,7 @@ class CTXPS_Ajax {
         } else {
 
             //Make sure user isnt already in the group
-            if(CTXPS_Queries::check_membership($_REQUEST['user_id'], $_REQUEST['groupid'])){
+            if(CTXPS_Queries::check_membership($_REQUEST['user_id'], $_REQUEST['group_id'])){
                 //ERROR!
                 $response = new WP_Ajax_Response(array(
                     'what'=>    'enroll',
@@ -234,7 +234,7 @@ class CTXPS_Ajax {
             }
 
             //Add the user to the group
-            if(CTXPS_Queries::add_membership($_REQUEST['user_id'], $_REQUEST['groupid']) === false){
+            if(CTXPS_Queries::add_membership($_REQUEST['user_id'], $_REQUEST['group_id']) === false){
                 //ERROR!
                 $response = new WP_Ajax_Response(array(
                     'what'=>    'enroll',
@@ -319,7 +319,7 @@ class CTXPS_Ajax {
             $response->send();
         }
 
-        if( !CTXPS_Queries::delete_membership( $_REQUEST['user_id'], $_REQUEST['groupid'] ) ){
+        if( !CTXPS_Queries::delete_membership( $_REQUEST['user_id'], $_REQUEST['group_id'] ) ){
             //Error - membership not found.
             $response = array(
                 'what'=>    'unenroll',

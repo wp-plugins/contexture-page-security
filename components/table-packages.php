@@ -74,10 +74,16 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 'color' =>''
                 )
         );
-        
+
         //****** GET & SHOW TERMS **************************************************
         $termlist = CTXPS_Queries::get_content_by_group($_GET['groupid'],'term');
+
+        //wp_die('<pre>'.print_r($termlist,true).'</pre>');
+
         foreach($termlist as $term){
+
+            $archiveurl = get_term_link(get_term($term->term_id, $term->taxonomy));
+
             $term_edit_url = admin_url('edit-tags.php?action=edit&taxonomy='.$term->taxonomy.'&tag_ID='.$term->term_id);
             $this->list_data[] = array(
                 'id'=>$term->sec_protect_id,
@@ -89,7 +95,7 @@ class CTXPS_Table_Packages extends CTX_Tables{
                 'actions'=>array(
                     'edit'  => $term_edit_url,
                     'trash' => array('onclick'=>sprintf('CTXPS_Ajax.removeTermFromGroup(%1$s,jQuery(this));return false;',$term->sec_protect_id)),
-                    'view'  => get_term_link($term->name, $term->taxonomy)
+                    'view'  => (!is_wp_error($archiveurl)) ? $archiveurl : ''
                 )
             );
         }unset($termlist,$term);

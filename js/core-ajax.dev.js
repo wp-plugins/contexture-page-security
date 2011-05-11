@@ -357,7 +357,7 @@ CTXPS_Ajax.addGroupToUser = function(){
         jQuery.get('admin-ajax.php',
             {
                 action:     'ctxps_add_group_to_user',
-                groupid:    group_id,
+                group_id:   group_id,
                 user_id:    user_id
             },
             function(response){
@@ -581,8 +581,8 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
         jQuery.get('admin-ajax.php',
             {
                 action:     'ctxps_remove_group_from_page',
-                groupid:    group_id,
-                postid:     post_id,
+                group_id:    group_id,
+                post_id:     post_id,
                 requester:  'sidebar'
             },
             function(response){
@@ -673,8 +673,8 @@ CTXPS_Ajax.removePageFromGroup = function(post_id,me){
         jQuery.get('admin-ajax.php',
             {
                 action:     'ctxps_remove_group_from_page',
-                groupid:    group_id,
-                postid:     post_id
+                group_id:    group_id,
+                post_id:     post_id
             },
             function(data){
                 data = jQuery(data);

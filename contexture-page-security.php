@@ -119,6 +119,8 @@ add_action('admin_head', array('CTXPS_App','help_init'));
 
 //Inject Javascript that marks used category tags
 add_action('admin_head', array('CTXPS_Security','tag_protected_terms_heirarchal'));
+//Also add asterisks to unused tags
+add_action('tag_cloud_sort', array('CTXPS_Security','tag_protected_terms_unused'),10,2);
 
 //add_action('edit_terms', array('CTXPS_Queries','toggle_term_protection')); //Disabled. This is now done via ajax
 

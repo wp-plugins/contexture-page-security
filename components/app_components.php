@@ -396,8 +396,7 @@ class CTXPS_Components{
             $security = CTXPS_Security::get_post_protection( $security );
         }
 
-        //Set this to 0, we are going to count the number of groups attached to this page next...
-        $groupcount = 0;
+        //Default vars
         $return = '';
         $termGroups = array();
 
@@ -418,10 +417,13 @@ class CTXPS_Components{
         if(!empty($cur_page_id))
             $termGroups = CTXPS_Queries::get_groups_by_post_terms($cur_page_id,true);
 
-        //Count the number of groups attached to this page (including inherited groups)
-        if(!!$security){
+        //Count the number of term groups
+        $groupcount = count($termGroups);
+
+        //Count the number of groups directly attached to this page (including inherited groups)
+        if(!empty($security)){
             foreach($security as $securityGroups){
-                $groupcount = $groupcount+count($securityGroups)+count($termGroups);
+                $groupcount += count($securityGroups);
             }
         }
 
@@ -430,25 +432,26 @@ class CTXPS_Components{
             //Display this if we have no groups (inherited or otherwise)
             $return .= '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
         }else{
-            foreach($security as $sec_array->pageid => $sec_array->grouparray){
-                //If this is the current page (and not an ancestor)
-                if($sec_array->pageid == $cur_page_id){
-                    foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
-                    }
-                }else{
-                    foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                        $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
-                            .$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
-                            .admin_url('/users.php?page=ps_groups_edit&groupid='
-                            .$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
-                            .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'
-                            .__('ancestor','contexture-page-security')
-                            .'</a></div>';
-                    }
-                }
-            }
-
+            if(!empty($security)){
+                foreach($security as $sec_array->pageid => $sec_array->grouparray){
+                    //If this is the current page (and not an ancestor)
+                    if($sec_array->pageid == $cur_page_id){
+                        foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
+                            $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                        }
+                    }else{
+                        foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
+                            $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
+                                .$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
+                                .admin_url('/users.php?page=ps_groups_edit&groupid='
+                                .$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
+                                .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'
+                                .__('ancestor','contexture-page-security')
+                                .'</a></div>';
+                        }//foreach
+                    }//else
+                }//foreach
+            }//if
 
             //Show terms that are already added to this list
             foreach($termGroups as $tgroup){
