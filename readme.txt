@@ -134,6 +134,9 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.5.1 =
+* Minor aesthetic fix for admin
+
 = 1.5.0 =
 * New feature: You can now add security to taxonomy terms (categories, tags, or custom).
 * Lots and lots and LOTS of usability improvements.
