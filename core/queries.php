@@ -698,10 +698,6 @@ class CTXPS_Queries{
         /******* Use terms to find associated groups ***************************/
         foreach($terms as $term){
             $groups += self::get_groups_by_term($term->term_id,$term->taxonomy,$inc_terms);
-
-//            echo '<pre>';
-//            print_r($groups);
-//            echo '</pre>';
         }
 
         return $groups;
@@ -719,10 +715,10 @@ class CTXPS_Queries{
 
         //Get all the groups for this term
         foreach(self::get_groups_by_object('term',$term->term_id,true) as $tg){
-            if($inc_terms){
+            if(!$inc_terms){
                 $groups[$tg->group_id] = $tg->group_title;
             }else{
-                $groups[] = array(
+                $groups[$tg->group_id] = array(
                     'group_id'=>$tg->group_id,
                     'group_title'=>$tg->group_title,
                     'term_id'=>$term->term_id,
@@ -734,7 +730,7 @@ class CTXPS_Queries{
 
         //If there's a parent, recurse
         if(!empty($term->parent))
-            $groups = self::get_groups_by_term($term->parent,$taxonomy,$inc_terms);
+            $groups += self::get_groups_by_term($term->parent,$taxonomy,$inc_terms);
 
         return $groups;
     }
@@ -758,7 +754,7 @@ class CTXPS_Queries{
         if(!empty($object_id) && is_numeric($object_id) && !empty($object_type)){
 
             //If this is a simple query (no security info), do this...
-            if($security===false){
+            if(!$security){
 
                 //Only return basic security info (no extended results)
                 return $wpdb->get_results($wpdb->prepare(

@@ -457,11 +457,11 @@ class CTXPS_Components{
             foreach($termGroups as $tgroup){
 
                 //Get the term archive URL. If one doesnt exist, dont link
-                $term_archive_link = admin_url(sprintf('/edit-tags.php?action=edit&taxonomy=%s&tag_ID=%s',$tgroup->taxonomy,$tgroup->term_id));
+                $term_archive_link = admin_url(sprintf('/edit-tags.php?action=edit&taxonomy=%s&tag_ID=%s',$tgroup['taxonomy'],$tgroup['term_id']));
 
                 //Build the link HTML for terms
                 $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
-                    .$tgroup->group_title
+                    .$tgroup['group_title']
                     .'</span> <a style="text-decoration:none;" href="'.$term_archive_link.'">&raquo;</a><a class="viewgrp" target="_blank" href="'.$term_archive_link.'" >'
                     .__('term','contexture-page-security')
                     .'</a></div>';

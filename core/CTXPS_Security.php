@@ -55,10 +55,10 @@ class CTXPS_Security{
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             }
 
-            /**PAGE/SECTION CHECK*/
+            /**PAGE/SECTION CHECK**********************************************/
             $pagereqs = self::get_post_protection($post->ID);
 
-            if(!!$pagereqs){
+            if($pagereqs !== false && is_array($pagereqs)){
                 //Determine if user can access this content
                 $pageallowed = self::check_access($useraccess,$pagereqs);
 
@@ -69,17 +69,18 @@ class CTXPS_Security{
             }
 
 
-            /**TERM CHECK*/
+            /**TERM CHECK******************************************************/
             //Ensure the term branch is protected before getting the array
             $termreqs = false;
+            //If this term branch is protected...
             if(CTXPS_Queries::check_post_term_protection($post->ID)){
-                //If the branch isnt protected, get groups
+                //Branch is protected, get attached groups
                 $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
             }
 
             //wp_die('<pre>'.print_r($termreqs,true).'</pre>');
 
-            if(is_array($termreqs)){
+            if($termreqs !== false && is_array($termreqs)){
                 //Determine if user can access this content
                 $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
 
@@ -107,6 +108,7 @@ class CTXPS_Security{
     public static function filter_loops($content){
         global $current_user;
 
+        //Get plugin options
         $dbOpts = get_option('contexture_ps_options');
 
         if(is_feed() && $dbOpts['ad_msg_usefilter_rss']=='false'){
@@ -119,16 +121,19 @@ class CTXPS_Security{
 
                     /**Groups that this user is a member of*/
                     $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
-                    /**Groups required to access this page*/
+                    /**Groups required to access this post*/
                     $pagereqs = self::get_post_protection($post->value->ID);
-                    /**Term groups required to access this page*/
+                    /**Term groups required to access this post - default is false (no protection) */
                     $termreqs = false;
+
+                    //First, check if the post has any protected terms
                     if(CTXPS_Queries::check_post_term_protection($post->value->ID)){
-                        //If the branch isnt protected, get groups
+                        //If the term-branch is protected, get an array of groups
                         $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
                     }
 
-                    if(!!$pagereqs){
+                    //If necessary, validate group membership for page
+                    if($pagereqs !== false && is_array($pagereqs)){
                         $secureallowed = self::check_access($useraccess,$pagereqs);
                         //NOT ALLOWED TO ACCESS!!
                         if(!$secureallowed){
@@ -136,7 +141,10 @@ class CTXPS_Security{
                             unset($content[$post->key]);
                         }
                     }
-                    if(!!$termreqs && is_array($termreqs)){
+
+                    //If necessary, validate group membership for page's terms
+                    if($termreqs !== false && is_array($termreqs)){
+
                         //Determine if user can access this content
                         $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
 
@@ -277,7 +285,7 @@ class CTXPS_Security{
      * and determines if the user should be allowed to access the specified content.
      *
      * @param array $UserGroupsArray The array returned by CTXPS_Queries::get_user_groups() (groups the user is a member of)
-     * @param array $PageSecurityArray The array returned by ctx_ps_get_protection() (groups required by the current content)
+     * @param array $PageSecurityArray The array returned by ctx_ps_get_protection() (an array of pages, each containing an array of groups required)
      * @return bool Returns true if user has necessary permissions to access the page, false if not.
      */
     public static function check_access($UserGroupsArray,$PageSecurityArray){
