@@ -165,20 +165,22 @@ class CTXPS_Queries{
     public static function plugin_delete(){
         global $wpdb, $ctxpsdb;
 
+        //Build SQL script to remove all old postmeta
+        $sql_scrub_postmeta = "DELETE FROM {$wpdb->postmeta} WHERE meta_key='ctx_ps_security'";
+        $sql_scrub_termmeta = "DELETE FROM {$wpdb->prefix}termmeta WHERE meta_key='ctx_ps_security'";
+
         //Build our SQL scripts to delete the old db tables (don't touch termmeta, no telling if someone else is using it)
         $sql_drop_groups = "DROP TABLE IF EXISTS `" . $ctxpsdb->groups . "`";
         $sql_drop_group_relationships = "DROP TABLE IF EXISTS `" . $ctxpsdb->group_rels . "`";
         $sql_drop_security = "DROP TABLE IF EXISTS `" . $ctxpsdb->security . "`";
 
-        //Build SQL script to remove all old postmeta
-        $sql_scrub_postmeta = "DELETE FROM {$wpdb->postmeta} WHERE meta_key='ctx_ps_security'";
-
         //Run our cleanup queries
         $wpdb->show_errors();
+        $wpdb->query($sql_scrub_postmeta);
+        $wpdb->query($sql_scrub_termmeta);
         $wpdb->query($sql_drop_groups);
         $wpdb->query($sql_drop_group_relationships);
         $wpdb->query($sql_drop_security);
-        $wpdb->query($sql_scrub_postmeta);
 
         //Remove our db version reference from options
         delete_option("contexture_ps_db_version");
