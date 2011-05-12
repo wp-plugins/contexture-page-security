@@ -128,7 +128,7 @@ $result = update_enrollment_grel($grel_id,$expiration_date);
 
 $result = CTXPS_Queries::get_groups();
 
-= Get Protection Status of Current Page/Post/etc =
+= Get Protection Status of Current Page/Post =
 
 $result = CTXPS_Queries::check_protection();
 

@@ -165,7 +165,7 @@ class CTXPS_Queries{
     public static function plugin_delete(){
         global $wpdb, $ctxpsdb;
 
-        //Build SQL script to remove all old postmeta
+        //Build SQL script to remove all old metadata
         $sql_scrub_postmeta = "DELETE FROM {$wpdb->postmeta} WHERE meta_key='ctx_ps_security'";
         $sql_scrub_termmeta = "DELETE FROM {$wpdb->prefix}termmeta WHERE meta_key='ctx_ps_security'";
 
