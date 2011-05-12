@@ -630,8 +630,10 @@ class CTXPS_Security{
 
         //Check each term, if it's protected, add an asterisk to its visible name
         foreach($tags as $term){
-            if(CTXPS_Queries::check_term_protection($term->term_id,$term->taxonomy)){
-                $term->name .= '*';
+            if(isset($term->name) && isset($term->term_id) && isset($term->taxonomy)){ //Fixes an error on some screens
+                if(CTXPS_Queries::check_term_protection($term->term_id,$term->taxonomy)){
+                    $term->name .= '*';
+                }
             }
         }
         return $tags;
