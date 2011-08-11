@@ -110,6 +110,10 @@ class CTXPS_Queries{
             update_option("contexture_ps_db_version", "1.5");
         }
         /******** END UPGRADE PATH < 1.5 **************/
+        
+        /********* START UPGRADE PATH < 1.6 ***********/
+        //No changes to 1.6. JS updates only.
+        /******** END UPGRADE PATH < 1.6 **************/
 
         //Check if our "Registered Users" group already exists
         $CntRegSmrtGrp = (bool)$wpdb->get_var("SELECT COUNT(*) FROM `".$ctxpsdb->groups."` WHERE `group_system_id` = 'CPS01' LIMIT 1");
@@ -132,7 +136,7 @@ class CTXPS_Queries{
      * @param decimal $version Which version of PHP is required?
      * @param boolean $die If true, wp_die() is called, else returns string.
      */
-    public static function check_php_version($version='5.1',$die=true){
+    public static function check_php_version($version='5.2.4',$die=true){
         global $ctxpsdb;
 
         //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
@@ -155,6 +159,41 @@ class CTXPS_Queries{
             wp_die($return);
         }
     }
+    
+        /**
+     * Check whether the required version of PHP is present and disable the plugin if it's not.
+     *
+     * @global CTXPS_Tables $ctxpsdb
+     * @param decimal $version Which version of PHP is required?
+     * @param boolean $die If true, wp_die() is called, else returns string.
+     */
+    public static function check_wp_version($version='3.2',$die=true){
+        global $ctxpsdb, $wp_version;
+
+        //Ensure that we're using PHP5 (plugin has reported problems with PHP4)
+        if (version_compare($wp_version, $version, '<')) {
+
+            //Ensure deactivate_plugins is loaded
+            if(!function_exists('deactivate_plugins')){
+                //If not, we need to include plugin.php
+                require_once ABSPATH.'\wp-admin\includes\plugin.php';
+            }
+            //Now we can deactivate the plugin
+            deactivate_plugins($ctxpsdb->pluginbase);
+
+            //Build the error message
+            $return = '<span style="color:red;font-weight:bold;">'.__('Missing Requirement:','contexture-page-security').'</span> '
+                .sprintf(__('This version of Page Security requires WordPress %1$s or higher. You are running WordPress %2$s. Please update your copy of WordPress or use an earlier version of Page Security (recommended: 1.5.1).','contexture-page-security'),
+                        $version,
+                        $wp_version)
+                .'<a href="'.admin_url('plugins.php').'"> '.__('Return to plugin page','contexture-page-security').' &gt;&gt;</a>';
+
+            //wp_die and show error message
+            wp_die($return);
+        }
+    }
+    
+    
 
      /**
      * Removes custom tables and options from the WP database.
@@ -494,7 +533,7 @@ class CTXPS_Queries{
         if(empty($expiration_date)){
             return false;
         }
-
+        
         //If we need to set this to null...
         if(trim(strtolower($expiration_date))==='null'){
             return $wpdb->query($wpdb->prepare('UPDATE `'.$ctxpsdb->group_rels.'` SET grel_expires=NULL WHERE id=%s',$grel_id));
@@ -504,13 +543,13 @@ class CTXPS_Queries{
             //Try to format the date (extra layer of validation)
             $expiration_date = strtotime((string)$expiration_date);
             //Let's convert our unix timestamp back to a MySQL-friendly date
-            $expiration_date = date('Y-m-d H:i:s');
+            $expiration_date = date('Y-m-d H:i:s', $expiration_date);
         }else{
             return false;
         }
 
         //Run the query and return
-        return $wpdb->update($ctxpsdb->group_rels, array('grel_expires'=>$expiration_date), array('ID'=>$grel_id));;
+        return $wpdb->update($ctxpsdb->group_rels, array('grel_expires'=>$expiration_date), array('ID'=>$grel_id));
     }
 
     /**

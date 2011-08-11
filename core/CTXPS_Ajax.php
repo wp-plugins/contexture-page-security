@@ -279,7 +279,7 @@ class CTXPS_Ajax {
 
         //Determine if we need to pass NULL or a DateTime value...
         $db_expires = ($_POST['expires']=='1') ? $_POST['date'] : 'NULL';
-
+        
         //Determine response
         if(CTXPS_Queries::update_enrollment_grel($_POST['grel'], $db_expires) === false){
             $response = array(
@@ -292,7 +292,7 @@ class CTXPS_Ajax {
                 'what'=>    'update',
                 'action'=>  'update_membership',
                 'id'=>      1,
-                'data'=>    __('User membership updated','contexture-page-security')
+                'data'=>    __('User membership updated to '.$db_expires,'contexture-page-security')
             );
         }
         $response = new WP_Ajax_Response($response);

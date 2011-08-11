@@ -164,7 +164,7 @@ CTXPS_Ajax.addBulkUsersToGroup = function(){
 
             //If this was a success, uncheck all selected users
             if(response.find('bulk_enroll').attr('id') == '1'){
-                checkedArray.removeAttr('checked');
+                checkedArray.removeAttr('checked').prop('checked','false');
             }
         },
         'xml'
@@ -234,7 +234,7 @@ CTXPS_Ajax.toggleSecurity = function(){
             );
         }else{
             //If user cancelled, re-check the box
-            jQuery('#ctx_ps_protectmy').attr('checked','checked');
+            jQuery('#ctx_ps_protectmy').attr('checked','checked').prop('checked','checked');
         }
     }
 }
@@ -321,7 +321,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
 
                         //Reset the ddl, if needed
                         if(groups_ddl.length!=0){
-
+                            //Do nothing atm
                         }
 
                         //Show the saved message if the selector isn't empty
@@ -340,7 +340,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
             );
         }else{
             //If user cancelled, re-check the box
-            jQuery('#ctxps-cb-protect').attr('checked','checked');
+            jQuery('#ctxps-cb-protect').attr('checked','checked').prop('checked','checked');
         }
     }
 }
@@ -352,7 +352,7 @@ CTXPS_Ajax.addGroupToUser = function(){
     var group_id = parseInt(jQuery('#ctxps-grouplist-ddl').val());
     var user_id = parseInt(jQuery('#ctx-group-user-id').val());
     if(group_id!=0){
-        jQuery('#btn-add-grp-2-user').attr('disabled','disabled');
+        jQuery('#btn-add-grp-2-user').attr('disabled','disabled').prop('disabled','disabled');
         //alert("The group you want to add is: "+$groupid);
         jQuery.get('admin-ajax.php',
             {
@@ -378,7 +378,7 @@ CTXPS_Ajax.addGroupToUser = function(){
                         .children('.detach')                        //Select all detached options
                             .remove();                              //Remove them
 
-                    jQuery('#btn-add-grp-2-user').removeAttr('disabled');
+                    jQuery('#btn-add-grp-2-user').removeAttr('disabled').prop('disabled','false');
                     CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
                 }else{
                     alert(ctxpsmsg.GeneralError+data.find('wp_error').text());

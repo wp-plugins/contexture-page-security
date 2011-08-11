@@ -2,9 +2,9 @@
 Contributors: Contexture International, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
-Requires at least: 3.0.0
-Tested up to: 3.2
-Stable tag: 1.5.1
+Requires at least: 3.2
+Tested up to: 3.3
+Stable tag: 1.5.2
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -63,13 +63,13 @@ While we believe this plugin is secure, we make no warranty about it's effective
 
 = I get an error about PHP5 when I activate your plugin. What gives? =
 
-As of version 1.4.3, Page Security requires PHP 5.1 or higher to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
+As of version 1.5.2, Page Security requires PHP 5.2.4 and WordPress 3.2 or higher to work. If you receive an error message while activating/installing this plugin, you may need to upgrade your PHP installation (you are probably still running PHP4).
 If you are using a web hosting service, simply contact your hosting provider about updating your default version of PHP (it's usually as simple as checking a box somewhere on your
 hosting dashboard).
 
 = Does Page Security work with WordPress 2.9 or earlier? =
 
-PSC has only been tested with WordPress 3.0 and higher. It's possible that it may work on earlier versions, but we don't officially support this.
+As of Page Security 1.5.2, WordPress 3.2 is REQUIRED (due to a critical change in jQuery, this was unavoidable). Older versions of PSC (1.5.1 or earlier) may still work with older versions of WordPress.
 
 = How does "Protect Entire Site" Work? =
 
@@ -134,8 +134,12 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.5.2 =
+* Fixed Membership Expiration for newer versions of WordPress
+* WordPress 3.2 is now required (due to a critical change in jQuery)
+
 = 1.5.1 =
-* Minor aesthetic fix for admin
+* Minor aesthetic fix for admin sections
 
 = 1.5.0 =
 * New feature: You can now add security to taxonomy terms (categories, tags, or custom).

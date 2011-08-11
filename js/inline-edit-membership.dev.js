@@ -25,9 +25,9 @@
             //Toggle editor window date enabled
             $('input[name="membership_permanent"]').live('click',function(){
                 if( $(this).filter(':checked').length>0 ){
-                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').removeAttr('disabled');
+                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled','false');
                 }else{
-                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').attr('disabled','disabled');
+                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').attr('disabled','disabled').prop('disabled','disabled');
                 }
             });
 
@@ -49,14 +49,14 @@
             //Get data
             rowData = $('#inline_'+memberid);
             //Move editor to new position in table
-            editForm = $('#inline-edit').clone().attr('id','edit-'+memberid).insertAfter('#user-'+memberid).css('display','table-row');
+            editForm = $('#inline-edit').clone().attr('id','edit-'+memberid).prop('id','edit-'+memberid).insertAfter('#user-'+memberid).css('display','table-row');
             //Update username
             $('.username',editForm).text($('.username',rowData).text());
             //Update expires checkbox
-            if($('.jj',rowData).text().length!=0){ $('input[name="membership_permanent"]',editForm).attr('checked','checked'); expires=true; }
+            if($('.jj',rowData).text().length!=0){ $('input[name="membership_permanent"]',editForm).attr('checked','checked').prop('checked','checked'); expires=true; }
             //Set dates (if appropriate)
             if(expires){
-                editForm.find('.inline-edit-date').find('input, select').removeAttr('disabled')
+                editForm.find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled','false')
                     .filter('[name="mm"]').val($('.mm',rowData).text()).end()
                     .filter('[name="aa"]').val($('.aa',rowData).text()).end()
                     .filter('[name="jj"]').val($('.jj',rowData).text()).end();
@@ -103,10 +103,10 @@
             //Submit ajax data to server
             $.post('admin-ajax.php',
             {
-                action:'ctxps_update_member',
-                grel:newData.grel,
+                action: 'ctxps_update_member',
+                grel:   newData.grel,
                 expires:hasExpire,
-                date:newDate
+                date:   newDate
             },
             function(response){ response = $(response);
                 var showDate = 'Never',today = new Date();
