@@ -25,7 +25,7 @@
             //Toggle editor window date enabled
             $('input[name="membership_permanent"]').live('click',function(){
                 if( $(this).filter(':checked').length>0 ){
-                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled','false');
+                    $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled',false);
                 }else{
                     $(this).parents('fieldset:first').find('.inline-edit-date').find('input, select').attr('disabled','disabled').prop('disabled','disabled');
                 }
@@ -56,7 +56,7 @@
             if($('.jj',rowData).text().length!=0){ $('input[name="membership_permanent"]',editForm).attr('checked','checked').prop('checked','checked'); expires=true; }
             //Set dates (if appropriate)
             if(expires){
-                editForm.find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled','false')
+                editForm.find('.inline-edit-date').find('input, select').removeAttr('disabled').prop('disabled',false)
                     .filter('[name="mm"]').val($('.mm',rowData).text()).end()
                     .filter('[name="aa"]').val($('.aa',rowData).text()).end()
                     .filter('[name="jj"]').val($('.jj',rowData).text()).end();

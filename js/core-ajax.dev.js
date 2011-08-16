@@ -164,7 +164,7 @@ CTXPS_Ajax.addBulkUsersToGroup = function(){
 
             //If this was a success, uncheck all selected users
             if(response.find('bulk_enroll').attr('id') == '1'){
-                checkedArray.removeAttr('checked').prop('checked','false');
+                checkedArray.removeAttr('checked').prop('checked',false);
             }
         },
         'xml'
@@ -378,7 +378,7 @@ CTXPS_Ajax.addGroupToUser = function(){
                         .children('.detach')                        //Select all detached options
                             .remove();                              //Remove them
 
-                    jQuery('#btn-add-grp-2-user').removeAttr('disabled').prop('disabled','false');
+                    jQuery('#btn-add-grp-2-user').removeAttr('disabled').prop('disabled',false);
                     CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
                 }else{
                     alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
