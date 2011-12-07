@@ -211,11 +211,19 @@ class CTXPS_Components{
         $alternatecss = ' class="alternate" ';
         $countusers = count_users();
 
-        if(empty($user_id) && !empty($_REQUEST['user_id'])){
-            $user_id = $_REQUEST['user_id'];
+        if( empty($user_id) && !empty($_REQUEST['user_id']) ){
+            $user_id = esc_attr( $_REQUEST['user_id'] );
         }
 
+        //Loop through all groups and output...
         foreach($groups as $group){
+            
+            //Escape output
+            $group->ID = esc_attr( $group->ID );
+            $group->group_title = esc_attr( $group->group_title );
+            $group->group_description = esc_attr( $group->group_description );
+            
+            //Count the number of members in the group
             $countmembers = (!isset($group->group_system_id)) ? CTXPS_Queries::count_members($group->ID) : $countusers['total_users'];
 
             //Only create the actions if $showactions is true
@@ -223,12 +231,19 @@ class CTXPS_Components{
                 switch($view){
                     case 'users':
                         //Button for "Remove" takes user out of group (ajax)
-                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" id=\"unenroll-{$group->ID}\" onclick=\"CTXPS_Ajax.removeGroupFromUser({$group->ID},{$user_id},jQuery(this))\">Unenroll</a></span></div>";
+                        $htmlactions = sprintf('<div class="row-actions"><span class="edit"><a href="%1$s?page=ps_groups_edit&groupid=%2$s">Edit</a> | </span><span class="delete"><a class="submitdelete" id="unenroll-%2$s" onclick="CTXPS_Ajax.removeGroupFromUser(%2$s,%3$s,jQuery(this))">Unenroll</a></span></div>',
+                                /*1*/$linkBack,
+                                /*2*/$group->ID,
+                                /*3*/$user_id
+                        );
                         break;
                     case 'groups':
                         //Button for "Delete" removes group from db (postback)
                         //If $showactions is false, we dont show the actions row at all
-                        $htmlactions = "<div class=\"row-actions\"><span class=\"edit\"><a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\">Edit</a> | </span><span class=\"delete\"><a class=\"submitdelete\" href=\"?page=ps_groups_delete&groupid={$group->ID}\">Delete</a></span></div>";
+                        $htmlactions = sprintf('<div class="row-actions"><span class="edit"><a href="%1$s?page=ps_groups_edit&groupid=%2$s">Edit</a> | </span><span class="delete"><a class="submitdelete" href="?page=ps_groups_delete&groupid=%2$s">Delete</a></span></div>',
+                                /*1*/$linkBack,
+                                /*2*/$group->ID
+                        );
                         break;
                     default:break;
                 }
@@ -237,22 +252,33 @@ class CTXPS_Components{
             //If user isnt admin, we wont even link to group edit page (useful for profile pages)
             if ( current_user_can('promote_users') ){
                 //User is admin - determined if link is system or not
-                $grouplink = (!isset($group->group_system_id))
+                $grouplink = ( !isset($group->group_system_id) )
                     //This is a user group (editable)
-                    ? "<a href=\"{$linkBack}?page=ps_groups_edit&groupid={$group->ID}\"><strong>{$group->group_title}</strong></a>{$htmlactions}"
+                    ? sprintf('<a href="%1$s?page=ps_groups_edit&groupid=%2$s"><strong>%3$s</strong></a>%4$s', 
+                            $linkBack,
+                            $group->ID,
+                            $group->group_title,
+                            $htmlactions
+                      )
                     //This is a system group (not editable)
-                    : "<a id=\"$group->group_system_id\" class=\"ctx-ps-sysgroup\"><strong>{$group->group_title}</strong></a>";
+                    : sprintf( '<a id="%s" class="ctx-ps-sysgroup"><strong>%s</strong></a>', $group->group_system_id, $group->group_title );
             }else{
                 //User is not admin - no links
-                $grouplink = "<a id=\"$group->group_system_id\"><strong>{$group->group_title}</strong></a>";
+                $grouplink = sprintf('<a id="%s"><strong>%s</strong></a>', $group->group_system_id, esc_attr( $group->group_title ) ) ;
             }
 
-            $html .= "<tr {$alternatecss}>
-                <td class=\"id\">{$group->ID}</td>
-                <td class=\"name\">{$grouplink}</td>
-                <td class=\"description\">{$group->group_description}</td>
-                <td class=\"user-count\">$countmembers</td>
-            </tr>";
+            $html .= sprintf('<tr %1$s>
+                <td class="id">%2$s</td>
+                <td class="name">%3$s</td>
+                <td class="description">%4$s</td>
+                <td class="user-count">%5$s</td>
+            </tr>',
+                    $alternatecss,
+                    $group->ID,
+                    $grouplink,
+                    $group->group_description,
+                    $countmembers
+            );
 
             //Alternate css style for odd-numbered rows
             $alternatecss = ($alternatecss != '') ? '' : ' class="alternate" ';

@@ -503,7 +503,7 @@ class CTXPS_Queries{
         } else {
             //Add user to group (can't use $wpdb->insert because of the NULL possibility)
             $sqlUpdateGroup = sprintf("INSERT INTO `%s` (grel_group_id, grel_user_id, grel_expires) VALUES ('%s','%s',%s);",
-                $ctxpsdb->group_relss,
+                $ctxpsdb->group_rels,
                 $group_id,
                 $user_id,
                 (empty($expiration) || strtolower($expiration)==='null') ? 'NULL' : "'".$expiration."'"

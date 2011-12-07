@@ -33,6 +33,7 @@ PSC is created to be simple, yet powerful - and is designed to integrate seamles
 = Languages =
 1. English
 1. Italian (by Tristano Ajmone)
+1. French (by Sparza Benoit)
 
 Notice:
 While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
@@ -79,7 +80,7 @@ Best of all, ALL SECURITY RESTRICTIONS you have created are still in effect, eve
 
 This is powerful because it allows you to quickly and completely restrict site access to all unapproved users, while maintaining multiple levels of ADDITIONAL security for your content. To ensure your site is completely intranet-secure, remember to disable WordPress's "Anyone Can Register" setting.
 
-= Can I help translate PSC into my language? =
+= Can I help translate PSC into my language (or update an outdated translation)? =
 
 Absolutely! PO files are now included with each PSC download. You can use a WordPress plugin like "CodeStyling Localization" or a program like "Poedit" to easily create language-specific translations. If you'd like us to include your translation in the official release, simply email it to opensource@contextureintl.com!
 
@@ -133,6 +134,12 @@ $result = CTXPS_Queries::get_groups();
 $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
+
+= 1.5.4 =
+* Added a French translation (thanks, Sparza!)
+* Fixed a bug that could prevent adding users with expiring memberships
+* Fixed a potential security exploit
+* Improved MS support based on community contributions
 
 = 1.5.3 =
 * Additional JavaScript improvements

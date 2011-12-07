@@ -507,6 +507,7 @@ class CTXPS_Security{
 
             //IF FORCE LOGIN....
             if($plugin_opts['ad_opt_login_anon']==='true'){
+                //TODO: Problem area for some IIS users - not sure if its possible to fix, clearly an IIS bug
                 wp_safe_redirect(wp_login_url((empty($_SERVER['HTTPS'])?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
                 die();
             }
@@ -535,7 +536,7 @@ class CTXPS_Security{
                     //ELSE USE REDIRECT...
                     }else{
                         $redir_anon_link = get_permalink($plugin_opts['ad_page_anon_id']);
-                        wp_redirect($redir_anon_link);
+                        wp_redirect(apply_filters( 'psc_redir_anon_link', $redir_anon_link));
                         exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                     }
 

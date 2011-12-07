@@ -423,7 +423,7 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
 
                 CTXPS_Ajax.showSaveMsg('.ctx-ps-tablenav');
             }else{
-                alert(ctxpsmsg.GeneralError+data.find('wp_error').text());
+                alert(ctxpsmsg.GeneralError+response.find('wp_error').text());
             }
         },'xml'
     );
