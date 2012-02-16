@@ -380,7 +380,7 @@ class CTXPS_Ajax {
                 $response = array(
                     'what'=>    'update_sec',
                     'action'=>  'update_security',
-                    'id'=>      add_metadata($_REQUEST['object_type'], $_REQUEST['object_id'], 'ctx_ps_security', '1', true),
+                    'id'=>      (int)add_metadata($_REQUEST['object_type'], $_REQUEST['object_id'], 'ctx_ps_security', '1', true),
                     'data'=>    __('Security enabled.','contexture-page-security')
                 );
                 break;

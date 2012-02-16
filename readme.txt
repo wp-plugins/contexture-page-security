@@ -135,6 +135,10 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.5.5 =
+* Fixed a bug that caused "Protect this page" to incorrectly return an error under WP 3.3
+* More fixes and tweaks coming soon!
+
 = 1.5.4 =
 * Added a French translation (thanks, Sparza!)
 * Fixed a bug that could prevent adding users with expiring memberships

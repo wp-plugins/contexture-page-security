@@ -18,7 +18,7 @@ jQuery(function(){
     //Post sidebar - toggle security (cb)
     jQuery('#ctxps-grouplist-box #ctxps-cb-protect').click(function(){
         //CTXPS_Ajax.toggleSecurity()
-        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val()), '#ctxps-grouplist-box h3.hndle');
+        CTXPS_Ajax.toggleContentSecurity('post', parseInt(jQuery('#ctx_ps_post_id').val() ), '#ctxps-grouplist-box h3.hndle');
     });
     //Post sidebar - toggle security (cb label)
     jQuery('#ctxps-grouplist-box label[for="ctx_ps_protectmy"]').click(function(){
@@ -266,13 +266,13 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
 
             },
             function(response){response = jQuery(response);
-                if(response.find('update_sec').attr('id') == '1'){
+                if( 0 != response.find('update_sec').attr('id') ){
 
                     //Before we show the list, regenerate the content
-                    if(response.find('supplemental html').length!=0){
+                    if( 0 != response.find('supplemental html').length ){
                         switch(object_type){
                             case 'term':
-                                jQuery('#the-list-ctxps-relationships').replaceWith(response.find('supplemental html').text());
+                                jQuery('#the-list-ctxps-relationships').replaceWith( response.find('supplemental html').text() );
                                 break;
                             default:break;
                         }
@@ -592,13 +592,13 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
                     //Remove the row from the sidebar with a nifty fade effect, and add it back to the select box
                     var grpsAvail = jQuery('#ctxps-grouplist-ddl');
                     grpsAvail
-                        .html(grpsAvail.data('options'))
-                        .children('option[value="'+group_id+'"]')
-                            .removeClass('detach')
+                        .html(grpsAvail.data('options')) //Replace html with our saved option data
+                        .children('option[value="'+group_id+'"]') //Select the option with our group id
+                            .removeClass('detach') //Give it the detached class
                         .end()
-                        .data('options',grpsAvail.html())
-                        .children('.detach')
-                            .remove();
+                        .data('options',grpsAvail.html()) //Replace the option data with the new html
+                        .children('.detach') //Select the detach class items
+                            .remove(); //Remove the detach options
                     me.parent().fadeOut(500,function(){
                         console.log('Removed');
                         jQuery('#ctx-ps-page-group-list').html(response.find('supplemental html').text());
