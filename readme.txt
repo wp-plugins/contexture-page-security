@@ -1,10 +1,10 @@
 === Page Security by Contexture ===
-Contributors: Contexture International, Matt VanAndel
+Contributors: Contexture Media, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.2
-Tested up to: 3.3
-Stable tag: 1.5.5
+Tested up to: 3.4
+Stable tag: 1.5.6
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -134,6 +134,10 @@ $result = CTXPS_Queries::get_groups();
 $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
+
+= 1.5.6 =
+* Major bug fix: Rewrote the term protection code. Categories, tags, and custom taxonomy terms should now behave as expected. Posts/pages with protected terms will now behave as if the term protections are attached directly to the post.
+* A couple very minor UI tweaks.
 
 = 1.5.5 =
 * Fixed a bug that caused "Protect this page" to incorrectly return an error under WP 3.3

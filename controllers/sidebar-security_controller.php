@@ -15,7 +15,7 @@
         }
 
         //Get array with security requirements for this post
-        $securityStatus = CTXPS_Security::get_post_protection( $_REQUEST['post'] );
+        $securityStatus = CTXPS_Security::get_post_protection( $_REQUEST['post'], false );
         //Get array with security requirements for this posts terms
         $termSecurityStatus = CTXPS_Queries::check_post_term_protection( $_REQUEST['post'] );
 

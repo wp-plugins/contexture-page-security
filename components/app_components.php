@@ -419,7 +419,7 @@ class CTXPS_Components{
 
         if(is_numeric($security) || is_string($security)){
             //Get array with security requirements for this page
-            $security = CTXPS_Security::get_post_protection( $security );
+            $security = CTXPS_Security::get_post_protection( $security, false );
         }
 
         //Default vars
@@ -463,7 +463,10 @@ class CTXPS_Components{
                     //If this is the current page (and not an ancestor)
                     if($sec_array->pageid == $cur_page_id){
                         foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                            $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'.admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))">'.__('remove','contexture-page-security').'</span></div>';
+                            $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
+                                    .admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))" title="'
+                                    .__('Click to remove group access.','contexture-page-security').'" >'
+                                    .__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
                         foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
@@ -471,7 +474,8 @@ class CTXPS_Components{
                                 .$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
                                 .admin_url('/users.php?page=ps_groups_edit&groupid='
                                 .$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
-                                .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" >'
+                                .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" title="'
+                                .__('Protection has been inherited from an ancestor. Click to view ancestor.','contexture-page-security').'">'
                                 .__('ancestor','contexture-page-security')
                                 .'</a></div>';
                         }//foreach
@@ -488,7 +492,7 @@ class CTXPS_Components{
                 //Build the link HTML for terms
                 $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
                     .$tgroup['group_title']
-                    .'</span> <a style="text-decoration:none;" href="'.$term_archive_link.'">&raquo;</a><a class="viewgrp" target="_blank" href="'.$term_archive_link.'" >'
+                    .'</span> <a style="text-decoration:none;" href="'.$term_archive_link.'">&raquo;</a><a class="viewgrp" target="_blank" href="'.$term_archive_link.'" title="'.__('Protection has been inherited from a term. Click to view term.','contexture-page-security').'">'
                     .__('term','contexture-page-security')
                     .'</a></div>';
             }

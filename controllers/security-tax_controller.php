@@ -1,4 +1,7 @@
 <?php
+/**
+ *  
+ */
 global $taxonomy,$tag,$wpdb;
 
 /**
@@ -65,4 +68,3 @@ $all_groups::::
 print_r($all_groups);
 echo '</pre>';
 */
-?>

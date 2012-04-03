@@ -54,6 +54,12 @@ class CTXPS_Security{
                 /**Groups that this user is a member of*/
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
             }
+            
+            /**MERGE PAGE/TERM ARRAYS******************************************/
+            
+            //Get any page requirements
+            $pagereqs = self::get_post_protection($post->ID);
+           
 
             /**PAGE/SECTION CHECK**********************************************/
             $pagereqs = self::get_post_protection($post->ID);
@@ -68,29 +74,6 @@ class CTXPS_Security{
                 }
             }
 
-
-            /**TERM CHECK******************************************************/
-            //Ensure the term branch is protected before getting the array
-            $termreqs = false;
-            //If this term branch is protected...
-            if(CTXPS_Queries::check_post_term_protection($post->ID)){
-                //Branch is protected, get attached groups
-                $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->ID);
-            }
-
-            //wp_die('<pre>'.print_r($termreqs,true).'</pre>');
-
-            if($termreqs !== false && is_array($termreqs)){
-                //Determine if user can access this content
-                $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
-
-                //wp_die('<pre>'.(string)$termallowed.'</pre>');
-
-                //NOT ALLOWED TO ACCESS!
-                if(!$termallowed){
-                    self::deny_access($plugin_opts);
-                }
-            }
 
             //If we reach this point, there's no reason to deny access
         }
@@ -366,9 +349,10 @@ class CTXPS_Security{
      * @global wpdb $wpdb
      *
      * @param int $post_id The id of the post to get permissions for.
+     * @param bool $include_terms Optional. Define whether or not term protection should be merged into page protection.
      * @return mixed Returns an array with all the required permissions to access this page. If no security is present, returns false.
      */
-    public static function get_post_protection($post_id){
+    public static function get_post_protection($post_id,$include_terms=true){
 
         //If this branch isn't protected, just stop now and save all that processing power
         if (!CTXPS_Queries::check_section_protection($post_id)){
@@ -399,6 +383,19 @@ class CTXPS_Security{
         //Add an item to the array. 'pageid'=>array('groupid','groupname')
         $return[(string)$post_id] = $group_array;
         unset($group_array);
+        
+        /** 1b. Get term protections *******************************************/
+        if ( $include_terms ) {
+            //If term protection exists for this post, get the array
+            if( CTXPS_Queries::check_post_term_protection($post_id) ) {
+                
+                //Term branch is protected, get attached groups
+                $termreqs = CTXPS_Queries::get_groups_by_post_terms($post_id);
+                
+                //Merge those changes back into $pagereqs
+                $return[(string)$post_id] += $termreqs;
+            }
+        }
 
 
         /** 2. If I have a parent, recurse  ************************************/
@@ -407,7 +404,7 @@ class CTXPS_Security{
             if($parent_id != 0){
                 //$recursedArray = CTXPS_Security::get_protection($parentid);
                 //$array = array_merge($array,$recursedArray);
-                $parent_array = self::get_post_protection($parent_id);
+                $parent_array = self::get_post_protection($parent_id,$include_terms);
                 if(!!$parent_array){
                   $return += $parent_array;
                 }
