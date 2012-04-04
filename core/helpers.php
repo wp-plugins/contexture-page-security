@@ -128,5 +128,3 @@ class CTX_Helper{
         else{ return self::gen('a', $atts, $content); }
     }
 }}
-
-?>

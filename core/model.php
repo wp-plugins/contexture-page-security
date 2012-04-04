@@ -24,4 +24,3 @@ class CTXPS_Tables{
 }
 }
 $ctxpsdb = new CTXPS_Tables();
-?>

@@ -471,4 +471,3 @@ class CTXPS_Ajax {
         $response->send();
     }
 }}
-?>

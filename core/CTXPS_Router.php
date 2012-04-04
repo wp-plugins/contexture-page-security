@@ -35,5 +35,3 @@ class CTXPS_Router{
     public static function security_posts(){ self::render('sidebar-security',false); }
     public static function security_tax(){ self::render('security-tax'); }
 }}
-
-?>

@@ -59,11 +59,11 @@ class CTXPS_Security{
             
             //Get any page requirements
             $pagereqs = self::get_post_protection($post->ID);
+            
+            //wp_die(sprintf('<pre>%s</pre>',print_r($pagereqs,true)));
            
 
             /**PAGE/SECTION CHECK**********************************************/
-            $pagereqs = self::get_post_protection($post->ID);
-
             if($pagereqs !== false && is_array($pagereqs)){
                 //Determine if user can access this content
                 $pageallowed = self::check_access($useraccess,$pagereqs);
@@ -109,11 +109,11 @@ class CTXPS_Security{
                     /**Term groups required to access this post - default is false (no protection) */
                     $termreqs = false;
 
-                    //First, check if the post has any protected terms
-                    if(CTXPS_Queries::check_post_term_protection($post->value->ID)){
-                        //If the term-branch is protected, get an array of groups
-                        $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
-                    }
+//                    //First, check if the post has any protected terms
+//                    if(CTXPS_Queries::check_post_term_protection($post->value->ID)){
+//                        //If the term-branch is protected, get an array of groups
+//                        $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
+//                    }
 
                     //If necessary, validate group membership for page
                     if($pagereqs !== false && is_array($pagereqs)){
@@ -125,17 +125,19 @@ class CTXPS_Security{
                         }
                     }
 
-                    //If necessary, validate group membership for page's terms
-                    if($termreqs !== false && is_array($termreqs)){
-
-                        //Determine if user can access this content
-                        $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
-
-                        //NOT ALLOWED TO ACCESS!
-                        if(!$termallowed){
-                            unset($content[$post->key]);
-                        }
-                    }//End if
+//                    //If necessary, validate group membership for page's terms
+//                    if($termreqs !== false && is_array($termreqs)){
+//
+//                        //Determine if user can access this content
+//                        $termallowed = CTXPS_Security::check_access($useraccess,$termreqs);
+//
+//                        //NOT ALLOWED TO ACCESS!
+//                        if(!$termallowed){
+//                            unset($content[$post->key]);
+//                        }
+//                    }//End if
+                    
+                    
                 }//End foreach
             }//End appropriate section check
         }
@@ -212,9 +214,12 @@ class CTXPS_Security{
      * @param array $content
      * @return The array of wordpress posts used to build the custom menu.
      */
-    public static function filter_custom_menus($content){
+    public static function filter_custom_menus($content,$menu=null){
         global $current_user;
 
+        
+        //wp_die(sprintf('<pre>%s</pre>',print_r($content,true)));
+        
         $dbOpts = get_option('contexture_ps_options');//ad_msg_usefilter_menus
 
 
@@ -227,15 +232,25 @@ class CTXPS_Security{
                 return array();
             }
 
-            //Get options (in case we need to strip access denied pages)
-            $dbOpts = get_option('contexture_ps_options');
+            //Redundant: Get options (in case we need to strip access denied pages)
+            //$dbOpts = get_option('contexture_ps_options');
 
             foreach($content as $post->key => $post->value){
 
                 //Get groups that this user is a member of
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
-                //Get groups required to access this page
-                $pagereqs = self::get_post_protection($post->value->object_id);
+                
+                
+                //Determine menu item type to be filtered (post or term)
+                if ( 'taxonomy' === $post->value->type ) {
+                    //Get groups required to access this term archive
+                    $pagereqs = self::get_term_protection($post->value->object_id, $post->value->object);
+                }
+                else {
+                    //Get groups required to access this page (assume post)
+                    $pagereqs = self::get_post_protection($post->value->object_id);
+                }
+                
 
                 //So long as $pagereqs is anything but false
                 if(!!$pagereqs){
@@ -353,9 +368,9 @@ class CTXPS_Security{
      * @return mixed Returns an array with all the required permissions to access this page. If no security is present, returns false.
      */
     public static function get_post_protection($post_id,$include_terms=true){
-
+        
         //If this branch isn't protected, just stop now and save all that processing power
-        if (!CTXPS_Queries::check_section_protection($post_id)){
+        if (!CTXPS_Queries::check_section_protection($post_id,true)){
             return false;
         }
 
@@ -384,11 +399,13 @@ class CTXPS_Security{
         $return[(string)$post_id] = $group_array;
         unset($group_array);
         
+        
+        
         /** 1b. Get term protections *******************************************/
         if ( $include_terms ) {
             //If term protection exists for this post, get the array
             if( CTXPS_Queries::check_post_term_protection($post_id) ) {
-                
+            
                 //Term branch is protected, get attached groups
                 $termreqs = CTXPS_Queries::get_groups_by_post_terms($post_id);
                 
@@ -396,6 +413,9 @@ class CTXPS_Security{
                 $return[(string)$post_id] += $termreqs;
             }
         }
+        
+        //wp_die('|||'.print_r($termreqs,true));
+        //wp_die('|||'.print_r($return[(string)$post_id],true));
 
 
         /** 2. If I have a parent, recurse  ************************************/
@@ -520,10 +540,18 @@ class CTXPS_Security{
 
                 //IF USING PAGE...
                 if(is_numeric($plugin_opts['ad_page_anon_id'])){
+                    
+                    //WPML SUPPORT...
+                    $page_anon_id_current_language = $plugin_opts['ad_page_anon_id'];
+                    if( function_exists( 'icl_object_id' ) ) {
+                            global $sitepress;
+                            $current_language = $sitepress->get_current_language();
+                            $page_anon_id_current_language = icl_object_id( $page_anon_id_current_language, 'page', true, $current_language );
+                    }
 
                     //IF USING REPLACEMENT...
                     if($plugin_opts['ad_opt_page_replace']==='true'){
-                        $new_content = get_post($plugin_opts['ad_page_anon_id']);
+                        $new_content = get_post($page_anon_id_current_language);
                         $post->post_title = $new_content->post_title;
                         $post->post_content = $new_content->post_content;
                         if ( !$is_IIS && php_sapi_name() != 'cgi-fcgi' ){
@@ -532,7 +560,7 @@ class CTXPS_Security{
                         return;
                     //ELSE USE REDIRECT...
                     }else{
-                        $redir_anon_link = get_permalink($plugin_opts['ad_page_anon_id']);
+                        $redir_anon_link = get_permalink($page_anon_id_current_language);
                         wp_redirect(apply_filters( 'psc_redir_anon_link', $redir_anon_link));
                         exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_anon_link)); //Regular die to prevent restricted content from slipping out
                     }
@@ -557,10 +585,19 @@ class CTXPS_Security{
 
                 //IF USING PAGE...
                 if(is_numeric($plugin_opts['ad_page_auth_id'])){
+                    
+                    
+                     //WPML SUPPORT
+                    $page_auth_id_current_language = $plugin_opts['ad_page_auth_id'];
+                    if( function_exists( 'icl_object_id' ) ) {
+                            global $sitepress;
+                            $current_language = $sitepress->get_current_language();
+                            $page_auth_id_current_language = icl_object_id( $page_auth_id_current_language, 'page', true, $current_language );
+                    }
 
                     //IF USING REPLACEMENT...
                     if($plugin_opts['ad_opt_page_replace']==='true'){
-                        $new_content = get_post($plugin_opts['ad_page_auth_id']);
+                        $new_content = get_post($page_auth_id_current_language);
                         $post->post_title = $new_content->post_title;
                         $post->post_content = $new_content->post_content;
                         if ( !$is_IIS && php_sapi_name() != 'cgi-fcgi' ){
@@ -570,7 +607,7 @@ class CTXPS_Security{
 
                     //ELSE USE REDIRECT...
                     }else{
-                        $redir_auth_link = get_permalink($plugin_opts['ad_page_auth_id']);
+                        $redir_auth_link = get_permalink($page_auth_id_current_language);
                         wp_redirect($redir_auth_link);
                         exit(sprintf(__('Access Denied. Redirecting to %s','contexture-page-security'),$redir_auth_link)); //Regular die to prevent restricted content from slipping out
                     }
@@ -694,4 +731,3 @@ class CTXPS_Security{
     }
 
 }}
-?>

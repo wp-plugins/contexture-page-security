@@ -1036,26 +1036,30 @@ class CTXPS_Queries{
      * @return bool Returns true if post contains a protected term.
      */
     public static function check_post_term_protection($post_id){
-
+        
         //initialize variables
         $terms = self::get_post_terms($post_id);
+        
+        //wp_die(print_r($terms,true)); //TEST
 
-        $ancestor_protected = false;
+        //$ancestor_protected = false; //DISABLED
 
         foreach($terms as $term){
+            
             if(get_metadata('term',$term->term_id,'ctx_ps_security')){
                 return true;
             }else{
                 if( $term->parent!=0 ){
-                    if(self::check_term_protection($term->term_id))
-                        $ancestor_protected = true;
+                    if(self::check_term_protection($term->parent))
+                        //$ancestor_protected = true;  //DISABLED
+                        return true;
                 }
             }
         }
 
         //If any ancestor terms are protected, return true
-        if($ancestor_protected)
-            return true;
+        //if($ancestor_protected)  //DISABLED
+        //    return true;  //DISABLED
 
         //If no protection flags were triggered, return false
         return false;
@@ -1451,4 +1455,3 @@ class CTXPS_Queries{
 
 }
 }
-?>

@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.2
 Tested up to: 3.4
-Stable tag: 1.5.6
+Stable tag: 1.5.7
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -134,6 +134,11 @@ $result = CTXPS_Queries::get_groups();
 $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
+
+= 1.5.7 = 
+* Improved WPML support when using Access Denied pages
+* Menu filtering now handles protected terms that have been added to menus (if menu filtering is enabled)
+* Further substantial improvements to term protection (categories, tags, etc).
 
 = 1.5.6 =
 * Major bug fix: Rewrote the term protection code. Categories, tags, and custom taxonomy terms should now behave as expected. Posts/pages with protected terms will now behave as if the term protections are attached directly to the post.

@@ -205,5 +205,3 @@ class CTXPS_App{
 
 }
 }
-
-?>
