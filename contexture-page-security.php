@@ -3,7 +3,7 @@
 Plugin Name: Page Security by Contexture
 Plugin URI: http://www.contextureintl.com/open-source-projects/contexture-page-security-for-wordpress/
 Description: Allows admins to create user groups and restrict access to sections of the site by group.
-Version: 1.5.7
+Version: 1.5.8
 Author: Contexture Intl, Matt VanAndel
 Author URI: http://www.contextureintl.com
 License: GPL2
@@ -123,6 +123,10 @@ add_action('admin_head', array('CTXPS_App','help_init'));
 add_action('admin_head', array('CTXPS_Security','tag_protected_terms_heirarchal'));
 //Also add asterisks to unused tags
 add_action('tag_cloud_sort', array('CTXPS_Security','tag_protected_terms_unused'),10,2);
+
+//Update security records when a user is deleted
+add_action( 'delete_user', array('CTXPS_Queries','delete_user') );
+add_action( 'wpmu_delete_user', array('CTXPS_Queries','delete_user') );
 
 //add_action('edit_terms', array('CTXPS_Queries','toggle_term_protection')); //Disabled. This is now done via ajax
 

@@ -2,9 +2,9 @@
 Contributors: Contexture Media, Matt VanAndel
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
-Requires at least: 3.2
+Requires at least: 3.3
 Tested up to: 3.4
-Stable tag: 1.5.7
+Stable tag: 1.5.8
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -102,7 +102,7 @@ Please visit our official support page at http://goo.gl/Cw7v7 and we'd be glad t
 
 = Can I help test out pre-release versions of PSC =
 
-Absolutely. If you want access to all the newest features, and don't mind dealing with occassional bugs, visit our support page http://goo.gl/Cw7v7 and look for the "Development Build" option.
+Absolutely. If you want access to all the newest features, and don't mind dealing with occasional bugs, visit our support page http://goo.gl/Cw7v7 and look for the "Development Build" option.
 
 == Theme Functions ==
 
@@ -134,6 +134,10 @@ $result = CTXPS_Queries::get_groups();
 $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
+
+= 1.5.8 =
+* Deleting a WordPress user now updates Page Security too
+* Built-in help documentation now uses WordPress 3.3+ new system
 
 = 1.5.7 = 
 * Improved WPML support when using Access Denied pages

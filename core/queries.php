@@ -593,6 +593,28 @@ class CTXPS_Queries{
         ));
         return ($count>0);
     }
+    
+    
+    /**
+     * This function will completely wipe a user from all groups. It is called
+     * directly by the delete_user hook.
+     *
+     * @global wpdb $wpdb
+     * @global CTXPSC_Tables $ctxpsdb
+     * @param int $user_id 
+     */
+    public static function delete_user($user_id){
+        global $wpdb,$ctxpsdb;
+        
+        if( ! empty($user_id) ){
+            return $wpdb->query($wpdb->prepare('
+            DELETE FROM `'.$ctxpsdb->group_rels.'`
+            WHERE grel_user_id = %s',
+                $user_id
+            ));
+        }
+        
+    }
 
 
     /**
