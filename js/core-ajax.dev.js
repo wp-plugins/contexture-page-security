@@ -165,11 +165,12 @@ CTXPS_Ajax.addBulkUsersToGroup = function(){
             //If this was a success, uncheck all selected users
             if(response.find('bulk_enroll').attr('id') == '1'){
                 checkedArray.removeAttr('checked').prop('checked',false);
+                jQuery('#cb-select-all-1,#cb-select-all-2').removeAttr('checked').prop('checked',false);
             }
         },
         'xml'
     );
-}
+};
 
 /**
  * GENERAL. Will display a "Security Updated" message in the sidebar when successful change to security
@@ -186,7 +187,7 @@ CTXPS_Ajax.showSaveMsg = function(selector){
                     });
             });
     }
-}
+};
 
 /**
  * SIDEBAR. Updates the security status of a post/page
@@ -237,7 +238,7 @@ CTXPS_Ajax.toggleSecurity = function(){
             jQuery('#ctx_ps_protectmy').attr('checked','checked').prop('checked','checked');
         }
     }
-}
+};
 
 /**
  * SIDEBAR. Updates the security status of a taxonomy term or other type
@@ -343,7 +344,7 @@ CTXPS_Ajax.toggleContentSecurity = function(object_type,object_id,save_selector)
             jQuery('#ctxps-cb-protect').attr('checked','checked').prop('checked','checked');
         }
     }
-}
+};
 
 /**
  * USER PROFILE MEMBERSHIP TABLE. Adds a group to a user
@@ -388,7 +389,7 @@ CTXPS_Ajax.addGroupToUser = function(){
     }else{
         alert(ctxpsmsg.NoGroupSel);
     }
-}
+};
 
 /**
  * USER PROFILE MEMBERSHIP TABLE. Removes a group from a user
@@ -427,7 +428,7 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
             }
         },'xml'
     );
-}
+};
 
 /**
  * SIDEBAR. Adds a group to a page with security
@@ -467,7 +468,7 @@ CTXPS_Ajax.addGroupToPage = function(){
     }else{
         alert(ctxpsmsg.NoGroupSel);
     }
-}
+};
 
 /**
  * SIDEBAR. Adds a group to a protected term
@@ -521,7 +522,7 @@ CTXPS_Ajax.addGroupToTerm = function(){
     }else{
         alert(ctxpsmsg.NoGroupSel);
     }
-}
+};
 
 /**
  * SIDEBAR. Adds a group to any content with security
@@ -568,7 +569,7 @@ CTXPS_Ajax.addGroupToContent = function(group_id,content_type,content_id,list_se
     }else{
         alert(ctxpsmsg.NoGroupSel);
     }
-}
+};
 
 /**
  * SIDEBAR. Removes a group from a page with security
@@ -611,7 +612,7 @@ CTXPS_Ajax.removeGroupFromPage = function(group_id,me){
             },'xml'
         );
     }
-}
+};
 
 
 /**
@@ -660,7 +661,7 @@ CTXPS_Ajax.removeGroupFromTerm = function(group_id,me){
             },'xml'
         );
     }
-}
+};
 
 /**
  * GROUP EDIT > ASSOCIATED CONTENT TABLE. Removes a page from a group via the group screen
@@ -691,4 +692,4 @@ CTXPS_Ajax.removePageFromGroup = function(post_id,me){
             },'xml'
         );
     }
-}
+};

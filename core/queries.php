@@ -167,7 +167,7 @@ class CTXPS_Queries{
      * @param decimal $version Which version of PHP is required?
      * @param boolean $die If true, wp_die() is called, else returns string.
      */
-    public static function check_wp_version($version='3.2',$die=true){
+    public static function check_wp_version($version='3.5',$die=true){
         global $ctxpsdb, $wp_version;
 
         //Ensure that we're using PHP5 (plugin has reported problems with PHP4)

@@ -62,3 +62,7 @@ option.cts-ps-system-group { font-weight:bold; }
     .inline-edit-col-left { width:30% !important; border-right:1px solid #DDDDDD;  }
 
     .inline-edit-col-right label { padding-left:10px !important; }
+
+.prot-icon {
+    max-width: 15px;
+}

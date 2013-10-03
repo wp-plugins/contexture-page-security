@@ -1,10 +1,10 @@
 === Page Security by Contexture ===
-Contributors: Contexture Media, Matt VanAndel
+Contributors: Veraxus, Contexture
 Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, members, restricted
 Requires at least: 3.3
-Tested up to: 3.4
-Stable tag: 1.5.8
+Tested up to: 3.8
+Stable tag: 1.5.9
 
 Allows admins to create user groups and set access restrictions for any post, page or section.
 
@@ -135,6 +135,10 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
+= 1.5.9 ( 2013/10/03 ) =
+* Various other bug fixes (should solve most reported error messages and problems)
+* Retina-screen icons.
+
 = 1.5.8 =
 * Deleting a WordPress user now updates Page Security too
 * Built-in help documentation now uses WordPress 3.3+ new system
@@ -201,88 +205,3 @@ $result = CTXPS_Queries::check_protection();
 * Fixed a bug with membership expirations.
 * Lots and lots and lots of usability improvements.
 * MORE FEATURES COMING SOON!
-
-= 1.3.4 =
-* Fixed a bug that could cause query strings to become too long when adding users from the Group Edit screen
-
-= 1.3.3 =
-* Bug fixes (thanks, Alex)
-
-= 1.3.2 =
-* Somewhat remedied an issue that could cause slower sites to "blink" during AD page redirects
-* Other minor bug fixes
-
-= 1.3.1 =
-* Fixed a bug that could cause search results to return an AD in certain conditions.
-
-= 1.3.0 =
-* Merry Christmas! Lots of new features.
-* New feature: Subscription support! You can now assign expiration dates to group memberships!
-* New feature: New theme-friendly functions! Now you can easily check permissions, get group lists, or add or remove users from groups programmatically!
-* New feature: Group screens now show which pages they are assigned to!
-* New feature: The contextual help tab now includes documentation for all PSC features!
-
-= 1.2.4 =
-* Fixed a redirect bug reported by the community.
-
-= 1.2.3 =
-* Bug fixes
-
-= 1.2.1 =
-* New feature: To improve usability, the "Restrict Access" sidebar now appears on "New..." screens.
-
-= 1.2 =
-
-* New feature: All-new settings screen with lots of new customization options.
-* New feature: You can now use any page as a custom "access denied" screen
-* New feature: You can now control whether menus or RSS feeds get filtered
-* LOTS of new usability improvements
-* Bug fixes!
-
-= 1.1 =
-* New feature: Easily manage a user's group memberships from the Edit User page
-* New feature: Admins can now customize their default access denied messages!
-* New feature: Added [groups_attached] and [groups_required] shortcodes, which print permissions requirements for the current page/post (great troubleshooting tool for folks with complex permissions)
-* New feature: The "Restrict Access" sidebar now lists inherited permissions for easy management of security
-* Lots and lots of minor usability improvements
-* Fixed a bug that prevented the plugin from activating with certain PHP configurations
-* Numerous bug fixes (and hopefully no new ones)
-
-= 1.0.4 =
-* Fixed a restricted access message that pointed to incorrect login page url
-
-= 1.0.3 =
-* Fixed a bug with the PHP version check.
-
-= 1.0.2 =
-* Activation now enforces PHP requirement
-
-= 1.0.1 =
-* Fixed a bug where group count was incorrectly including smart groups
-* Updated readme to reflect PHP5 requirement
-
-= 1.0 =
-* Added a system-owned "Registered Users" smart group so admins can easily limit access to logged-in users only
-* Fixed a webkit-only bug where "Restrict Access" sidebar was not being properly updated when changes were made
-* Groups can now be deleted
-* Lots of minor usability improvements
-
-= 0.8.3 =
-* Usability improvement: Restrict Access sidebar now lets you know that your security changes are saved
-
-= 0.8.2 =
-* Fixed a bug introduced in 0.8.1 that could cause post page to display incorrectly
-* Protected blog posts will no longer appear in RSS feeds
-
-= 0.8.1 =
-* Added menu filtering to WP3 custom menus. Minor bug fixes.
-
-= 0.8.0 =
-* Users will no longer see menu links to pages they are restricted from (default menus only).
-
-= 0.7.1 =
-* Minor bug fixes.
-
-= 0.7.0 =
-* Basic security features are in place. First releasable version.
-

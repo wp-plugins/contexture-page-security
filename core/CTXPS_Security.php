@@ -100,19 +100,19 @@ class CTXPS_Security{
         }else{
             //Do this only if user is not an admin, or if this is the blog page, category page, tag page, or feed (and isnt an admin page)
             if( !current_user_can('edit_others_posts') && ( is_home() || is_category() || is_tag() || is_tax() || is_feed() || is_author() || is_search() || is_archive() )  && !is_admin()) {
-                foreach($content as $post->key => $post->value){
+                foreach($content as $postKey => $postVal){
 
                     /**Groups that this user is a member of*/
                     $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
                     /**Groups required to access this post*/
-                    $pagereqs = self::get_post_protection($post->value->ID);
+                    $pagereqs = self::get_post_protection($postVal->ID);
                     /**Term groups required to access this post - default is false (no protection) */
                     $termreqs = false;
 
 //                    //First, check if the post has any protected terms
-//                    if(CTXPS_Queries::check_post_term_protection($post->value->ID)){
+//                    if(CTXPS_Queries::check_post_term_protection($postVal->ID)){
 //                        //If the term-branch is protected, get an array of groups
-//                        $termreqs = CTXPS_Queries::get_groups_by_post_terms($post->value->ID);
+//                        $termreqs = CTXPS_Queries::get_groups_by_post_terms($postVal->ID);
 //                    }
 
                     //If necessary, validate group membership for page
@@ -121,7 +121,7 @@ class CTXPS_Security{
                         //NOT ALLOWED TO ACCESS!!
                         if(!$secureallowed){
                             //If we're NOT allowed to access this page
-                            unset($content[$post->key]);
+                            unset($content[$postKey]);
                         }
                     }
 
@@ -133,7 +133,7 @@ class CTXPS_Security{
 //
 //                        //NOT ALLOWED TO ACCESS!
 //                        if(!$termallowed){
-//                            unset($content[$post->key]);
+//                            unset($content[$postKey]);
 //                        }
 //                    }//End if
                     
@@ -172,12 +172,12 @@ class CTXPS_Security{
             }
 
             //Loop through the content array
-            foreach($content as $post->key => $post->value){
+            foreach($content as $postKey => $postVal){
 
                 //Get groups that this user is a member of
                 $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
                 //Get groups required to access this page
-                $pagereqs = self::get_post_protection($post->value->ID);
+                $pagereqs = self::get_post_protection($postVal->ID);
 
                 //So long as $pagereqs is anything but false
                 if(!!$pagereqs){
@@ -189,14 +189,14 @@ class CTXPS_Security{
                         //If we're allowed to access this page
                     }else{
                         //If we're NOT allowed to access this page
-                        unset($content[$post->key]); //Remove content from array
+                        unset($content[$postKey]); //Remove content from array
                     }
                 }
 
                 //If this is an AD page, strip it too
                 if($dbOpts['ad_msg_usepages']==='true'){
-                    if($post->value->ID==$dbOpts['ad_page_auth_id'] || $post->value->ID==$dbOpts['ad_page_anon_id']){
-                        unset($content[$post->key]);
+                    if($postVal->ID==$dbOpts['ad_page_auth_id'] || $postVal->ID==$dbOpts['ad_page_anon_id']){
+                        unset($content[$postKey]);
                     }
                 }
             }
@@ -235,43 +235,47 @@ class CTXPS_Security{
             //Redundant: Get options (in case we need to strip access denied pages)
             //$dbOpts = get_option('contexture_ps_options');
 
-            foreach($content as $post->key => $post->value){
+            if ( !empty($content) ) {
 
-                //Get groups that this user is a member of
-                $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
-                
-                
-                //Determine menu item type to be filtered (post or term)
-                if ( 'taxonomy' === $post->value->type ) {
-                    //Get groups required to access this term archive
-                    $pagereqs = self::get_term_protection($post->value->object_id, $post->value->object);
-                }
-                else {
-                    //Get groups required to access this page (assume post)
-                    $pagereqs = self::get_post_protection($post->value->object_id);
-                }
-                
+                foreach($content as $postKey => $postValue){
 
-                //So long as $pagereqs is anything but false
-                if(!!$pagereqs){
+                    //Get groups that this user is a member of
+                    $useraccess = CTXPS_Queries::get_user_groups($current_user->ID);
 
-                    //Determine user access
-                    $secureallowed = self::check_access($useraccess,$pagereqs);
 
-                    if($secureallowed){
-                        //If we're allowed to access this page
-                    }else{
-                        //If we're NOT allowed to access this page
-                        unset($content[$post->key]);
+                    //Determine menu item type to be filtered (post or term)
+                    if ( 'taxonomy' === $postValue->type ) {
+                        //Get groups required to access this term archive
+                        $pagereqs = self::get_term_protection($postValue->object_id, $postValue->object);
                     }
-                }
-                //If this is an AD page, strip it too
-                if($dbOpts['ad_msg_usepages']==='true'){
-                    if($post->value->object_id==$dbOpts['ad_page_auth_id'] || $post->value->object_id==$dbOpts['ad_page_anon_id']){
-                        unset($content[$post->key]);
+                    else {
+                        //Get groups required to access this page (assume post)
+                        $pagereqs = self::get_post_protection($postValue->object_id);
+                    }
+
+
+                    //So long as $pagereqs is anything but false
+                    if(!!$pagereqs){
+
+                        //Determine user access
+                        $secureallowed = self::check_access($useraccess,$pagereqs);
+
+                        if($secureallowed){
+                            //If we're allowed to access this page
+                        }else{
+                            //If we're NOT allowed to access this page
+                            unset($content[$postKey]);
+                        }
+                    }
+                    //If this is an AD page, strip it too
+                    if($dbOpts['ad_msg_usepages']==='true'){
+                        if($postValue->object_id==$dbOpts['ad_page_auth_id'] || $postValue->object_id==$dbOpts['ad_page_anon_id']){
+                            unset($content[$postKey]);
+                        }
                     }
                 }
             }
+
         }
 
         return $content;

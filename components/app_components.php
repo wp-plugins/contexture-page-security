@@ -19,7 +19,7 @@ class CTXPS_Components{
         }
 
         //Add new column
-        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png'.'" /></div>';
+        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected-2x.png'.'" class="prot-icon" /></div>';
 
         //Add date back on (now at end of array);
         if(!empty($date)){
@@ -39,7 +39,7 @@ class CTXPS_Components{
     public static function add_term_protection_column($columns){
 
         //Add new column
-        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected.png'.'" /></div>';
+        $columns['protected'] = '<div class="vers"><img alt="Protected" src="'.CTXPSURL.'images/protected-2x.png'.'" class="prot-icon" /></div>';
 
         //Return new column array
         return $columns;
@@ -64,7 +64,8 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected','contexture-page-security'),
                     'title'=>__('Protected','contexture-page-security'),
-                    'src'=>CTXPSURL.'images/protected-inline.png'
+                    'src'=>CTXPSURL.'images/protected-inline-2x.png',
+                    'class'=>"prot-icon prot-inline",
                 ));
             }
             //If this page isnt protected, but an ancestor is, return a lighter icon
@@ -72,7 +73,8 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected (inherited)','contexture-page-security'),
                     'title'=>__('Inheriting protection','contexture-page-security'),
-                    'src'=>CTXPSURL.'images/protected-inline-descendant.png'
+                    'src'=>CTXPSURL.'images/protected-inline-descendant-2x.png',
+                    'class'=>"prot-icon prot-descendant",
                 ));
             //If theres no direct protection, is this content protected through term inheritance?
             }else{
@@ -81,7 +83,8 @@ class CTXPS_Components{
                     CTX_Helper::img (array(
                         'alt'=>__('Protected (inherited from term)','contexture-page-security'),
                         'title'=>__('Inheriting protection from term','contexture-page-security'),
-                        'src'=>CTXPSURL.'images/protected-inline-inherit.png'
+                        'src'=>CTXPSURL.'images/protected-inline-inherit-2x.png',
+                        'class'=>"prot-icon prot-inline-inherit",
                     ));
                 }
             }
@@ -104,7 +107,8 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected','contexture-page-security'),
                     'title'=>__('Protected','contexture-page-security'),
-                    'src'=>CTXPSURL.'images/protected-inline.png'
+                    'src'=>CTXPSURL.'images/protected-inline-2x.png',
+                    'class'=>"prot-icon prot-inline",
                 ));
             }
             //If this page isnt protected, but an ancestor is, return a lighter icon
@@ -112,7 +116,8 @@ class CTXPS_Components{
                 CTX_Helper::img (array(
                     'alt'=>__('Protected (inherited)','contexture-page-security'),
                     'title'=>__('Inheriting protection','contexture-page-security'),
-                    'src'=>CTXPSURL.'images/protected-inline-descendant.png'
+                    'src'=>CTXPSURL.'images/protected-inline-descendant-2x.png',
+                    'class'=>"prot-icon prot-inline-descendant",
                 ));
             }
         }
@@ -459,22 +464,22 @@ class CTXPS_Components{
             $return .= '<div><em>'.__('No groups have been added yet.','contexture-page-security').'</em></div>';
         }else{
             if(!empty($security)){
-                foreach($security as $sec_array->pageid => $sec_array->grouparray){
+                foreach($security as $sec_array_id => $sec_array){
                     //If this is the current page (and not an ancestor)
-                    if($sec_array->pageid == $cur_page_id){
-                        foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
-                            $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
-                                    .admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroup->id).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroup->id.',jQuery(this))" title="'
+                    if($sec_array_id == $cur_page_id){
+                        foreach($sec_array as $currentGroupId => $currentGroup){
+                            $return .= '<div class="ctx-ps-sidebar-group">&bull; <span class="ctx-ps-sidebar-group-title">'.$currentGroup.'</span> <a style="text-decoration:none;" href="'
+                                    .admin_url('/users.php?page=ps_groups_edit&groupid='.$currentGroupId).'">&raquo;</a><span class="removegrp" onclick="CTXPS_Ajax.removeGroupFromPage('.$currentGroupId.',jQuery(this))" title="'
                                     .__('Click to remove group access.','contexture-page-security').'" >'
                                     .__('remove','contexture-page-security').'</span></div>';
                         }
                     }else{
-                        foreach($sec_array->grouparray as $currentGroup->id => $currentGroup->name){
+                        foreach($sec_array as $currentGroupId => $currentGroup){
                             $return .= '<div class="ctx-ps-sidebar-group inherited">&bull; <span class="ctx-ps-sidebar-group-title">'
-                                .$currentGroup->name.'</span> <a style="text-decoration:none;" href="'
+                                .$currentGroup.'</span> <a style="text-decoration:none;" href="'
                                 .admin_url('/users.php?page=ps_groups_edit&groupid='
-                                .$currentGroup->id).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
-                                .admin_url('post.php?post='.$sec_array->pageid.'&action=edit').'" title="'
+                                .$currentGroupId).'">&raquo;</a><a class="viewgrp" target="_blank" href="'
+                                .admin_url('post.php?post='.$sec_array_id.'&action=edit').'" title="'
                                 .__('Protection has been inherited from an ancestor. Click to view ancestor.','contexture-page-security').'">'
                                 .__('ancestor','contexture-page-security')
                                 .'</a></div>';
