@@ -307,18 +307,18 @@ class CTXPS_Security{
         $loopswithgroups = 0;
 
         //Loop through each page's permissions, starting with current page and travelling UP the heirarchy...
-        foreach($PageSecurityArray as $security->page => $security->secarray){
+        foreach($PageSecurityArray as $securityPage => $securityArray){
 
             //Ensure secarray is an array - if not, make it one (needed for some term checks)
-            if(!is_array($security->secarray))
-                $security->secarray = array($security->secarray);
+            if(!is_array($securityArray))
+                $securityArray = array($securityArray);
 
             //If the current page has group settings attached...
-            if(count($security->secarray) != 0){
+            if(count($securityArray) != 0){
                 //Increment our group tracking var
                 $loopswithgroups += 1;
                 //If any of this user's groups do not match any of this page's groups...
-                if( count(array_intersect($UserGroupsArray,$security->secarray)) == 0 ){
+                if( count(array_intersect($UserGroupsArray,$securityArray)) == 0 ){
                     //We return false as the user does not have access
                     return false;
                 }

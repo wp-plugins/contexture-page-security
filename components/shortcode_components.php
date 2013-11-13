@@ -62,14 +62,14 @@ class CTXPS_Shortcodes{
 
         $return = "<div class=\"ctx-ps-groupvis\"><h3>{$output['label']}</h3><p>{$output['description']}</p><ul>";
 
-        foreach($requiredGroups as $pageGroup->ID => $pageGroups->groups){
+        foreach($requiredGroups as $pageGroupID => $pageGroupsArray){
 
             //List the page title
-            $return .= "<li><strong>".get_the_title($pageGroup->ID)." (id:{$pageGroup->ID})</strong><ul>";
+            $return .= "<li><strong>".get_the_title($pageGroupID)." (id:{$pageGroupID})</strong><ul>";
 
-            foreach($pageGroups->groups as $curGrp->ID => $curGrp->title){
+            foreach($pageGroupsArray as $curGrpID => $curGrpTitle){
                 ++$groupcount;
-                $return .= "<li>".$curGrp->title." (id:{$curGrp->ID})</li>";
+                $return .= "<li>".$curGrpTitle." (id:{$curGrpID})</li>";
             }
 
             //If there were no groups attached, show that there's no access at that level
