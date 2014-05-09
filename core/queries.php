@@ -460,8 +460,13 @@ class CTXPS_Queries{
     public static function add_membership($user_id,$group_id,$expiration=null){
         global $wpdb,$ctxpsdb;
 
+        // If the $user_id is 0 or false, halt (adding a user 0 membership effectively makes content public).
+        if ( empty($user_id) ) {
+            return false;
+        }
+
         //If we're trying to use this method with an expiration, forward to add_membership_with_expiration()
-        if(!empty($expiration)){
+        if( ! empty( $expiration ) ){
             return self::add_membership_with_expiration($user_id,$group_id,$expiration);
         }
 
@@ -489,8 +494,8 @@ class CTXPS_Queries{
     public static function add_membership_with_expiration($user_id,$group_id,$expiration=null){
         global $wpdb,$ctxpsdb;
 
-        //If either value isnt an int, fail
-        if(!is_numeric($user_id) || !is_numeric($group_id)){
+        //If either value isn't a non-zero int, fail
+        if( is_empty($user_id) || ! is_numeric($user_id) || ! is_numeric($group_id)){
             return false;
         }
 
@@ -1262,21 +1267,30 @@ class CTXPS_Queries{
     }
 
     /**
-     *
+     * Returns a user id for the specified user name
+     * 
      * @global wpdb $wpdb
-     * @param string $username
+     * @param string $name
      * @return int The user_id of the specified user. False if not found.
      */
-    public static function get_user_id_by_username( $username ) {
+    public static function get_user_id_by_username( $name ) {
         global $wpdb;
 
         //Lets convert the request to a nicename (should be more reliable)
-        $username = sanitize_title( $username );
-        $username = apply_filters('pre_user_nicename', $username);
+        $name = sanitize_title( $name );
+        $name = apply_filters('pre_user_nicename', $name);
 
         //lets run this thing...
-        $query = $wpdb->prepare('SELECT `ID` FROM `'.$wpdb->users.'` WHERE `user_nicename`=%s LIMIT 1',$username);
-        return $wpdb->get_var($query,0,0);
+        $query = $wpdb->prepare('SELECT `ID` FROM `'.$wpdb->users.'` WHERE `user_nicename`=%s LIMIT 1',$name);
+        
+        $uid = $wpdb->get_var($query,0,0);
+        
+        if ( empty($uid) ){
+            return false;
+        }
+        else {
+            return $uid;
+        } 
     }
 
     /**

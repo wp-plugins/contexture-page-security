@@ -6,7 +6,7 @@
 #ctx-ps-page-group-list > div .viewgrp {float:right;color:gray;font-family:arial,helvetica,sans-serif;display:none;font-weight:bold;text-decoration:none;}
 #ctx-ps-page-group-list > div:hover .removegrp,
 #ctx-ps-page-group-list > div:hover .viewgrp{display:inline;cursor:pointer;}
-.ctx-ajax-status { display:none; float:right; color:green; font-size:0.8em; margin-right:5px; margin-top:-5px; }
+.ctx-ajax-status { display:none; float:right; color:green; font-size:0.8em; margin-right:0.75em; margin-top:0.15em; }
 .ctx-ps-sysgroup { color:gray; }
 .ctx-ps-sysgroup:hover { color:gray; }
 option.cts-ps-system-group { font-weight:bold; }
@@ -29,9 +29,14 @@ option.cts-ps-system-group { font-weight:bold; }
     #ad-msg-auth, #ad-msg-anon { width:500px; }
     .toggle-opts-ad { } /*Hide this until "custom ad pages" feature is implemented */
     .toggle-opts-ad-page {display:none; }
-    #ctx-about {width:326px;float:right;border:1px solid #e5e5e5;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;padding:10px;margin-top:1px;margin-right:10px;margin-left:10px;}
+    #ctx-about { max-width:780px;border-top:1px solid silver;border-bottom:1px solid silver;padding:10px;margin-top:1em;}
+    #ctx-about .options a { display:inline-block;width:48%;float:left;text-align:center; }
+    @media screen and (max-width:600px){
+        #ctx-about .options a {display:block;clear:both !important;float:none !important;width:100%;margin-bottom:1em;}
+    }
     #ctx-about a.img-block {display:block;text-align:center;}
-    #ctx-about p, #ctx-about div {padding-left:10px;color:#9c9c9c;}
+        #ctx-about a.img-block img {max-width:400px}
+    #ctx-about p, #ctx-about div {color:#9c9c9c;}
     #ctx-about p a { color:gray; }
     #ctx-ps-opts-form {float:left;min-width:765px;padding-top:20px;}
     #ctx-ps-opts-form+td { width:370px !important; }
