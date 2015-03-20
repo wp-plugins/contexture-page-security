@@ -149,10 +149,10 @@
     <div id="ctx-about">
         <a class="img-block" href="http://www.contextureintl.com"><img src="<?php echo CTXPSURL.'images/ctx-logo.png'; ?>" alt="Contexture International" /></a>
         <p>Page Security is a free, open source plugin developed at <a href="http://www.contextureintl.com">Contexture International</a> and released under the <a href="http://wordpress.org/about/gpl/" style="text-decoration:none">GNU General Public License</a>.</p>
-        <p>Contexture International is an all-in-one agency specializing in <a href="http://www.contextureintl.com/portfolio/graphic-design/">graphic design</a>, <a href="http://www.contextureintl.com/portfolio/web-interactive/">web design</a>, and <a href="http://www.contextureintl.com/portfolio/broadcast-video-production/">broadcast and video production</a>, with an unparalleled ability to connect with the heart of your audience.</p>
+        <p>Contexture International is an all-in-one agency specializing in <a href="http://www.contextureintl.com/case-studies/">graphic design</a>, <a href="http://www.contextureintl.com/portfolio/web-interactive/">web design</a>, and <a href="http://www.contextureintl.com/portfolio/broadcast-video-production/">broadcast and video production</a>, with an unparalleled ability to connect with the heart of your audience.</p>
         <p>Contexture's staff has successfully promoted organizations and visionaries for more than 2 decades through exceptional storytelling, in just the right contexts for their respective audiences, with overwhelming returns on investment.  See the proof in our <a href="http://www.contextureintl.com/portfolio/">portfolio </a>or learn more <a href="http://www.contextureintl.com/about-us/">about us</a>.</p>
         <div class="options">
-            <a class="button-primary" href="http://www.contextureintl.com/contact-us/request-a-quote/">Get a quote!</a>
+            <a class="button-primary" href="http://www.contextureintl.com">Get a quote!</a>
             <a class="button-primary" href="http://wordpress.org/support/plugin/contexture-page-security" style="float:right">Need help?</a>
             <div style="clear:both;"></div>
         </div>

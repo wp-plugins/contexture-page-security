@@ -1,16 +1,16 @@
-=== Page Security by Contexture ===
+=== Page Security & Membership ===
 Contributors: Veraxus, Contexture
 Donate link: http://www.contextureintl.com/
-Tags: security, permissions, users, groups, page, post, members, restricted
+Tags: security, permissions, users, groups, page, post, membership, restricted
 Requires at least: 3.3
-Tested up to: 3.9
-Stable tag: 1.5.11
+Tested up to: 4.2
+Stable tag: 1.5.12
 
-Allows admins to create user groups and set access restrictions for any post, page or section.
+Allows admins to create user membership groups and set access restrictions for any post, page or section.
 
 == Description ==
 
-Page Security by Contexture International (PSC) lets YOU decide which users can access which content. Add users to groups, set granular permissions for content, and finally take control of your website!
+Page Security & Membership lets YOU decide which users can access which content. Add users to groups, set granular permissions for content, and finally take control of your website!
 
 Groups allow you to organize your users how YOU see fit, then use your groups to choose who can access posts, pages, custom content, or entire sections of your website.
 Create an intranet or a members-only area with just a few clicks, or build a subscription based system with automatically expiring memberships. You can even create multiple levels
@@ -34,9 +34,6 @@ PSC is created to be simple, yet powerful - and is designed to integrate seamles
 1. English
 1. Italian (by Tristano Ajmone)
 1. French (by Sparza Benoit)
-
-Notice:
-While we believe this plugin is secure, we make no warranty about it's effectiveness during real-world use. Use at your own risk!
 
 == Installation ==
 
@@ -134,6 +131,9 @@ $result = CTXPS_Queries::get_groups();
 $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
+
+= 1.5.12 ( 2015/03/20 ) =
+* Maintenance update. Better IIS and CGI support.
 
 = 1.5.11 ( 2014/05/09 ) =
 * Fixed a bug that could result in admins accidentally unprotecting pages without realizing it.
