@@ -528,8 +528,10 @@ class CTXPS_Security{
 
             //IF FORCE LOGIN....
             if($plugin_opts['ad_opt_login_anon']==='true'){
-                //TODO: Problem area for some IIS users - not sure if its possible to fix, clearly an IIS bug
-                wp_safe_redirect(wp_login_url((is_ssl()?'http://':'https://').$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI']));
+                //TODO: Possible problem area for some IIS users - not sure if its possible to fix
+                wp_safe_redirect( wp_login_url( 
+	                ( is_ssl()?'https://':'http://' ).$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'] 
+                ) );
                 die();
             }
 
