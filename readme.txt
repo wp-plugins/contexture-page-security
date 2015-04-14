@@ -4,7 +4,7 @@ Donate link: http://www.contextureintl.com/
 Tags: security, permissions, users, groups, page, post, membership, restricted
 Requires at least: 3.3
 Tested up to: 4.2
-Stable tag: 1.5.14
+Stable tag: 1.5.15
 
 Allows admins to create user membership groups and set access restrictions for any post, page or section.
 
@@ -132,8 +132,9 @@ $result = CTXPS_Queries::check_protection();
 
 == Changelog ==
 
-= 1.5.14 ( 2015/04/14 ) =
+= 1.5.15 ( 2015/04/14 ) =
 * Fixed an ajax bug that could prevent adding groups to users.
+* Added an option that allows admins to selectively disable security for certain pages
 
 = 1.5.13 ( 2015/03/22 ) =
 * Bug fix.

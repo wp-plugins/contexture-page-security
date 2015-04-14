@@ -32,6 +32,16 @@ class CTXPS_Security{
         if(current_user_can('edit_others_posts')){
             return;//Exit the function, no further checks are needed
         }
+	    
+	    //ALLOW HOOK TO EXEMPT PAGES FROM PROTECTION - IF CURRENT PAGE IS IN ARRAY, END CHECK
+	    $force_public_pages = array();
+	    if(isset($plugin_opts['force-public-pages']) && !empty($plugin_opts['force-public-pages'])){
+		    $force_public_pages = str_getcsv(str_replace(' ', '', $plugin_opts['force-public-pages']));
+	    }
+	    $force_public_pages = apply_filters('force_public_pages',$force_public_pages);
+	    if (in_array($post->ID,$force_public_pages)) {
+		    return;
+	    }
 
         //SITE-WIDE PROTECTION
         if($plugin_opts['ad_opt_protect_site']==='true'){

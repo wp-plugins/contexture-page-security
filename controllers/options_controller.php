@@ -49,6 +49,7 @@ if(empty($_POST['action'])){
     }
 
     //Update filtering options
+	$newopts['force-public-pages'] = $_POST['force-public-pages'];
     $newopts['ad_msg_usefilter_menus'] = (isset($_POST['filter-menus'])) ? 'true' : 'false';
     $newopts['ad_msg_usefilter_rss'] = (isset($_POST['filter-rss'])) ? 'true' : 'false';
     //Set option for AD replacement
@@ -118,6 +119,3 @@ if($ADMsg['ad_opt_protect_site']==='true'){
         __('Edit Groups','contexture-page-security')
     );*/
 }
-
-
-?>

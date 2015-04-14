@@ -142,6 +142,27 @@
                     </label>
                 </td>
             </tr>
+	        
+        </table>
+
+        <!-- GLOBAL SECURITY -->
+        <h3 class="title"><?php _e('Advanced Options','contexture-page-security') ?></h3>
+        <p><?php _e('Optional settings for uncommon/advanced site configurations.','contexture-page-security') ?></p>
+        <table class="form-table">
+
+	        <!-- EXEMPTED PAGES -->
+	        <tr valign="top">
+		        <th scope="row">
+			        <label for="filter-rss"><?php _e('Force Public Pages:','contexture-page-security') ?></label>
+		        </th>
+		        <td>
+			        <label>
+				        <input type="text" name="force-public-pages" id="force-public-pages" value="<?php echo $ADMsg['force-public-pages']; ?>" placeholder="e.g. 1, 2, 3, 4, 5" style="width:500px;" /><br/>
+				        <div class="ctx-footnote"><?php _e('Disable security checks for the specified <em>numeric</em> post/page ids (comma-separated list).<br/>Notice: Specified page ids will not automatically apply to child pages!','contexture-page-security') ?></div>
+			        </label>
+		        </td>
+	        </tr>
+	        
         </table>
         <input type="submit" name="Submit" class="button-primary" value="<?php _e('Save Changes','contexture-page-security') ?>" />
     </form>
