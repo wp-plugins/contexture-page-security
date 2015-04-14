@@ -69,7 +69,7 @@
             <input id="action" name="page" type="hidden" value="ps_groups_edit" />
             <input id="action" name="action" type="hidden" value="addusr" />
             <input id="groupid" name="groupid" type="hidden" value="<?php echo $_GET['groupid']; ?>" />
-            <input id="add-username" name="add-username" class="regular-text" type="text" value="username" onclick="if(jQuery(this).val()=='username'){jQuery(this).val('')}" onblur="if(jQuery(this).val().replace(' ','')==''){jQuery(this).val('username')}" /> <input type="submit" class="button-secondary action" value="<?php _e('Add User','contexture-page-security'); ?>" onclick="if(jQuery('#add-username').val().replace(' ','') != '' && jQuery('#add-username').val().replace(' ','') != 'username'){return true;}else{ jQuery('#add-username').css({'border-color':'#CC0000','background-color':'pink'});return false; }" />
+            <input id="add-username" name="add-username" class="regular-text" type="text" placeholder="username" onclick="if(jQuery(this).val()=='username'){jQuery(this).val('')}" onblur="if(jQuery(this).val().replace(' ','')==''){jQuery(this).val('username')}" /> <input type="submit" class="button-secondary action" value="<?php _e('Add User','contexture-page-security'); ?>" onclick="if(jQuery('#add-username').val().replace(' ','') != '' && jQuery('#add-username').val().replace(' ','') != 'username'){return true;}else{ jQuery('#add-username').css({'border-color':'#CC0000','background-color':'pink'});return false; }" />
             <?php wp_nonce_field('ps-add-user','',false); ?>
         </div>
         <table id="grouptable" class="widefat fixed" cellspacing="0">

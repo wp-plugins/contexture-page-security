@@ -398,7 +398,7 @@ CTXPS_Ajax.removeGroupFromUser = function(group_id,user_id,me,action){
     jQuery.get('admin-ajax.php',
         {
             action:     'ctxps_remove_group_from_user',
-            groupid:    group_id,
+            group_id:    group_id,
             user_id:    user_id
         },
         function(response){
@@ -483,7 +483,7 @@ CTXPS_Ajax.addGroupToTerm = function(){
 
     if( typeof(group_id)!='undefined' && group_id!=0 ){
 
-        //alert("The group you want to add is: "+$groupid);
+        //alert("The group you want to add is: "+$group_id);
         jQuery.get('admin-ajax.php',
             {
                 action:       'ctxps_add_group_to_term',
