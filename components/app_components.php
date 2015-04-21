@@ -203,10 +203,10 @@ class CTXPS_Components{
         //If there are no groups, stop right here
         if(count($groups)===0){
             if ( $profile ) {
-                return sprintf('<td colspan="4">%s</td>',sprintf(__('You are not currently a member of any groups.','contexture-page-security'),admin_url('users.php?page=ps_groups')));
+                return sprintf( '<tr><td colspan="4">%s</td></tr>',sprintf(__('You are not currently a member of any groups.','contexture-page-security'),admin_url('users.php?page=ps_groups')));
             }
             else{
-                return sprintf( '<td colspan="4">%s</td>', sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'), admin_url('users.php?page=ps_groups') ) );
+                return sprintf( '<tr><td colspan="4">%s</td></tr>', sprintf(__('This user has not been added to any custom groups. Select a group above or visit any <a href="%s">group detail page</a>.','contexture-page-security'), admin_url('users.php?page=ps_groups') ) );
             }
         }
 
